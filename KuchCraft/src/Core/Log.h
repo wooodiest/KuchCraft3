@@ -71,24 +71,20 @@ namespace KuchCraft {
 		static inline std::shared_ptr<spdlog::logger> s_CoreLogger;
 		static inline std::shared_ptr<spdlog::logger> s_GameLogger;
 
-	private:
-		Log() = delete;
-		~Log() = delete;
-		Log(const Log&) = delete;
-		Log& operator=(const Log&) = delete;
-		Log(Log&&) = delete;
-		Log& operator=(Log&&) = delete;
+		KC_DISALLOW_COPY(Log);
+		KC_DISALLOW_MOVE(Log);
+		KC_DISALLOW_CREATE(Log);
 	};
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Core Logging
-#define KZ_CORE_TRACE(...)  ::KuchCraft::Log::PrintMessage(::KuchCraft::LogType::Core, ::KuchCraft::LogLevel::Trace, __VA_ARGS__)
-#define KZ_CORE_INFO(...)   ::KuchCraft::Log::PrintMessage(::KuchCraft::LogType::Core, ::KuchCraft::LogLevel::Info, __VA_ARGS__)
-#define KZ_CORE_WARN(...)   ::KuchCraft::Log::PrintMessage(::KuchCraft::LogType::Core, ::KuchCraft::LogLevel::Warn, __VA_ARGS__)
-#define KZ_CORE_ERROR(...)  ::KuchCraft::Log::PrintMessage(::KuchCraft::LogType::Core, ::KuchCraft::LogLevel::Error, __VA_ARGS__)
-#define KZ_CORE_FATAL(...)  ::KuchCraft::Log::PrintMessage(::KuchCraft::LogType::Core, ::KuchCraft::LogLevel::Fatal, __VA_ARGS__)
+#define KC_CORE_TRACE(...)  ::KuchCraft::Log::PrintMessage(::KuchCraft::LogType::Core, ::KuchCraft::LogLevel::Trace, __VA_ARGS__)
+#define KC_CORE_INFO(...)   ::KuchCraft::Log::PrintMessage(::KuchCraft::LogType::Core, ::KuchCraft::LogLevel::Info, __VA_ARGS__)
+#define KC_CORE_WARN(...)   ::KuchCraft::Log::PrintMessage(::KuchCraft::LogType::Core, ::KuchCraft::LogLevel::Warn, __VA_ARGS__)
+#define KC_CORE_ERROR(...)  ::KuchCraft::Log::PrintMessage(::KuchCraft::LogType::Core, ::KuchCraft::LogLevel::Error, __VA_ARGS__)
+#define KC_CORE_FATAL(...)  ::KuchCraft::Log::PrintMessage(::KuchCraft::LogType::Core, ::KuchCraft::LogLevel::Fatal, __VA_ARGS__)
 
 // Game Logging
 #define KC_TRACE(...)   ::KuchCraft::Log::PrintMessage(::KuchCraft::LogType::Game, ::KuchCraft::LogLevel::Trace, __VA_ARGS__)

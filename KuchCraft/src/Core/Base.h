@@ -50,7 +50,45 @@ namespace KuchCraft {
 	#define KC_EXPLICIT_STATIC
 #endif
 
-#define BIT(x) (1u << x)
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#if defined(_MSC_VER)
+	#define KC_TODO(msg) __pragma(message("[TODO] " __FILE__ "(" KC_STRINGIFY(__LINE__) "): " msg))
+#else
+	#define KC_TODO(msg)
+#endif
 
 #define KC_BIND_EVENT_FN(fn) [this](auto&&... args) -> decltype(auto) { return this->fn(std::forward<decltype(args)>(args)...); }
 #define KC_BIND_STATIC_EVENT_FN(fn) [](auto&&... args) -> decltype(auto) { return fn(std::forward<decltype(args)>(args)...); }
+
+#define KC_EXPAND_MACRO(x) x
+
+#define KC_UNUSED(x) (void)(x)
+
+#define KC_STRINGIFY_INTERNAL(x) #x
+#define KC_STRINGIFY(x) KC_STRINGIFY_INTERNAL(x)
+
+#define BIT(x) (1u << x)
+
+#define KC_ARRAY_COUNT(x) (sizeof(x) / sizeof((x)[0]))
+
+#define KC_ENUM_FLAG_OPERATORS(Enum) \
+	inline Enum operator|(Enum a, Enum b) { return static_cast<Enum>(static_cast<int>(a) | static_cast<int>(b)); } \
+	inline Enum operator&(Enum a, Enum b) { return static_cast<Enum>(static_cast<int>(a) & static_cast<int>(b)); } \
+	inline Enum& operator|=(Enum& a, Enum b) { return a = a | b; } \
+	inline Enum& operator&=(Enum& a, Enum b) { return a = a & b; }
+
+#define KC_CONCAT_INTERNAL(a, b) a##b
+#define KC_CONCAT(a, b) KC_CONCAT_INTERNAL(a, b)
+
+#define KC_DISALLOW_COPY(Type) \
+	Type(const Type&) = delete; \
+	Type& operator=(const Type&) = delete
+
+#define KC_DISALLOW_MOVE(Type) \
+	Type(Type&&) = delete; \
+	Type& operator=(Type&&) = delete
+
+#define KC_DISALLOW_CREATE(Type) \
+	Type() = delete; \
+	~Type() = delete

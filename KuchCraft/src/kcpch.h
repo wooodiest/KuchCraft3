@@ -38,3 +38,7 @@
 #include <optional>
 #include <variant>
 #include <any>
+
+#include "Core/Base.h"
+#include "Core/Assert.h"
+#include "Core/Log.h"

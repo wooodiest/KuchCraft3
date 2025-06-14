@@ -6,11 +6,11 @@
 void KuchCraft::InitializeCore()
 {
 	Log::Init();
-	KZ_CORE_TRACE("Core Initializing...");
+	KC_CORE_TRACE("Core Initializing...");
 }
 
 void KuchCraft::ShutdownCore()
 {
-	KZ_CORE_TRACE("Shutting down...");
+	KC_CORE_TRACE("Shutting down...");
 	Log::Shutdown();
 }

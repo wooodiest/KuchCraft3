@@ -15,5 +15,6 @@ int main(int argc, char** argv)
 	KuchCraft::InitializeCore();
 	std::cout << "Hello, KuchCraft!" << std::endl;
 	KuchCraft::ShutdownCore();
+
 	return 0;
 }
