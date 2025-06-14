@@ -34,6 +34,7 @@ project "KuchCraft"
     {
         "%{wks.location}/KuchCraft/src",
         "%{wks.location}/KuchCraft/vendor",
+        "%{wks.location}/KuchCraft/vendor/spdlog/include"
     }
 
     filter "system:windows"
@@ -44,6 +45,9 @@ project "KuchCraft"
     {
         "_CRT_SECURE_NO_WARNINGS"
     }
+
+    filter "configurations:Debug or configurations:Release"
+        defines { "KC_HAS_CONSOLE" }
 
     filter   "configurations:Debug"
         defines  "KC_DEBUG"
