@@ -15,6 +15,7 @@ workspace "KuchCraft3"
 
 group "Dependencies"
 	include "KuchCraft/vendor/glfw"
+    include "KuchCraft/vendor/glad"
 group ""
 
 project "KuchCraft"
@@ -43,6 +44,7 @@ project "KuchCraft"
         "%{wks.location}/KuchCraft/src",
         "%{wks.location}/KuchCraft/vendor",
         "%{wks.location}/KuchCraft/vendor/glfw/include",
+        "%{wks.location}/KuchCraft/vendor/glad/include",
         "%{wks.location}/KuchCraft/vendor/spdlog/include",
         "%{wks.location}/KuchCraft/vendor/glm",
         "%{wks.location}/KuchCraft/vendor/stb_image"
@@ -50,7 +52,9 @@ project "KuchCraft"
 
     links
     {
-        "GLFW"
+        "GLFW",
+        "Glad",
+        "opengl32.lib"
     }
 
     filter "system:windows"
