@@ -19,7 +19,7 @@ group "Dependencies"
 group ""
 
 project "KuchCraft"
-    kind       "ConsoleApp"
+    kind       "WindowedApp"
     language   "C++"
     cppdialect "C++20"
     location   "KuchCraft"
@@ -69,6 +69,7 @@ project "KuchCraft"
 
     filter "configurations:Debug or configurations:Release"
         defines { "KC_HAS_CONSOLE" }
+        kind "ConsoleApp"
 
     filter   "configurations:Debug"
         defines  "KC_DEBUG"

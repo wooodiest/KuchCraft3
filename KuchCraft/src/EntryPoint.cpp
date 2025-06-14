@@ -6,10 +6,14 @@
 	#include <Windows.h>
 #endif
 
+#if defined(KC_PLATFORM_WINDOWS) && defined(KC_DIST)
+int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
+{
+	int    argc = __argc;
+	char** argv = __argv;
+#else
 int main(int argc, char** argv)
 {
-#if defined(KC_PLATFORM_WINDOWS) && !defined(KC_HAS_CONSOLE)
-	::ShowWindow(::GetConsoleWindow(), SW_HIDE);
 #endif
 
 	KuchCraft::InitializeCore();

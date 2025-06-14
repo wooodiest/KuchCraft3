@@ -81,7 +81,7 @@ namespace KuchCraft {
 		GLFWwindow*  m_Window = nullptr;
 		
 		struct TimeData {
-			float DeltaTime     = 0.0f; // Time interval between the current frame and the last frame (clamped to max_delta_time)
+			float DeltaTime     = 0.0f; /// Time interval between the current frame and the last frame (clamped to max_delta_time)
 			float RawDeltaTime  = 0.0f; /// Time interval between the current frame and the last frame	
 			float LastFrameTime = 0.0f; /// Time of the last frame, used for calculating the delta time.
 		} m_TimeData;
