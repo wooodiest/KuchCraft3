@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Base.h"
-#include "Log.h"
+#include "Core/Base.h"
+#include "Core/Log.h"
 
 #if defined(KC_PLATFORM_WINDOWS)
 	#include <intrin.h>

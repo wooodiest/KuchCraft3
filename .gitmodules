@@ -7,3 +7,6 @@
 [submodule "KuchCraft/vendor/glm"]
 	path = KuchCraft/vendor/glm
 	url = https://github.com/wooodiest/glm
+[submodule "KuchCraft/vendor/glad"]
+	path = KuchCraft/vendor/glad
+	url = https://github.com/wooodiest/glad

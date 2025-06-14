@@ -51,6 +51,8 @@ namespace KuchCraft {
 
 	};
 
+	using EventCallbackFn = std::function<void(Event&)>;
+
 	/// Helper class to dispatch events based on their type. 
 	class EventDispatcher
 	{

@@ -1,8 +1,16 @@
 #pragma once
 
 #include <filesystem>
+#include <string>
 
 namespace KuchCraft {
+
+	constexpr inline int min_window_width  = 640;
+	constexpr inline int min_window_height = 480;
+	constexpr inline int max_window_width  = 7680;
+	constexpr inline int max_window_height = 4320;
+
+	constexpr inline float max_delta_time = 1.0f / 60.0f;
 
 	struct ApplicationConfig
 	{
@@ -14,12 +22,12 @@ namespace KuchCraft {
 
 	struct WindowConfig
 	{
-		const char* Title = "KuchCraft";
+		std::string Title = "KuchCraft";
 
 		std::filesystem::path IconPath;
 
-		bool StartMaximized = true;
-		bool FullScreen     = false;
+		bool FullScreen = false;
+		bool Borderless = false;
 
 		int  Width  = 1280;
 		int  Height = 720;
@@ -30,7 +38,10 @@ namespace KuchCraft {
 		bool Resizable = true;
 		bool VSync     = true;
 
-		bool ShowCursor = true;
+		bool CursorVisible = true;
+
+		float ContentScaleX = 0.0f;
+		float ContentScaleY = 0.0f;
 	};
 
 	struct RendererConfig
