@@ -13,6 +13,10 @@ workspace "KuchCraft3"
         "MultiProcessorCompile" 
     }
 
+group "Dependencies"
+	include "KuchCraft/vendor/glfw"
+group ""
+
 project "KuchCraft"
     kind       "ConsoleApp"
     language   "C++"
@@ -27,14 +31,26 @@ project "KuchCraft"
     files
     {
         "%{wks.location}/KuchCraft/src/**.h",
-        "%{wks.location}/KuchCraft/src/**.cpp"
+        "%{wks.location}/KuchCraft/src/**.cpp",
+        "%{wks.location}/KuchCraft/vendor/glm/glm/**.hpp",
+        "%{wks.location}/KuchCraft/vendor/glm/glm/**.inl",
+        "%{wks.location}/KuchCraft/vendor/stb_image/**.h",
+		"%{wks.location}/KuchCraft/vendor/stb_image/**.cpp"
     }
 
     includedirs
     {
         "%{wks.location}/KuchCraft/src",
         "%{wks.location}/KuchCraft/vendor",
-        "%{wks.location}/KuchCraft/vendor/spdlog/include"
+        "%{wks.location}/KuchCraft/vendor/glfw/include",
+        "%{wks.location}/KuchCraft/vendor/spdlog/include",
+        "%{wks.location}/KuchCraft/vendor/glm",
+        "%{wks.location}/KuchCraft/vendor/stb_image"
+    }
+
+    links
+    {
+        "GLFW"
     }
 
     filter "system:windows"
@@ -43,7 +59,8 @@ project "KuchCraft"
 
     defines
     {
-        "_CRT_SECURE_NO_WARNINGS"
+        "_CRT_SECURE_NO_WARNINGS",
+        "GLFW_INCLUDE_NONE"
     }
 
     filter "configurations:Debug or configurations:Release"
