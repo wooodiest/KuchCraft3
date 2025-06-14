@@ -1,6 +1,6 @@
 #include "kcpch.h"
 
-#include "Core/Base.h"
+#include "Core/Application.h"
 
 #if defined(KC_PLATFORM_WINDOWS)
 	#include <Windows.h>
@@ -13,7 +13,9 @@ int main(int argc, char** argv)
 #endif
 
 	KuchCraft::InitializeCore();
-	std::cout << "Hello, KuchCraft!" << std::endl;
+	auto app = new KuchCraft::Application(argc, argv);
+	app->Run();
+	delete app;
 	KuchCraft::ShutdownCore();
 
 	return 0;
