@@ -1,5 +1,5 @@
 #include "kcpch.h"
-#include "Config.h"
+#include "Core/Config.h"
 
 namespace KuchCraft {
 

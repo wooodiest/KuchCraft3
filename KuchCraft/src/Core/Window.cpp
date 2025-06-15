@@ -4,8 +4,6 @@
 #include <glad/glad.h>
 #include <stb_image.h>
 
-#include "Core/Input.h"
-
 namespace KuchCraft {
 
 	static void GLFWErrorCallback(int error, const char* description)

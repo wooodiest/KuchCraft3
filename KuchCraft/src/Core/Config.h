@@ -1,10 +1,5 @@
 #pragma once
 
-#include <filesystem>
-#include <string>
-
-#include "Core/KeyCodes.h"
-
 namespace KuchCraft {
 
 	constexpr inline int min_window_width  = 640;

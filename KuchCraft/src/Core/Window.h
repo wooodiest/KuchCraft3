@@ -2,9 +2,6 @@
 
 #include <GLFW/glfw3.h>
 
-#include "Core/Config.h"
-#include "Core/Event.h"
-
 namespace KuchCraft {
 
 	class Window

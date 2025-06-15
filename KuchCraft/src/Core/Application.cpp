@@ -1,9 +1,6 @@
 #include "kcpch.h"
 #include "Core/Application.h"
 
-#include "Core/Event.h"
-#include "Core/Input.h"
-
 namespace KuchCraft {
 
 	Application::Application(int argc, char** argv)
@@ -44,6 +41,13 @@ namespace KuchCraft {
 			float deltaTime = m_Window->GetDeltaTime();
 			if (!m_Minimized)
 			{
+				if (Input::IsKeyPressed(KeyCode::R))
+				{
+					KC_INFO("Random: {}", Random::Float(1.0f, 10.0f));
+
+					FastRandom random;
+					KC_INFO("FastRandom: {}", random.GetFloat32InRange(1.0f, 10.0f));
+				}
 			}
 
 			m_Window->SwapBuffers();

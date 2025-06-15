@@ -1,16 +1,27 @@
 #include "kcpch.h"
-#include "Base.h"
+#include "Core/Base.h"
 
-#include "Core/Log.h"
+namespace KuchCraft {
 
-void KuchCraft::InitializeCore()
-{
-	Log::Init();
-	KC_CORE_TRACE("Core Initializing...");
-}
 
-void KuchCraft::ShutdownCore()
-{
-	KC_CORE_TRACE("Shutting down...");
-	Log::Shutdown();
+	void InitializeCore()
+	{
+		Log::Init();
+
+		uint32_t threadsCount = std::thread::hardware_concurrency();
+		std::vector<std::thread> threads;
+		threads.reserve(threadsCount);
+
+		for (uint32_t i = 0; i < threadsCount; i++)
+			threads.emplace_back([]() { Random::Init(); });
+
+		for (auto& t : threads)
+			t.join();
+	}
+
+	void ShutdownCore()
+	{
+		Log::Shutdown();
+	}
+
 }

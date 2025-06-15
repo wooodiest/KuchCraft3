@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Core/Config.h"
-#include "Core/Event.h"
 #include "Core/Window.h"
 
 namespace KuchCraft {
