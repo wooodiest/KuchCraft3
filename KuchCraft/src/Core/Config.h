@@ -3,6 +3,8 @@
 #include <filesystem>
 #include <string>
 
+#include "Core/KeyCodes.h"
+
 namespace KuchCraft {
 
 	constexpr inline int min_window_width  = 640;
@@ -38,7 +40,7 @@ namespace KuchCraft {
 		bool Resizable = true;
 		bool VSync     = true;
 
-		bool CursorVisible = true;
+		WindowCursorMode CursorMode = WindowCursorMode::Normal;
 
 		float ContentScaleX = 0.0f;
 		float ContentScaleY = 0.0f;

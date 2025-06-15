@@ -255,16 +255,16 @@ namespace KuchCraft {
 	class MouseButtonEvent : public Event
 	{
 	public:
-		inline [[nodiscard]] MouseCode GetMouseButton() const noexcept { return m_Button; }
+		inline [[nodiscard]] MouseButton GetMouseButton() const noexcept { return m_Button; }
 
 		virtual [[nodiscard]] int GetCategoryFlags() const noexcept override { return EventCategoryMouse | EventCategoryInput | EventCategoryMouseButton; }
 
 	protected:
-		MouseButtonEvent(const MouseCode button)
+		MouseButtonEvent(const MouseButton button)
 			: m_Button(button) {
 		}
 
-		MouseCode m_Button;
+		MouseButton m_Button;
 
 	};
 
@@ -272,7 +272,7 @@ namespace KuchCraft {
 	class MouseButtonPressedEvent : public MouseButtonEvent
 	{
 	public:
-		MouseButtonPressedEvent(const MouseCode button)
+		MouseButtonPressedEvent(const MouseButton button)
 			: MouseButtonEvent(button) {
 		}
 
@@ -286,7 +286,7 @@ namespace KuchCraft {
 	class MouseButtonReleasedEvent : public MouseButtonEvent
 	{
 	public:
-		MouseButtonReleasedEvent(const MouseCode button)
+		MouseButtonReleasedEvent(const MouseButton button)
 			: MouseButtonEvent(button) {
 		}
 

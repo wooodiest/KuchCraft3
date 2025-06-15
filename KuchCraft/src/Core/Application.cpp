@@ -2,6 +2,7 @@
 #include "Core/Application.h"
 
 #include "Core/Event.h"
+#include "Core/Input.h"
 
 namespace KuchCraft {
 
@@ -38,16 +39,16 @@ namespace KuchCraft {
 		while (m_Running)
 		{
 			m_Window->Update();
+			ProcessEvents();
 
 			float deltaTime = m_Window->GetDeltaTime();
-
 			if (!m_Minimized)
 			{
-
 			}
 
-			m_Window->ProcessEvents();
 			m_Window->SwapBuffers();
+
+			Input::ClearReleasedKeys();
 		}
 
 	}
@@ -59,6 +60,14 @@ namespace KuchCraft {
 
 	void Application::OnShutdown()
 	{
+	}
+
+	void Application::ProcessEvents()
+	{
+		Input::TransitionPressedKeys();
+		Input::TransitionPressedButtons();
+
+		m_Window->ProcessEvents();
 	}
 
 	void Application::OnEvent(Event& e)

@@ -4,6 +4,8 @@
 #include <glad/glad.h>
 #include <stb_image.h>
 
+#include "Core/Input.h"
+
 namespace KuchCraft {
 
 	static void GLFWErrorCallback(int error, const char* description)
@@ -79,12 +81,12 @@ namespace KuchCraft {
 		glfwGetWindowContentScale(m_Window, &m_Data.Config.ContentScaleX, &m_Data.Config.ContentScaleY);
 
 		SetVSync(m_Data.Config.VSync);
-		SetCursorVisible(m_Data.Config.CursorVisible);
+		SetCursorMode(m_Data.Config.CursorMode);
 
 		/// Set up event callbacks
 		glfwSetWindowSizeCallback(m_Window, [](GLFWwindow* window, int width, int height) {
 			WindowData& data = *static_cast<WindowData*>(glfwGetWindowUserPointer(window));
-			data.Config.Width = width;
+			data.Config.Width  = width;
 			data.Config.Height = height;
 
 			WindowResizeEvent event(width, height);
@@ -114,18 +116,21 @@ namespace KuchCraft {
 			{
 				case GLFW_PRESS:
 				{
+					Input::UpdateKeyState((KeyCode)key, KeyState::Pressed);
 					KeyPressedEvent event(static_cast<KeyCode>(key), false);
 					data.EventCallback(event);
 					break;
 				}
 				case GLFW_RELEASE:
 				{
+					Input::UpdateKeyState((KeyCode)key, KeyState::Released);
 					KeyReleasedEvent event(static_cast<KeyCode>(key));
 					data.EventCallback(event);
 					break;
 				}
 				case GLFW_REPEAT:
 				{
+					Input::UpdateKeyState((KeyCode)key, KeyState::Held);
 					KeyPressedEvent event(static_cast<KeyCode>(key), true);
 					data.EventCallback(event);
 					break;
@@ -147,13 +152,15 @@ namespace KuchCraft {
 			{
 				case GLFW_PRESS:
 				{
-					MouseButtonPressedEvent event(static_cast<MouseCode>(button));
+					Input::UpdateButtonState((MouseButton)button, KeyState::Pressed);
+					MouseButtonPressedEvent event(static_cast<MouseButton>(button));
 					data.EventCallback(event);
 					break;
 				}
 				case GLFW_RELEASE:
 				{
-					MouseButtonReleasedEvent event(static_cast<MouseCode>(button));
+					Input::UpdateButtonState((MouseButton)button, KeyState::Released);
+					MouseButtonReleasedEvent event(static_cast<MouseButton>(button));
 					data.EventCallback(event);
 					break;
 				}
@@ -276,15 +283,13 @@ namespace KuchCraft {
 		KC_CORE_INFO("Window resizable set to {0}", resizable ? "true" : "false");
 	}
 
-	void Window::SetCursorVisible(bool visible)
+	void Window::SetCursorMode(WindowCursorMode mode)
 	{
-		if (visible)
-			glfwSetInputMode(m_Window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-		else
-			glfwSetInputMode(m_Window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+		glfwSetInputMode(m_Window, GLFW_CURSOR, GLFW_CURSOR_NORMAL + (int)mode);
 
-		m_Data.Config.CursorVisible = visible;
-		KC_CORE_INFO("Cursor visibility set to {0}", visible ? "visible" : "hidden");
+		m_Data.Config.CursorMode = mode;
+		KC_CORE_INFO("Cursor mode set to {0}", mode == WindowCursorMode::Normal ? "Normal" :
+			mode == WindowCursorMode::Hidden ? "Hidden" : "Disabled");
 	}
 
 	void Window::SetTitle(const std::string& title)

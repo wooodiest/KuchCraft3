@@ -140,7 +140,7 @@ namespace KuchCraft {
 
 	} Key;
 
-	typedef enum class MouseCode : uint16_t
+	typedef enum class MouseButton : uint16_t
 	{
 		Button0 = 0, /// Left mouse button.
 		Button1 = 1, /// Right mouse button.
@@ -159,4 +159,18 @@ namespace KuchCraft {
 
 	} Mouse;
 
+	enum class KeyState
+	{
+		None = -1,
+		Pressed,
+		Held,
+		Released
+	};
+
+	enum class WindowCursorMode
+	{
+		Normal = 0,
+		Hidden = 1,
+		Locked = 2
+	};
 }

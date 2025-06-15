@@ -28,8 +28,8 @@ namespace KuchCraft {
 		float GetDeltaTime()    const { return m_TimeData.DeltaTime; }
 		float GetRawDeltaTime() const { return m_TimeData.RawDeltaTime; }
 
-		glm::vec2 GetMousePositionDifference() const { return m_MouseData.PositionDifference; }
-		glm::vec2 GetMousePreviousPosition()   const { return m_MouseData.PreviousPosition; }
+		std::pair<float, float> GetMousePositionDifference() const { return m_MouseData.PositionDifference; }
+		std::pair<float, float> GetMousePreviousPosition()   const { return m_MouseData.PreviousPosition; }
 
 		void SetSize(int width, int height);
 		void SetWidth (int width)  { SetSize(width, m_Data.Config.Height); }
@@ -51,8 +51,8 @@ namespace KuchCraft {
 		void SetResizable(bool resizable);
 		bool IsResizable() const { return m_Data.Config.Resizable; }
 
-		void SetCursorVisible(bool visible);
-		bool IsCursorVisible() const { return m_Data.Config.CursorVisible; }
+		void SetCursorMode(WindowCursorMode mode);
+		WindowCursorMode GetCursorMode() const { return m_Data.Config.CursorMode; }
 
 		void SetTitle(const std::string& title);
 		const std::string& GetTitle() const { return m_Data.Config.Title; }
@@ -87,8 +87,8 @@ namespace KuchCraft {
 		} m_TimeData;
 
 		struct MouseData {		
-			glm::vec2 PositionDifference{ 0.0f }; /// The mouse position difference between frames
-			glm::vec2 PreviousPosition  { 0.0f }; /// The mouse position in previous frame
+			std::pair<float, float> PositionDifference{ 0.0f, 0.0f }; /// The mouse position difference between frames
+			std::pair<float, float> PreviousPosition  { 0.0f, 0.0f }; /// The mouse position in previous frame
 		} m_MouseData;
 	};
 

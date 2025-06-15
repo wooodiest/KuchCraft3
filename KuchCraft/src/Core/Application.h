@@ -30,6 +30,7 @@ namespace KuchCraft {
 		bool OnKeyPressed(KeyPressedEvent& e);
 
 		void OnShutdown();
+		void ProcessEvents();
 
 	private:
 		bool m_Running   = true;
