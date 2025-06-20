@@ -15,11 +15,15 @@ namespace KuchCraft {
 
 		void Close();
 
+		void Restart();
+
 		static inline Application& Get() { return *s_Instance; }
 
 		Config& GetConfig() { return m_Config; }
 
 		Ref<Window> GetWindow() { return m_Window; }
+
+		bool ShouldRestart() const { return m_Restart; }
 
 	private:
 		void OnEvent(Event& e);
@@ -33,6 +37,7 @@ namespace KuchCraft {
 	private:
 		bool m_Running   = true;
 		bool m_Minimized = false;
+		bool m_Restart   = false;
 
 		Config                m_Config;
 		std::filesystem::path m_ConfigPath = "config.json";

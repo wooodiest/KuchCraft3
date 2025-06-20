@@ -5,6 +5,7 @@ namespace KuchCraft {
 
 	Application::Application(int argc, char** argv)
 	{
+		KC_CORE_ASSERT(s_Instance == nullptr, "Application already exists!");
 		s_Instance = this;
 
 		m_Config.Deserialize(m_ConfigPath);
@@ -13,12 +14,19 @@ namespace KuchCraft {
 
 		if (argc > 1)
 		{
-			KC_CORE_WARN("More than one word file path specified, using {}", argv[0]);
+			KC_CORE_INFO("Received {} argument(s):", argc - 1);
+			for (int i = 1; i < argc; i++)
+			{
+				KC_CORE_INFO("[{}]: {}", i, argv[i]);
+			}
+		}
+		else
+		{
+			KC_CORE_INFO("No command-line arguments provided.");
 		}
 
 		m_Window = CreateRef<Window>(m_Config.Window, KC_BIND_EVENT_FN(Application::OnEvent));
 		m_Window->CenterWindow();
-
 	}
 
 	Application::~Application()
@@ -43,10 +51,7 @@ namespace KuchCraft {
 			{
 				if (Input::IsKeyPressed(KeyCode::R))
 				{
-					KC_INFO("Random: {}", Random::Float(1.0f, 10.0f));
-
-					FastRandom random;
-					KC_INFO("FastRandom: {}", random.GetFloat32InRange(1.0f, 10.0f));
+					Restart();
 				}
 			}
 
@@ -55,10 +60,17 @@ namespace KuchCraft {
 			Input::ClearReleasedKeys();
 		}
 
+		OnShutdown();
 	}
 
 	void Application::Close()
 	{
+		m_Running = false;
+	}
+
+	void Application::Restart()
+	{
+		m_Restart = true;
 		m_Running = false;
 	}
 

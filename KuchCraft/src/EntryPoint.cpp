@@ -17,9 +17,26 @@ int main(int argc, char** argv)
 #endif
 
 	KuchCraft::InitializeCore();
-	auto app = new KuchCraft::Application(argc, argv);
-	app->Run();
-	delete app;
+
+	bool restart = false;
+	do {
+		restart = false;
+		KC_CORE_INFO("Starting KuchCraft {}", KC_VERSION_LONG);
+
+		auto app = new KuchCraft::Application(argc, argv);
+		app->Run();
+
+		if (app->ShouldRestart())
+		{
+			restart = true;
+			argc = app->GetConfig().Application.argc;
+			argv = app->GetConfig().Application.argv;
+			KC_CORE_INFO("Restarting application...");
+		}
+		
+		delete app;
+	} while (restart);
+
 	KuchCraft::ShutdownCore();
 
 	return 0;
