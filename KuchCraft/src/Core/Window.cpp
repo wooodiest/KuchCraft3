@@ -191,7 +191,9 @@ namespace KuchCraft {
 		float time = (float)glfwGetTime();
 		m_TimeData.DeltaTime    = time - m_TimeData.LastFrameTime;
 		m_TimeData.RawDeltaTime = m_TimeData.DeltaTime;
-		m_TimeData.DeltaTime    = m_TimeData.DeltaTime > max_delta_time ? max_delta_time : m_TimeData.DeltaTime;
+		
+		if (m_TimeData.DeltaTime > max_delta_time)
+			m_TimeData.DeltaTime = max_delta_time;
 
 		/// Update the last frame time to the current time for the next frame calculation.
 		m_TimeData.LastFrameTime = time;

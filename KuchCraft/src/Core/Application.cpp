@@ -46,7 +46,7 @@ namespace KuchCraft {
 			m_Window->Update();
 			ProcessEvents();
 
-			float deltaTime = m_Window->GetDeltaTime();
+			Timestep ts = m_Window->GetDeltaTime();
 			if (!m_Minimized)
 			{
 				if (Input::IsKeyPressed(KeyCode::R))

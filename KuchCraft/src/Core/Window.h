@@ -22,8 +22,9 @@ namespace KuchCraft {
 		int GetPositionY() const { return m_Data.Config.PositionY; }
 		std::pair<int, int> GetPosition() const { return { m_Data.Config.PositionX, m_Data.Config.PositionY }; }
 
-		float GetDeltaTime()    const { return m_TimeData.DeltaTime; }
-		float GetRawDeltaTime() const { return m_TimeData.RawDeltaTime; }
+		Timestep GetDeltaTime()     const { return m_TimeData.DeltaTime;     }
+		Timestep GetRawDeltaTime()  const { return m_TimeData.RawDeltaTime;  }
+		Timestep GetLastFrameTime() const { return m_TimeData.LastFrameTime; }
 
 		std::pair<float, float> GetMousePositionDifference() const { return m_MouseData.PositionDifference; }
 		std::pair<float, float> GetMousePreviousPosition()   const { return m_MouseData.PreviousPosition; }
@@ -78,9 +79,9 @@ namespace KuchCraft {
 		GLFWwindow*  m_Window = nullptr;
 		
 		struct TimeData {
-			float DeltaTime     = 0.0f; /// Time interval between the current frame and the last frame (clamped to max_delta_time)
-			float RawDeltaTime  = 0.0f; /// Time interval between the current frame and the last frame	
-			float LastFrameTime = 0.0f; /// Time of the last frame, used for calculating the delta time.
+			Timestep DeltaTime     = 0.0f; /// Time interval between the current frame and the last frame (clamped to max_delta_time)
+			Timestep RawDeltaTime  = 0.0f; /// Time interval between the current frame and the last frame	
+			Timestep LastFrameTime = 0.0f; /// Time of the last frame, used for calculating the delta time.
 		} m_TimeData;
 
 		struct MouseData {		
