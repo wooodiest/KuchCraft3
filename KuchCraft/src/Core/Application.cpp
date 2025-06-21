@@ -49,14 +49,34 @@ namespace KuchCraft {
 			Timestep ts = m_Window->GetDeltaTime();
 			if (!m_Minimized)
 			{
-				if (Input::IsKeyPressed(KeyCode::R))
+				/// OnTick
+				m_TickTimer += ts;
+				while (m_TickTimer >= tick_interval)
 				{
-					Restart();
+					for (auto& layer : m_LayerStack)
+						if (layer->IsActive())
+							layer->OnTick(tick_interval);
+
+					m_TickTimer -= tick_interval;
 				}
+
+				/// OnUpdate
+				for (auto& layer : m_LayerStack)
+				{
+					if (layer->IsActive())
+						layer->OnUpdate(ts);
+				}
+
+				/// OnRender
+				for (auto& layer : m_LayerStack)
+				{
+					if (layer->IsVisible())
+						layer->OnRender();
+				}		
 			}
 
+			RenderImGui();
 			m_Window->SwapBuffers();
-
 			Input::ClearReleasedKeys();
 		}
 
@@ -76,6 +96,7 @@ namespace KuchCraft {
 
 	void Application::OnShutdown()
 	{
+		m_LayerStack.Clear();
 	}
 
 	void Application::ProcessEvents()
@@ -86,12 +107,37 @@ namespace KuchCraft {
 		m_Window->ProcessEvents();
 	}
 
+	void Application::RenderImGui()
+	{
+		if (m_Config.Application.EnableImGui)
+		{
+			KC_TODO("ImGui rendering not implemented yet");
+
+			for (const auto& layer : m_LayerStack)
+			{
+				if (layer->IsVisible())
+					layer->OnImGuiRender();
+			}
+		}
+	}
+
 	void Application::OnEvent(Event& e)
 	{
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<WindowCloseEvent> (KC_BIND_EVENT_FN(Application::OnWindowClose));
 		dispatcher.Dispatch<WindowResizeEvent>(KC_BIND_EVENT_FN(Application::OnWindowResize));
 		dispatcher.Dispatch<KeyPressedEvent>  (KC_BIND_EVENT_FN(Application::OnKeyPressed));
+
+		for (auto it = m_LayerStack.rbegin(); it != m_LayerStack.rend(); ++it)
+		{
+			if (e.Handled)
+				break;
+
+			if (!(*it)->IsActive())
+				continue;
+
+			(*it)->OnEvent(e);
+		}
 	}
 
 	bool Application::OnWindowClose(WindowCloseEvent& e)
@@ -110,6 +156,12 @@ namespace KuchCraft {
 	{
 		if (e.IsRepeat())
 			return false;
+
+		switch (e.GetKeyCode())
+		{
+			case KeyCode::R: Restart(); break;
+			default: break;
+		}
 
 		return false;
 	}	

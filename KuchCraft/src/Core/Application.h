@@ -1,6 +1,8 @@
 #pragma once
 
 #include "Core/Window.h"
+#include "Core/Layer.h"
+#include "Core/LayerStack.h"
 
 namespace KuchCraft {
 
@@ -25,6 +27,8 @@ namespace KuchCraft {
 
 		bool ShouldRestart() const { return m_Restart; }
 
+		void RenderImGui();
+
 	private:
 		void OnEvent(Event& e);
 		bool OnWindowClose(WindowCloseEvent& e);
@@ -43,6 +47,9 @@ namespace KuchCraft {
 		std::filesystem::path m_ConfigPath = "config.json";
 
 		Ref<Window> m_Window;
+		LayerStack  m_LayerStack;
+
+		Timestep m_TickTimer = 0.0f;
 
 	private:
 		static inline Application* s_Instance = nullptr;

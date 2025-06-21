@@ -8,6 +8,7 @@ namespace KuchCraft {
 	constexpr inline int max_window_height = 4320;
 
 	constexpr inline float max_delta_time = 1.0f / 60.0f;
+	constexpr inline float tick_interval  = 1.0f / 20.0f;
 
 	struct ApplicationConfig
 	{

@@ -18,6 +18,18 @@ namespace KuchCraft {
 	
 		operator float() { return m_Time; }
 
+		Timestep& operator+=(const Timestep& other)
+		{ 
+			m_Time += other.m_Time;
+			return *this;
+		}
+
+		Timestep& operator-=(const Timestep& other)
+		{
+			m_Time -= other.m_Time;
+			return *this;
+		}
+
 	private:
 		float m_Time = 0.0f;
 	
