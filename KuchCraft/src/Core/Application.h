@@ -27,8 +27,6 @@ namespace KuchCraft {
 
 		bool ShouldRestart() const { return m_Restart; }
 
-		void RenderImGui();
-
 	private:
 		void OnApplicationEvent(ApplicationEvent& e);
 		bool OnWindowClose(WindowCloseEvent& e);
@@ -37,6 +35,8 @@ namespace KuchCraft {
 
 		void OnShutdown();
 		void ProcessEvents();
+
+		void InitImGui();
 
 	private:
 		bool m_Running   = true;

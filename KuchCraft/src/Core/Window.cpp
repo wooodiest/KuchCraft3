@@ -11,8 +11,8 @@ namespace KuchCraft {
 		Log::PrintMessage(LogType::Core, LogLevel::Error, "[GLFW]: {0} : {1}", error, description);
 	}
 
-	Window::Window(const WindowConfig& config, ApplicationEventCallbackFn callback)
-		: m_Data(config, callback)
+	Window::Window(const Config& config, ApplicationEventCallbackFn callback)
+		: m_Data(config.Window, callback)
 	{
 		glfwSetErrorCallback(GLFWErrorCallback);
 
@@ -22,8 +22,8 @@ namespace KuchCraft {
 		}
 
 		KC_TODO("Set up GLFW window hints based on config");
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, config.Renderer.OpenGlMajorVersion);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, config.Renderer.OpenGlMinorVersion);
 		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 		glfwWindowHint(GLFW_RESIZABLE, m_Data.Config.Resizable ? GLFW_TRUE : GLFW_FALSE);

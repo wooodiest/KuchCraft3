@@ -16,6 +16,7 @@ workspace "KuchCraft3"
 group "Dependencies"
 	include "KuchCraft/vendor/glfw"
     include "KuchCraft/vendor/glad"
+    include "KuchCraft/vendor/imgui"
 group ""
 
 project "KuchCraft"
@@ -37,7 +38,12 @@ project "KuchCraft"
         "%{wks.location}/KuchCraft/vendor/glm/glm/**.inl",
         "%{wks.location}/KuchCraft/vendor/stb_image/**.h",
 		"%{wks.location}/KuchCraft/vendor/stb_image/**.cpp",
-        "%{wks.location}/KuchCraft/vendor/magic_enum/**.hpp"
+        "%{wks.location}/KuchCraft/vendor/magic_enum/**.hpp",
+
+        "%{wks.location}/KuchCraft/vendor/imgui/backends/imgui_impl_glfw.cpp",
+        "%{wks.location}/KuchCraft/vendor/imgui/backends/imgui_impl_opengl3.cpp",
+        "%{wks.location}/KuchCraft/vendor/imgui/misc/cpp/imgui_stdlib.h",
+        "%{wks.location}/KuchCraft/vendor/imgui/misc/cpp/imgui_stdlib.cpp"
     }
 
     includedirs
@@ -49,25 +55,34 @@ project "KuchCraft"
         "%{wks.location}/KuchCraft/vendor/spdlog/include",
         "%{wks.location}/KuchCraft/vendor/glm",
         "%{wks.location}/KuchCraft/vendor/stb_image",
-        "%{wks.location}/KuchCraft/vendor/magic_enum"
+        "%{wks.location}/KuchCraft/vendor/magic_enum",
+        "%{wks.location}/KuchCraft/vendor/imgui"
     }
 
     links
     {
         "GLFW",
         "Glad",
-        "opengl32.lib"
+        "opengl32.lib",
+        "ImGui"
     }
-
-    filter "system:windows"
-        systemversion "latest"
-        defines { "KC_PLATFORM_WINDOWS" }
 
     defines
     {
         "_CRT_SECURE_NO_WARNINGS",
         "GLFW_INCLUDE_NONE"
     }
+
+    filter "files:**/imgui_stdlib.cpp"
+        flags { "NoPCH" }
+    filter "files:**/imgui_impl_glfw.cpp"
+        flags { "NoPCH" }
+    filter "files:**/imgui_impl_opengl3.cpp"
+        flags { "NoPCH" }
+
+    filter "system:windows"
+        systemversion "latest"
+        defines { "KC_PLATFORM_WINDOWS" }
 
     filter "configurations:Debug or configurations:Release"
         defines { "KC_HAS_CONSOLE" }

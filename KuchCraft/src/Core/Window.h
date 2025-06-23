@@ -7,7 +7,7 @@ namespace KuchCraft {
 	class Window
 	{
 	public:
-		Window(const WindowConfig& config, ApplicationEventCallbackFn callback);
+		Window(const Config& config, ApplicationEventCallbackFn callback);
 		~Window();
 
 		void Update();
@@ -15,7 +15,7 @@ namespace KuchCraft {
 		void SwapBuffers();
 
 		int GetWidth()  const { return m_Data.Config.Width; }
-		int GetHeigth() const { return m_Data.Config.Height; }
+		int GetHeight() const { return m_Data.Config.Height; }
 		std::pair<int, int> GetSize() const { return { m_Data.Config.Width, m_Data.Config.Height }; }
 
 		int GetPositionX() const { return m_Data.Config.PositionX; }

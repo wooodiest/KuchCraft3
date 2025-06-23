@@ -1,6 +1,13 @@
 #include "kcpch.h"
 #include "Core/Application.h"
 
+#include <imgui.h>
+#include <backends/imgui_impl_glfw.h>
+#include <backends/imgui_impl_opengl3.h>
+
+/// tmp
+#include <glad/glad.h>
+
 namespace KuchCraft {
 
 	Application::Application(int argc, char** argv)
@@ -31,8 +38,10 @@ namespace KuchCraft {
 			KC_CORE_INFO("No command-line arguments provided.");
 		}
 
-		m_Window = CreateRef<Window>(m_Config.Window, KC_BIND_EVENT_FN(Application::OnApplicationEvent));
+		m_Window = CreateRef<Window>(m_Config, KC_BIND_EVENT_FN(Application::OnApplicationEvent));
 		m_Window->CenterWindow();
+
+		InitImGui();
 	}
 
 	Application::~Application()
@@ -51,6 +60,11 @@ namespace KuchCraft {
 		{
 			m_Window->Update();
 			ProcessEvents();
+
+			/// tmp
+			glViewport(0, 0, GetWindow()->GetWidth(), GetWindow()->GetHeight());
+			glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 			Timestep ts = m_Window->GetDeltaTime();
 			if (!m_Minimized)
@@ -79,9 +93,26 @@ namespace KuchCraft {
 					if (layer->IsVisible())
 						layer->OnRender();
 				}	
-			}
 
-			RenderImGui();
+				/// ImGui
+				if (m_Config.Application.EnableImGui)
+				{
+					ImGui_ImplOpenGL3_NewFrame();
+					ImGui_ImplGlfw_NewFrame();
+
+					ImGui::NewFrame();
+					for (const auto& layer : m_LayerStack)
+					{
+						if (layer->IsVisible())
+							layer->OnImGuiRender();
+					}
+					ImGui::EndFrame();
+
+					ImGui::Render();
+					ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+				}
+			}
+	
 			m_Window->SwapBuffers();
 			Input::ClearReleasedKeys();
 		}
@@ -103,6 +134,10 @@ namespace KuchCraft {
 	void Application::OnShutdown()
 	{
 		m_LayerStack.Clear();
+
+		ImGui_ImplOpenGL3_Shutdown();
+		ImGui_ImplGlfw_Shutdown();
+		ImGui::DestroyContext();
 	}
 
 	void Application::ProcessEvents()
@@ -113,18 +148,22 @@ namespace KuchCraft {
 		m_Window->ProcessEvents();
 	}
 
-	void Application::RenderImGui()
+	void Application::InitImGui()
 	{
-		if (m_Config.Application.EnableImGui)
-		{
-			KC_TODO("ImGui rendering not implemented yet");
+		IMGUI_CHECKVERSION();
+		ImGui::CreateContext();
 
-			for (const auto& layer : m_LayerStack)
-			{
-				if (layer->IsVisible())
-					layer->OnImGuiRender();
-			}
-		}
+		ImGuiIO& io = ImGui::GetIO();
+		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+		io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
+
+		ImGui_ImplGlfw_InitForOpenGL(GetWindow()->GetGLFWWindow(), true);
+		std::string glslVersion = "#version " + m_Config.Renderer.GetOpenGlVersion();
+		ImGui_ImplOpenGL3_Init(glslVersion.c_str());
+
+		ImGui::StyleColorsDark();
+		ImGuiStyle& style = ImGui::GetStyle();
+		style.Colors[ImGuiCol_WindowBg].w = 0.65f;
 	}
 
 	void Application::OnApplicationEvent(ApplicationEvent& e)

@@ -21,7 +21,6 @@ int main(int argc, char** argv)
 	bool restart = false;
 	do {
 		restart = false;
-		KC_CORE_INFO("Starting KuchCraft {}", KC_VERSION_LONG);
 
 		auto app = new KuchCraft::Application(argc, argv);
 		app->Run();
