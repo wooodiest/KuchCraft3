@@ -63,6 +63,7 @@
 #include "Core/FastRandom.h"
 #include "Core/KeyCodes.h"
 #include "Core/Input.h"
-#include "Core/Event.h"
+#include "Core/ApplicationEvent.h"
 #include "Core/Config.h"
 #include "Core/Timestep.h"
+#include "Core/EnumUtils.h"

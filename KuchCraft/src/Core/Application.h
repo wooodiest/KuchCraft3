@@ -30,7 +30,7 @@ namespace KuchCraft {
 		void RenderImGui();
 
 	private:
-		void OnEvent(Event& e);
+		void OnApplicationEvent(ApplicationEvent& e);
 		bool OnWindowClose(WindowCloseEvent& e);
 		bool OnWindowResize(WindowResizeEvent& e);
 		bool OnKeyPressed(KeyPressedEvent& e);

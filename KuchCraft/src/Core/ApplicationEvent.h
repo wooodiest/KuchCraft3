@@ -9,7 +9,7 @@
 
 namespace KuchCraft {
 
-	enum class EventType
+	enum class ApplicationEventType
 	{
 		None = 0,
 
@@ -23,7 +23,7 @@ namespace KuchCraft {
 		MouseButtonPressed, MouseButtonReleased, MouseMoved, MouseScrolled
 	};
 
-	enum EventCategory
+	enum ApplicationEventCategory
 	{
 		None = 0,
 		EventCategoryApplication = BIT(0),
@@ -33,31 +33,31 @@ namespace KuchCraft {
 		EventCategoryMouseButton = BIT(4)
 	};
 
-	class Event
+	class ApplicationEvent
 	{
 	public:
-		virtual ~Event() = default;
+		virtual ~ApplicationEvent() = default;
 
 		bool Handled = false;
 
-		virtual [[nodiscard]] EventType GetEventType() const noexcept = 0;
+		virtual [[nodiscard]] ApplicationEventType GetEventType() const noexcept = 0;
 
 		virtual [[nodiscard]] int GetCategoryFlags() const noexcept = 0;
 
-		[[nodiscard]] bool IsInCategory(EventCategory category) const noexcept
+		[[nodiscard]] bool IsInCategory(ApplicationEventCategory category) const noexcept
 		{
 			return GetCategoryFlags() & category;
 		}
 
 	};
 
-	using EventCallbackFn = std::function<void(Event&)>;
+	using ApplicationEventCallbackFn = std::function<void(ApplicationEvent&)>;
 
 	/// Helper class to dispatch events based on their type. 
-	class EventDispatcher
+	class ApplicationEventDispatcher
 	{
 	public:
-		EventDispatcher(Event& event)
+		ApplicationEventDispatcher(ApplicationEvent& event)
 			: m_Event(event) {
 		}
 
@@ -74,21 +74,21 @@ namespace KuchCraft {
 		}
 
 	private:
-		Event& m_Event;
+		ApplicationEvent& m_Event;
 
 	};
 
 	/// This event is triggered when the window is resized.
-	class WindowResizeEvent : public Event
+	class WindowResizeEvent : public ApplicationEvent
 	{
 	public:
 		WindowResizeEvent(int width, int height)
 			: m_Width(width), m_Height(height) {
 		}
 
-		static inline [[nodiscard]] EventType GetStaticType() noexcept { return EventType::WindowResize; }
+		static inline [[nodiscard]] ApplicationEventType GetStaticType() noexcept { return ApplicationEventType::WindowResize; }
 
-		virtual [[nodiscard]] EventType GetEventType() const noexcept override { return GetStaticType(); }
+		virtual [[nodiscard]] ApplicationEventType GetEventType() const noexcept override { return GetStaticType(); }
 
 		virtual [[nodiscard]] int GetCategoryFlags() const noexcept override { return EventCategoryApplication; }
 
@@ -103,30 +103,30 @@ namespace KuchCraft {
 	};
 
 	/// This event is triggered when the window is closed.
-	class WindowCloseEvent : public Event
+	class WindowCloseEvent : public ApplicationEvent
 	{
 	public:
 		WindowCloseEvent() = default;
 
-		static inline [[nodiscard]] EventType GetStaticType() noexcept { return EventType::WindowClose; }
+		static inline [[nodiscard]] ApplicationEventType GetStaticType() noexcept { return ApplicationEventType::WindowClose; }
 
-		virtual [[nodiscard]] EventType GetEventType() const noexcept override { return GetStaticType(); }
+		virtual [[nodiscard]] ApplicationEventType GetEventType() const noexcept override { return GetStaticType(); }
 
 		virtual [[nodiscard]] int GetCategoryFlags() const noexcept override { return EventCategoryApplication; }
 
 	};
 
 	/// This event is triggered when the window is moved.
-	class WindowMoveEvent : public Event
+	class WindowMoveEvent : public ApplicationEvent
 	{
 	public:
 		WindowMoveEvent(int x, int y)
 			: m_X(x), m_Y(y) {
 		}
 
-		static inline [[nodiscard]] EventType GetStaticType() noexcept { return EventType::WindowMoved; }
+		static inline [[nodiscard]] ApplicationEventType GetStaticType() noexcept { return ApplicationEventType::WindowMoved; }
 
-		virtual [[nodiscard]] EventType GetEventType() const noexcept override { return GetStaticType(); }
+		virtual [[nodiscard]] ApplicationEventType GetEventType() const noexcept override { return GetStaticType(); }
 
 		virtual [[nodiscard]] int GetCategoryFlags() const noexcept override { return EventCategoryApplication; }
 
@@ -140,7 +140,7 @@ namespace KuchCraft {
 	};
 
 	/// This class handles storing the key code and retrieving category flags.
-	class KeyEvent : public Event
+	class KeyEvent : public ApplicationEvent
 	{
 	public:
 		inline [[nodiscard]] KeyCode GetKeyCode() const noexcept { return m_KeyCode; }
@@ -167,9 +167,9 @@ namespace KuchCraft {
 
 		inline [[nodiscard]] bool IsRepeat() const noexcept { return m_IsRepeat; }
 
-		static inline [[nodiscard]] EventType GetStaticType() noexcept { return EventType::KeyPressed; }
+		static inline [[nodiscard]] ApplicationEventType GetStaticType() noexcept { return ApplicationEventType::KeyPressed; }
 
-		virtual [[nodiscard]] EventType GetEventType() const noexcept override { return GetStaticType(); }
+		virtual [[nodiscard]] ApplicationEventType GetEventType() const noexcept override { return GetStaticType(); }
 
 	private:
 		bool m_IsRepeat;
@@ -183,9 +183,9 @@ namespace KuchCraft {
 			: KeyEvent(keycode) {
 		}
 
-		static inline [[nodiscard]] EventType GetStaticType() noexcept { return EventType::KeyReleased; }
+		static inline [[nodiscard]] ApplicationEventType GetStaticType() noexcept { return ApplicationEventType::KeyReleased; }
 
-		virtual [[nodiscard]] EventType GetEventType() const noexcept override { return GetStaticType(); }
+		virtual [[nodiscard]] ApplicationEventType GetEventType() const noexcept override { return GetStaticType(); }
 
 	};
 
@@ -197,14 +197,14 @@ namespace KuchCraft {
 			: KeyEvent(keycode) {
 		}
 
-		static inline [[nodiscard]] EventType GetStaticType() noexcept { return EventType::KeyTyped; }
+		static inline [[nodiscard]] ApplicationEventType GetStaticType() noexcept { return ApplicationEventType::KeyTyped; }
 
-		virtual [[nodiscard]] EventType GetEventType() const noexcept override { return GetStaticType(); }
+		virtual [[nodiscard]] ApplicationEventType GetEventType() const noexcept override { return GetStaticType(); }
 
 	};
 
 	/// This event is triggered when the mouse is moved.
-	class MouseMovedEvent : public Event
+	class MouseMovedEvent : public ApplicationEvent
 	{
 	public:
 		MouseMovedEvent(float x, float y)
@@ -215,9 +215,9 @@ namespace KuchCraft {
 
 		inline [[nodiscard]] float GetY() const noexcept { return m_MouseY; }
 
-		static inline [[nodiscard]] EventType GetStaticType() noexcept { return EventType::MouseMoved; }
+		static inline [[nodiscard]] ApplicationEventType GetStaticType() noexcept { return ApplicationEventType::MouseMoved; }
 
-		virtual [[nodiscard]] EventType GetEventType() const noexcept override { return GetStaticType(); }
+		virtual [[nodiscard]] ApplicationEventType GetEventType() const noexcept override { return GetStaticType(); }
 
 		virtual [[nodiscard]] int GetCategoryFlags() const noexcept override { return EventCategoryMouse | EventCategoryInput; }
 
@@ -228,7 +228,7 @@ namespace KuchCraft {
 	};
 
 	/// This event is triggered when the mouse wheel is scrolled.
-	class MouseScrolledEvent : public Event
+	class MouseScrolledEvent : public ApplicationEvent
 	{
 	public:
 		MouseScrolledEvent(const float xOffset, const float yOffset)
@@ -239,9 +239,9 @@ namespace KuchCraft {
 
 		inline [[nodiscard]] float GetYOffset() const noexcept { return m_YOffset; }
 
-		static inline [[nodiscard]] EventType GetStaticType() noexcept { return EventType::MouseScrolled; }
+		static inline [[nodiscard]] ApplicationEventType GetStaticType() noexcept { return ApplicationEventType::MouseScrolled; }
 
-		virtual [[nodiscard]] EventType GetEventType() const noexcept override { return GetStaticType(); }
+		virtual [[nodiscard]] ApplicationEventType GetEventType() const noexcept override { return GetStaticType(); }
 
 		virtual [[nodiscard]] int GetCategoryFlags() const noexcept override { return EventCategoryMouse | EventCategoryInput; }
 
@@ -252,7 +252,7 @@ namespace KuchCraft {
 	};
 
 	/// This class stores the mouse button that triggered the event.
-	class MouseButtonEvent : public Event
+	class MouseButtonEvent : public ApplicationEvent
 	{
 	public:
 		inline [[nodiscard]] MouseButton GetMouseButton() const noexcept { return m_Button; }
@@ -276,9 +276,9 @@ namespace KuchCraft {
 			: MouseButtonEvent(button) {
 		}
 
-		static inline [[nodiscard]] EventType GetStaticType() noexcept { return EventType::MouseButtonPressed; }
+		static inline [[nodiscard]] ApplicationEventType GetStaticType() noexcept { return ApplicationEventType::MouseButtonPressed; }
 
-		virtual [[nodiscard]] EventType GetEventType() const noexcept override { return GetStaticType(); }
+		virtual [[nodiscard]] ApplicationEventType GetEventType() const noexcept override { return GetStaticType(); }
 
 	};
 
@@ -290,9 +290,9 @@ namespace KuchCraft {
 			: MouseButtonEvent(button) {
 		}
 
-		static inline [[nodiscard]] EventType GetStaticType() noexcept { return EventType::MouseButtonReleased; }
+		static inline [[nodiscard]] ApplicationEventType GetStaticType() noexcept { return ApplicationEventType::MouseButtonReleased; }
 
-		virtual [[nodiscard]] EventType GetEventType() const noexcept { return GetStaticType(); }
+		virtual [[nodiscard]] ApplicationEventType GetEventType() const noexcept { return GetStaticType(); }
 
 	};
 

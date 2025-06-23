@@ -7,7 +7,7 @@ namespace KuchCraft {
 	class Window
 	{
 	public:
-		Window(const WindowConfig& config, EventCallbackFn callback);
+		Window(const WindowConfig& config, ApplicationEventCallbackFn callback);
 		~Window();
 
 		void Update();
@@ -72,8 +72,8 @@ namespace KuchCraft {
 	private:
 		struct WindowData
 		{
-			WindowConfig    Config;
-			EventCallbackFn EventCallback;
+			WindowConfig Config;
+			ApplicationEventCallbackFn EventCallback;
 		} m_Data;
 
 		GLFWwindow*  m_Window = nullptr;

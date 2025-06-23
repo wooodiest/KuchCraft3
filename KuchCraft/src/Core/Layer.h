@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Core/Timestep.h"
-#include "Core/Event.h"
+#include "Core/ApplicationEvent.h"
 
 #include <string>
 
@@ -35,7 +35,7 @@ namespace KuchCraft {
 		virtual void OnTick(const Timestep ts) {}
 		virtual void OnRender() {}
 		virtual void OnImGuiRender() {}
-		virtual void OnEvent(Event& e) {}
+		virtual void OnApplicationEvent(ApplicationEvent& e) {}
 
 		inline const std::string& GetName() const { return m_Name; }
 		inline LayerType          GetType() const { return m_Type; }

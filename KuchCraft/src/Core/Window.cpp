@@ -11,7 +11,7 @@ namespace KuchCraft {
 		Log::PrintMessage(LogType::Core, LogLevel::Error, "[GLFW]: {0} : {1}", error, description);
 	}
 
-	Window::Window(const WindowConfig& config, EventCallbackFn callback)
+	Window::Window(const WindowConfig& config, ApplicationEventCallbackFn callback)
 		: m_Data(config, callback)
 	{
 		glfwSetErrorCallback(GLFWErrorCallback);
@@ -198,10 +198,10 @@ namespace KuchCraft {
 		/// Update the last frame time to the current time for the next frame calculation.
 		m_TimeData.LastFrameTime = time;
 
-		KC_TODO("Update mouse data in window based on Mouse Input");
-		/// glm::vec2 position = Input::GetMousePosition();
-		/// m_MouseData.PositionDifference = position - m_MouseData.PreviousPosition;
-		/// m_MouseData.PreviousPosition   = position;
+		auto [x, y] = Input::GetMousePosition();
+		m_MouseData.PositionDifference.first  = x - m_MouseData.PreviousPosition.first;
+		m_MouseData.PositionDifference.second = y - m_MouseData.PreviousPosition.second;
+		m_MouseData.PreviousPosition = { x, y };
 	}
 
 	void Window::ProcessEvents()

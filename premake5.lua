@@ -36,7 +36,8 @@ project "KuchCraft"
         "%{wks.location}/KuchCraft/vendor/glm/glm/**.hpp",
         "%{wks.location}/KuchCraft/vendor/glm/glm/**.inl",
         "%{wks.location}/KuchCraft/vendor/stb_image/**.h",
-		"%{wks.location}/KuchCraft/vendor/stb_image/**.cpp"
+		"%{wks.location}/KuchCraft/vendor/stb_image/**.cpp",
+        "%{wks.location}/KuchCraft/vendor/magic_enum/**.hpp"
     }
 
     includedirs
@@ -47,7 +48,8 @@ project "KuchCraft"
         "%{wks.location}/KuchCraft/vendor/glad/include",
         "%{wks.location}/KuchCraft/vendor/spdlog/include",
         "%{wks.location}/KuchCraft/vendor/glm",
-        "%{wks.location}/KuchCraft/vendor/stb_image"
+        "%{wks.location}/KuchCraft/vendor/stb_image",
+        "%{wks.location}/KuchCraft/vendor/magic_enum"
     }
 
     links

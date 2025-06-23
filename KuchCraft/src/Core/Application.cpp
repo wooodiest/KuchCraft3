@@ -12,6 +12,12 @@ namespace KuchCraft {
 		m_Config.Application.argc = argc;
 		m_Config.Application.argv = argv;
 
+		Log::SetLogLevel(LogType::Core, m_Config.Application.CoreLogLevel);
+		Log::SetLogLevel(LogType::Game, m_Config.Application.GameLogLevel);
+
+		KC_CORE_INFO("LogLevel: {}", ToString(m_Config.Application.CoreLogLevel));
+		KC_INFO     ("LogLevel: {}", ToString(m_Config.Application.GameLogLevel));
+
 		if (argc > 1)
 		{
 			KC_CORE_INFO("Received {} argument(s):", argc - 1);
@@ -25,7 +31,7 @@ namespace KuchCraft {
 			KC_CORE_INFO("No command-line arguments provided.");
 		}
 
-		m_Window = CreateRef<Window>(m_Config.Window, KC_BIND_EVENT_FN(Application::OnEvent));
+		m_Window = CreateRef<Window>(m_Config.Window, KC_BIND_EVENT_FN(Application::OnApplicationEvent));
 		m_Window->CenterWindow();
 	}
 
@@ -72,7 +78,7 @@ namespace KuchCraft {
 				{
 					if (layer->IsVisible())
 						layer->OnRender();
-				}		
+				}	
 			}
 
 			RenderImGui();
@@ -121,9 +127,9 @@ namespace KuchCraft {
 		}
 	}
 
-	void Application::OnEvent(Event& e)
+	void Application::OnApplicationEvent(ApplicationEvent& e)
 	{
-		EventDispatcher dispatcher(e);
+		ApplicationEventDispatcher dispatcher(e);
 		dispatcher.Dispatch<WindowCloseEvent> (KC_BIND_EVENT_FN(Application::OnWindowClose));
 		dispatcher.Dispatch<WindowResizeEvent>(KC_BIND_EVENT_FN(Application::OnWindowResize));
 		dispatcher.Dispatch<KeyPressedEvent>  (KC_BIND_EVENT_FN(Application::OnKeyPressed));
@@ -136,7 +142,7 @@ namespace KuchCraft {
 			if (!(*it)->IsActive())
 				continue;
 
-			(*it)->OnEvent(e);
+			(*it)->OnApplicationEvent(e);
 		}
 	}
 

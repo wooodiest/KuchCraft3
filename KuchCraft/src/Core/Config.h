@@ -16,6 +16,9 @@ namespace KuchCraft {
 		char** argv = nullptr;
 
 		bool EnableImGui = true;
+
+		LogLevel CoreLogLevel = LogLevel::Info;
+		LogLevel GameLogLevel = LogLevel::Info;
 	};
 
 	struct WindowConfig
