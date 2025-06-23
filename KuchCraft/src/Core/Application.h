@@ -37,6 +37,7 @@ namespace KuchCraft {
 		void ProcessEvents();
 
 		void InitImGui();
+		bool ShouldBlockEventFromImGui(ApplicationEventType type) const;
 
 	private:
 		bool m_Running   = true;

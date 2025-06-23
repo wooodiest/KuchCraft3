@@ -4,6 +4,7 @@
 #include "Core/Application.h"
 
 #include <GLFW/glfw3.h>
+#include <imgui.h>
 
 namespace KuchCraft {
 
@@ -19,8 +20,11 @@ namespace KuchCraft {
 
 	bool Input::IsKeyDown(KeyCode keycode)
 	{
-		GLFWwindow* window = Application::Get().GetWindow()->GetGLFWWindow();
+		bool enableImGui = Application::Get().GetConfig().Application.EnableImGui;
+		if (enableImGui && ImGui::GetIO().WantCaptureKeyboard)
+			return false;
 
+		GLFWwindow* window = Application::Get().GetWindow()->GetGLFWWindow();
 		auto state = glfwGetKey(window, static_cast<int32_t>(keycode));
 		return state == GLFW_PRESS || state == GLFW_REPEAT;
 	}
@@ -42,8 +46,11 @@ namespace KuchCraft {
 
 	bool Input::IsMouseButtonDown(MouseButton button)
 	{
-		GLFWwindow* window = Application::Get().GetWindow()->GetGLFWWindow();
+		bool enableImGui = Application::Get().GetConfig().Application.EnableImGui;
+		if (enableImGui && ImGui::GetIO().WantCaptureMouse)
+			return false;
 
+		GLFWwindow* window = Application::Get().GetWindow()->GetGLFWWindow();
 		auto state = glfwGetMouseButton(window, static_cast<int32_t>(button));
 		return state == GLFW_PRESS;
 	}

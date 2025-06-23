@@ -168,6 +168,9 @@ namespace KuchCraft {
 
 	void Application::OnApplicationEvent(ApplicationEvent& e)
 	{
+		if (m_Config.Application.EnableImGui && ShouldBlockEventFromImGui(e.GetEventType()))
+			return;
+
 		ApplicationEventDispatcher dispatcher(e);
 		dispatcher.Dispatch<WindowCloseEvent> (KC_BIND_EVENT_FN(Application::OnWindowClose));
 		dispatcher.Dispatch<WindowResizeEvent>(KC_BIND_EVENT_FN(Application::OnWindowResize));
@@ -211,4 +214,25 @@ namespace KuchCraft {
 		return false;
 	}	
 
+	bool Application::ShouldBlockEventFromImGui(ApplicationEventType type) const
+	{
+		if (!ImGui::GetCurrentContext())
+			return false;
+
+		ImGuiIO& io = ImGui::GetIO();
+		switch (type)
+		{
+			case ApplicationEventType::KeyPressed:
+			case ApplicationEventType::KeyReleased:
+				return io.WantCaptureKeyboard;
+
+			case ApplicationEventType::MouseButtonPressed:
+			case ApplicationEventType::MouseButtonReleased:
+			case ApplicationEventType::MouseMoved:
+			case ApplicationEventType::MouseScrolled:
+				return io.WantCaptureMouse;
+
+			default: return false;
+		}
+	}
 }
