@@ -67,3 +67,5 @@
 #include "Core/Config.h"
 #include "Core/Timestep.h"
 #include "Core/EnumUtils.h"
+
+#include "Graphics/Core/Core.h"

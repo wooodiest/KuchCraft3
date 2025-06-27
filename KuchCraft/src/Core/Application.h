@@ -4,6 +4,8 @@
 #include "Core/Layer.h"
 #include "Core/LayerStack.h"
 
+#include "Graphics/Renderer.h"
+
 namespace KuchCraft {
 
 	class Application
@@ -24,6 +26,10 @@ namespace KuchCraft {
 		Config& GetConfig() { return m_Config; }
 
 		Ref<Window> GetWindow() { return m_Window; }
+
+		LayerStack& GetLayerStack() { return m_LayerStack; }
+
+		Ref<Renderer> GetRenderer() { return m_Renderer; }
 
 		bool ShouldRestart() const { return m_Restart; }
 
@@ -51,6 +57,8 @@ namespace KuchCraft {
 		LayerStack  m_LayerStack;
 
 		Timestep m_TickTimer = 0.0f;
+
+		Ref<Renderer> m_Renderer;
 
 	private:
 		static inline Application* s_Instance = nullptr;

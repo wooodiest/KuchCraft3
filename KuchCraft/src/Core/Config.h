@@ -50,6 +50,8 @@ namespace KuchCraft {
 		int OpenGlMajorVersion = 4;
 		int OpenGlMinorVersion = 6;
 
+		bool OpenGlLogging = true;
+
 		std::string GetOpenGlVersion() const { return std::to_string(OpenGlMajorVersion * 100 + OpenGlMinorVersion * 10) + " core"; }
 	};
 

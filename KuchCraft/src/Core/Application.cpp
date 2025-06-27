@@ -41,14 +41,19 @@ namespace KuchCraft {
 		m_Window = CreateRef<Window>(m_Config, KC_BIND_EVENT_FN(Application::OnApplicationEvent));
 		m_Window->CenterWindow();
 
-		InitImGui();
+		if (m_Config.Application.EnableImGui)
+			InitImGui();
+
+		m_Renderer = Renderer::Create(m_Config);
 	}
 
 	Application::~Application()
 	{
 		s_Instance = nullptr;
 
-		m_Config.Window = m_Window->GetConfig();
+		if (m_Window)
+			m_Config.Window = m_Window->GetConfig();
+
 		m_Config.Serialize(m_ConfigPath);
 	}
 
@@ -135,9 +140,12 @@ namespace KuchCraft {
 	{
 		m_LayerStack.Clear();
 
-		ImGui_ImplOpenGL3_Shutdown();
-		ImGui_ImplGlfw_Shutdown();
-		ImGui::DestroyContext();
+		if (m_Config.Application.EnableImGui)
+		{
+			ImGui_ImplOpenGL3_Shutdown();
+			ImGui_ImplGlfw_Shutdown();
+			ImGui::DestroyContext();
+		}
 	}
 
 	void Application::ProcessEvents()
