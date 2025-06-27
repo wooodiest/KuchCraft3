@@ -71,6 +71,8 @@ namespace KuchCraft {
 		inline [[nodiscard]] std::vector<BufferElement>::const_iterator begin() const { return m_BufferElements.begin(); }
 		inline [[nodiscard]] std::vector<BufferElement>::const_iterator end()   const { return m_BufferElements.end();   }
 
+		uint32_t GetStride() const { return m_Stride; }
+
 	private:
 		std::vector<BufferElement> m_BufferElements;
 		uint32_t m_Stride        = 0;

@@ -16,6 +16,8 @@ namespace KuchCraft {
 	{
 		glCreateBuffers(1, &m_RendererID);
 		glNamedBufferData(m_RendererID, count * sizeof(uint32_t), nullptr, GL_DYNAMIC_DRAW);
+
+		KC_CORE_ASSERT(IsValid(), "Failed to create IndexBuffer!");
 	}
 
 	IndexBuffer::IndexBuffer(uint32_t* data, uint32_t count)
@@ -23,6 +25,8 @@ namespace KuchCraft {
 	{
 		glCreateBuffers(1, &m_RendererID);
 		glNamedBufferData(m_RendererID, count * sizeof(uint32_t), data, GL_STATIC_DRAW);
+
+		KC_CORE_ASSERT(IsValid(), "Failed to create IndexBuffer!");
 	}
 
 	Ref<IndexBuffer> IndexBuffer::Create(uint32_t count)
@@ -77,13 +81,7 @@ namespace KuchCraft {
 
 		m_DebugName = name;
 		if (GLAD_GL_KHR_debug)
-		{
 			glObjectLabel(GL_BUFFER, m_RendererID, static_cast<GLsizei>(name.length()), name.c_str());
-		}
-		else
-		{
-			KC_CORE_WARN("Tried to set debug name on IndexBuffer, but GL_KHR_debug is not supported.");
-		}
 	}
 
 }

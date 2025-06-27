@@ -38,6 +38,8 @@ namespace KuchCraft {
 
 		glCreateBuffers(1, &m_RendererID);
 		glNamedBufferData(m_RendererID, size, data, (usage == VertexBufferDataUsage::Static) ? GL_STATIC_DRAW : GL_DYNAMIC_DRAW);
+
+		KC_CORE_ASSERT(IsValid(), "Failed to create VertexBuffer!");
 	}
 
 	Ref<VertexBuffer> VertexBuffer::Create(VertexBufferDataUsage usage, size_t size, const void* data)
@@ -88,13 +90,7 @@ namespace KuchCraft {
 
 		m_DebugName = name;
 		if (GLAD_GL_KHR_debug)
-		{
 			glObjectLabel(GL_BUFFER, m_RendererID, static_cast<GLsizei>(name.length()), name.c_str());
-		}
-		else
-		{
-			KC_CORE_WARN("Tried to set debug name on IndexBuffer, but GL_KHR_debug is not supported.");
-		}
 	}
 
 }
