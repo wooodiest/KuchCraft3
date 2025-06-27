@@ -21,7 +21,6 @@ namespace KuchCraft {
 			KC_CORE_ERROR("Failed to initialize GLFW"); 
 		}
 
-		KC_TODO("Set up GLFW window hints based on config");
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, config.Renderer.OpenGlMajorVersion);
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, config.Renderer.OpenGlMinorVersion);
 		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);

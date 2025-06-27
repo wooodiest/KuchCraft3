@@ -42,13 +42,13 @@ namespace KuchCraft {
 
 	void IndexBuffer::SetData(uint32_t* data, uint32_t count, uint32_t offset)
 	{
+		KC_CORE_ASSERT(IsValid(), "IndexBuffer is not valid.");
 		KC_CORE_ASSERT(data != nullptr, "IndexBuffer data must not be null.");
 		KC_CORE_ASSERT(count > 0, "IndexBuffer count must be greater than 0.");
-		KC_CORE_ASSERT(IsValid(), "IndexBuffer is not valid.");
 
-		uint32_t currentSize  = m_Count * sizeof(uint32_t);
-		uint32_t requiredSize = count   * sizeof(uint32_t);
-		uint32_t byteOffset   = offset  * sizeof(uint32_t);
+		size_t currentSize  = m_Count * sizeof(uint32_t);
+		size_t requiredSize = count   * sizeof(uint32_t);
+		size_t byteOffset   = offset  * sizeof(uint32_t);
 		KC_CORE_ASSERT(byteOffset + requiredSize <= currentSize,
 			"IndexBuffer data exceeds buffer size. Required: {}, Allocated: {}", byteOffset + requiredSize, currentSize);
 

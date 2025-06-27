@@ -19,7 +19,7 @@ namespace KuchCraft {
 
 		RendererID GetRendererID() const { return m_RendererID;               }
 		uint32_t   GetCount()      const { return m_Count;                    }
-		uint32_t   GetSize()       const { return m_Count * sizeof(uint32_t); }
+		size_t     GetSize()       const { return m_Count * sizeof(uint32_t); }
 
 		void SetDebugName(const std::string& name);
 		const std::string& GetDebugName() const { return m_DebugName; }
