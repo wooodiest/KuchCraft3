@@ -1,6 +1,9 @@
 #pragma once
 
 #include "Core/Config.h"
+
+#include "Graphics/Core/IndexBuffer.h"
+
 namespace KuchCraft {
 
 	class Renderer
