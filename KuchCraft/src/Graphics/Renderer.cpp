@@ -47,6 +47,20 @@ namespace KuchCraft {
 			}, nullptr);
 		}
 
+		m_ShaderLibrary.SetGlobalSubstitution("KC_VERSION", KC_VERSION);
+		m_ShaderLibrary.SetGlobalSubstitution("KC_VERSION_LONG", KC_VERSION_LONG);
+		m_ShaderLibrary.SetGlobalSubstitution("OPENGL_VERSION_MAJOR", std::to_string(config.Renderer.OpenGlMajorVersion));
+		m_ShaderLibrary.SetGlobalSubstitution("OPENGL_VERSION_MINOR", std::to_string(config.Renderer.OpenGlMinorVersion));
+		m_ShaderLibrary.SetGlobalSubstitution("SHADER_VERSION",config.Renderer.GetOpenGlVersion());
+		m_ShaderLibrary.SetGlobalSubstitution("SHADER_VERSION_LONG", "#version " + config.Renderer.GetOpenGlVersion());
+
+		const auto& substitutions = m_ShaderLibrary.GetGlobalSubstitutions();
+		KC_CORE_INFO("Global shader substitutions:");
+		for (const auto& [name, value] : substitutions)
+		{
+			KC_CORE_INFO("  {} = {}", name, value);
+		}
+
 		/// tmp
 		float triangleVertices[] = {
 			// x     y     z       r     g     b
@@ -61,6 +75,15 @@ namespace KuchCraft {
 		m_ExampleData.VertexBuffer = VertexBuffer::Create(VertexBufferDataUsage::Static, sizeof(triangleVertices), triangleVertices);
 		m_ExampleData.VertexBuffer->SetLayout(m_ExampleData.Shader->GetVertexInputLayout());
 		m_ExampleData.VertexArray->AddVertexBuffer(m_ExampleData.VertexBuffer);
+
+		std::string shader_VertexBufferSource   = m_ExampleData.Shader->GetShaderSources().at(ShaderType::Vertex);
+		std::string shader_FragmentBufferSource = m_ExampleData.Shader->GetShaderSources().at(ShaderType::Fragment);
+		KC_INFO("VertexBuffer source:\n{}", shader_VertexBufferSource);
+		KC_INFO("FragmentBuffer source:\n{}", shader_FragmentBufferSource);
+
+
+		m_ExampleData.Shader->Bind();
+		m_ExampleData.Shader->SetFloat4("u_Color", glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
 	}
 
 	Renderer::~Renderer()

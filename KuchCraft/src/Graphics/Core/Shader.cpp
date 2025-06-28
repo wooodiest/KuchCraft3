@@ -293,19 +293,42 @@ namespace KuchCraft {
 			m_RendererID = 0;
 		}
 
-		m_RendererID = program;
+		m_RendererID    = program;
+		m_ShaderSources = shaderSources;
+
 		m_UniformLocations.clear();
 		m_UniformBlocks   .clear();
 		m_Variables       .clear();
-		KC_CORE_INFO("Successfully compiled shader '{}'", m_Name);
 
 		m_UniformBlocks = m_Preprocessor.ProcessUniformBlocks(shaderSources);
 		KC_TODO("Fix ProcessUniformBlocks, do not work properly")
 
-		m_Variables     = m_Preprocessor.ProcessVariables(shaderSources);
-		KC_TODO("Go through all shder unforms and cache their locations. GetUniformLocation() can be not used");
+		m_Variables = m_Preprocessor.ProcessVariables(shaderSources);
 
+		SetUniformLocations();
+
+		KC_CORE_INFO("Successfully compiled shader '{}'", m_Name);
 		return true;
+	}
+
+	void Shader::SetUniformLocations()
+	{
+		KC_CORE_ASSERT(IsValid(), "Shader is not valid.");
+
+		Bind();
+
+		for (const auto& [type, variables] : m_Variables)
+		{
+			for (const auto& var : variables)
+			{
+				if (var.Qualifier != ShaderVariableQualifier::Uniform)
+					continue;
+
+				int location = GetUniformLocation(var.Name);
+				if (location != -1)
+					m_UniformLocations[var.Name] = location;
+			}
+		}
 	}
 
 	int Shader::GetUniformLocation(const std::string& name)

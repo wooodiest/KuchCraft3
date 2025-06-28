@@ -63,6 +63,7 @@ namespace KuchCraft
 
 	private:
 		bool Compile(const std::string& source);
+		void SetUniformLocations();
 		int GetUniformLocation(const std::string& name);
 
 	private:
