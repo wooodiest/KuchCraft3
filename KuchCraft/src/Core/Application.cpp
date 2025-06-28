@@ -86,10 +86,16 @@ namespace KuchCraft {
 
 				/// OnRender
 				m_Renderer->NewFrame();
+				int layerIndex = 0;
 				for (auto& layer : m_LayerStack)
 				{
 					if (layer->IsVisible())
+					{
+						m_Renderer->SetLayerIndex(layerIndex);
 						layer->OnRender();
+					}
+
+					layerIndex++;
 				}
 				m_Renderer->EndFrame();
 
@@ -198,6 +204,7 @@ namespace KuchCraft {
 
 	bool Application::OnWindowResize(WindowResizeEvent& e)
 	{
+		m_Renderer->OnWindowResize(e.GetWidth(), e.GetHeight());
 		m_Minimized = e.GetWidth() == 0 || e.GetHeight() == 0;
 		return false;
 	}

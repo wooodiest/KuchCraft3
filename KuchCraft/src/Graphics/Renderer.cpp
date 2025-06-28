@@ -10,6 +10,46 @@ namespace KuchCraft {
 	Renderer::Renderer(Config config)
 		: m_Config(config)
 	{
+		CheckExtensions();
+		SetupLogging();
+		SetGlobalSubstitutions();
+
+		InitSimpleTriangleData();	
+	}
+
+	Renderer::~Renderer()
+	{
+	}
+
+	Ref<Renderer> Renderer::Create(Config config)
+	{
+		return Ref<Renderer>(new Renderer(config));
+	}
+
+	void Renderer::NewFrame()
+	{
+		auto [width, height] = Application::Get().GetWindow()->GetSize();
+		glViewport(0, 0, width, height);
+
+		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		m_CurrentLayerIndex = 0;
+	}
+
+	void Renderer::EndFrame()
+	{
+		RenderSimpleTriangle();
+	}
+
+	void Renderer::OnWindowResize(int width, int height)
+	{
+		if (width <= 0 || height <= 0)
+			return;
+	}
+
+	void Renderer::CheckExtensions()
+	{
 		if (!GLAD_GL_KHR_debug)
 		{
 			KC_CORE_WARN("GL_KHR_debug is not supported!");
@@ -34,48 +74,24 @@ namespace KuchCraft {
 		{
 			KC_CORE_WARN("GL_ARB_bindless_texture is not supported!");
 		}
-
-		if (config.Renderer.OpenGlLogging)
-		{
-			glEnable(GL_DEBUG_OUTPUT);
-			glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-			glDebugMessageCallback([](GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam) {
-				switch (severity)
-				{
-					case GL_DEBUG_SEVERITY_HIGH:   { KC_CORE_ERROR("OpenGL: {}", message); break; }
-					case GL_DEBUG_SEVERITY_MEDIUM: { KC_CORE_WARN ("OpenGL: {}", message); break; }
-					case GL_DEBUG_SEVERITY_LOW:    { KC_CORE_INFO ("OpenGL: {}", message); break; }
-					default:                       { KC_CORE_TRACE("OpenGL: {}", message); break; }
-				}
-			}, nullptr);
-		}
-
-		SetGlobalSubstitutions();
-
-		InitSimpleTriangleData();	
 	}
 
-	Renderer::~Renderer()
+	void Renderer::SetupLogging()
 	{
-	}
-
-	Ref<Renderer> Renderer::Create(Config config)
-	{
-		return Ref<Renderer>(new Renderer(config));
-	}
-
-	void Renderer::NewFrame()
-	{
-		auto [width, height] = Application::Get().GetWindow()->GetSize();
-		glViewport(0, 0, width, height);
-
-		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	}
-
-	void Renderer::EndFrame()
-	{
-		RenderSimpleTriangle();
+		if (!m_Config.Renderer.OpenGlLogging)
+			return;
+		
+		glEnable(GL_DEBUG_OUTPUT);
+		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+		glDebugMessageCallback([](GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam) {
+			switch (severity)
+			{
+				case GL_DEBUG_SEVERITY_HIGH:   { KC_CORE_ERROR("OpenGL: {}", message); break; }
+				case GL_DEBUG_SEVERITY_MEDIUM: { KC_CORE_WARN ("OpenGL: {}", message); break; }
+				case GL_DEBUG_SEVERITY_LOW:    { KC_CORE_INFO ("OpenGL: {}", message); break; }
+				default:                       { KC_CORE_TRACE("OpenGL: {}", message); break; }
+			}
+		}, nullptr);
 	}
 
 	void Renderer::SetGlobalSubstitutions()

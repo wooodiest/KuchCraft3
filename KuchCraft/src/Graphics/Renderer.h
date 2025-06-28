@@ -19,17 +19,27 @@ namespace KuchCraft {
 
 		void NewFrame();
 		void EndFrame();
+
+		/// Sets the current rendering layer index (used as implicit Z-depth).
+		/// This approach allows layering UI, game objects, and overlays without relying on manual Z-positioning.
+		void SetLayerIndex(int layerIndex) { m_CurrentLayerIndex = layerIndex; }
+
+		void OnWindowResize(int width, int height);
+
 	private:
+		void CheckExtensions();
+		void SetupLogging();
 		void SetGlobalSubstitutions();
 
-		void InitSimpleTriangleData();
-
 	private:
+		void InitSimpleTriangleData();
 		void RenderSimpleTriangle();
 
 	private:
 		Config m_Config;
 		ShaderLibrary m_ShaderLibrary;
+
+		int m_CurrentLayerIndex = 0;
 
 		struct {
 			Ref<VertexArray>  VertexArray;
