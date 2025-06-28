@@ -7,7 +7,7 @@
 
 namespace KuchCraft {
 
-	Shader::Shader(const std::string& name, const std::string& source, const std::filesystem::path& path, Weak<ShaderLibrary> shaderLibrary)
+	Shader::Shader(const std::string& name, const std::string& source, const std::filesystem::path& path, ShaderLibrary* shaderLibrary)
 		: m_Name(name), m_Source(source), m_Path(path), m_Library(shaderLibrary)
 	{
 		Compile(m_Source);
@@ -21,7 +21,7 @@ namespace KuchCraft {
 
 	Ref<Shader> Shader::Create(const std::filesystem::path& path, const std::string& name)
 	{
-		return Create(Weak<ShaderLibrary>(), path, name);
+		return Create(nullptr, path, name);
 	}
 
 	Ref<Shader> Shader::Create(const std::string& source, const std::string& name)
@@ -29,7 +29,7 @@ namespace KuchCraft {
 		return Ref<Shader>(new Shader(name, source));
 	}
 
-	Ref<Shader> Shader::Create(Weak<ShaderLibrary> shaderLibrary, const std::filesystem::path& path, const std::string& name)
+	Ref<Shader> Shader::Create(ShaderLibrary* shaderLibrary, const std::filesystem::path& path, const std::string& name)
 	{
 		if (path.extension() != ".glsl" && path.extension() != ".shader")
 		{
@@ -46,7 +46,7 @@ namespace KuchCraft {
 		return Ref<Shader>(new Shader(shaderName, source, path, shaderLibrary));
 	}
 
-	Ref<Shader> Shader::Create(Weak<ShaderLibrary> shaderLibrary, const std::string& source, const std::string& name)
+	Ref<Shader> Shader::Create(ShaderLibrary* shaderLibrary, const std::string& source, const std::string& name)
 	{
 		return Ref<Shader>(new Shader(name, source, std::filesystem::path(), shaderLibrary));
 	}
@@ -67,12 +67,15 @@ namespace KuchCraft {
 		if (it != m_LocalSubstitutions.end())
 			m_LocalSubstitutions.erase(it);
 		else
+		{
 			KC_CORE_WARN("Substitution '{}' not found in shader '{}'", name, m_Name);
+		}
 	}
 
 	void Shader::ClearLocalSubstitutions()
 	{
 		m_LocalSubstitutions.clear();
+		KC_CORE_INFO("Cleared all local substitutions in shader '{}'", m_Name);
 	}
 
 	bool Shader::Reload()
@@ -86,6 +89,20 @@ namespace KuchCraft {
 			m_Source = source;
 		
 		return success;
+	}
+
+	void Shader::Bind() const
+	{
+		KC_CORE_ASSERT(IsValid(), "Shader is not valid.");
+
+		glUseProgram(m_RendererID);
+	}
+
+	void Shader::Unbind() const
+	{
+		KC_CORE_ASSERT(IsValid(), "Shader is not valid.");
+
+		glUseProgram(0);
 	}
 
 	void Shader::SetInt(const std::string& name, int value)
@@ -156,6 +173,39 @@ namespace KuchCraft {
 
 		KC_CORE_ASSERT(false, "Unknown ShaderType");
 		return 0;
+	}
+
+	BufferLayout Shader::GetVertexInputLayout() const
+	{
+		BufferLayout layout;
+
+		auto vertexShader = m_Variables.find(ShaderType::Vertex);
+		if (vertexShader == m_Variables.end())
+			return layout;
+
+		for (const auto& var : vertexShader->second)
+		{
+			if (var.Qualifier != ShaderVariableQualifier::In)
+				continue;
+
+			ShaderDataType type;
+			switch (var.Type)
+			{
+				case ShaderVariableType::Float:    type = ShaderDataType::Float;    break;
+				case ShaderVariableType::Float2:   type = ShaderDataType::Float2;   break;
+				case ShaderVariableType::Float3:   type = ShaderDataType::Float3;   break;
+				case ShaderVariableType::Float4:   type = ShaderDataType::Float4;   break;
+				case ShaderVariableType::Int:      type = ShaderDataType::Int;      break;
+				case ShaderVariableType::Uint:     type = ShaderDataType::Uint;     break;
+				default:
+					KC_CORE_WARN("Shader input variable '{}' has unsupported type for vertex layout.", var.Name);
+					continue;
+			}
+
+			layout.AddElement(BufferElement(type, var.Name));
+		}
+
+		return layout;
 	}
 
 	bool Shader::Compile(const std::string& source)
@@ -245,7 +295,15 @@ namespace KuchCraft {
 
 		m_RendererID = program;
 		m_UniformLocations.clear();
+		m_UniformBlocks   .clear();
+		m_Variables       .clear();
 		KC_CORE_INFO("Successfully compiled shader '{}'", m_Name);
+
+		m_UniformBlocks = m_Preprocessor.ProcessUniformBlocks(shaderSources);
+		KC_TODO("Fix ProcessUniformBlocks, do not work properly")
+
+		m_Variables     = m_Preprocessor.ProcessVariables(shaderSources);
+		KC_TODO("Go through all shder unforms and cache their locations. GetUniformLocation() can be not used");
 
 		return true;
 	}

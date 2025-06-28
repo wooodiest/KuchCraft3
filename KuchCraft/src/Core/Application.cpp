@@ -97,7 +97,8 @@ namespace KuchCraft {
 				{
 					if (layer->IsVisible())
 						layer->OnRender();
-				}	
+				}
+				m_Renderer->Render();
 
 				/// ImGui
 				if (m_Config.Application.EnableImGui)

@@ -92,7 +92,7 @@ namespace KuchCraft {
 	public:
 		~VertexBuffer();
 
-		Ref<VertexBuffer> Create(VertexBufferDataUsage usage, size_t size, const void* data = nullptr);
+		static Ref<VertexBuffer> Create(VertexBufferDataUsage usage, size_t size, const void* data = nullptr);
 
 		void SetData(const void* data, size_t size, size_t offset = 0);
 

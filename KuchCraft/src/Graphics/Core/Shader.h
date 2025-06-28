@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Graphics/Core/ShaderPreprocessor.h"
+#include "Graphics/Core/VertexBuffer.h"
 
 namespace KuchCraft
 {
@@ -24,11 +25,14 @@ namespace KuchCraft
 		static Ref<Shader> Create(const std::filesystem::path& path, const std::string& name = std::string());
 		static Ref<Shader> Create(const std::string& source, const std::string& name);
 
-		static Ref<Shader> Create(Weak<ShaderLibrary> shaderLibrary, const std::filesystem::path& path, const std::string& name = std::string());
-		static Ref<Shader> Create(Weak<ShaderLibrary> shaderLibrary, const std::string& source, const std::string& name);
+		static Ref<Shader> Create(ShaderLibrary* shaderLibrary, const std::filesystem::path& path, const std::string& name = std::string());
+		static Ref<Shader> Create(ShaderLibrary* shaderLibrary, const std::string& source, const std::string& name);
 
 		bool IsValid() const { return m_RendererID != 0; }
 		bool Reload();
+
+		void Bind()   const;
+		void Unbind() const;
 
 		void SetInt(const std::string& name, int value);
 		void SetIntArray(const std::string& name, int* values, int count);
@@ -51,6 +55,12 @@ namespace KuchCraft
 		const std::string& GetSource() const { return m_Source; }
 		const std::filesystem::path& GetPath() const { return m_Path; }
 
+		const std::map<ShaderType, std::string>&                     GetShaderSources() const { return m_ShaderSources; }
+		const std::map<ShaderType, std::vector<ShaderVariable>>&     GetVariables()     const { return m_Variables;     }
+		const std::map<ShaderType, std::vector<ShaderUniformBlock>>& GetUniformBlocks() const { return m_UniformBlocks; }
+
+		BufferLayout GetVertexInputLayout() const;
+
 	private:
 		bool Compile(const std::string& source);
 		int GetUniformLocation(const std::string& name);
@@ -64,14 +74,16 @@ namespace KuchCraft
 
 		std::map<ShaderType, std::string> m_ShaderSources;
 
-		Weak<ShaderLibrary> m_Library;
+		ShaderLibrary* m_Library;
 		std::unordered_map<std::string, std::string> m_LocalSubstitutions;
 		ShaderPreprocessor m_Preprocessor;
 
 		std::unordered_map<std::string, int> m_UniformLocations;
+		std::map<ShaderType, std::vector<ShaderVariable>>     m_Variables;
+		std::map<ShaderType, std::vector<ShaderUniformBlock>> m_UniformBlocks;
 
 	private:
-		Shader(const std::string& name, const std::string& source, const std::filesystem::path& path = std::filesystem::path(), Weak<ShaderLibrary> shaderLibrary = Weak<ShaderLibrary>());
+		Shader(const std::string& name, const std::string& source, const std::filesystem::path& path = std::filesystem::path(), ShaderLibrary* shaderLibrary = nullptr);
 
 		KC_DISALLOW_COPY(Shader);
 		KC_DISALLOW_MOVE(Shader);

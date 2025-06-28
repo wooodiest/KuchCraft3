@@ -46,6 +46,21 @@ namespace KuchCraft {
 				}
 			}, nullptr);
 		}
+
+		/// tmp
+		float triangleVertices[] = {
+			// x     y     z       r     g     b
+			 0.0f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,  // top 
+			-0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,  // bottom left
+			 0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f   // bottom right
+		};
+
+		m_ExampleData.Shader = m_ShaderLibrary.Load(std::filesystem::path("assets/shaders/SimpleTriangle.glsl"), "SimpleTriangle");
+
+		m_ExampleData.VertexArray  = VertexArray::Create();
+		m_ExampleData.VertexBuffer = VertexBuffer::Create(VertexBufferDataUsage::Static, sizeof(triangleVertices), triangleVertices);
+		m_ExampleData.VertexBuffer->SetLayout(m_ExampleData.Shader->GetVertexInputLayout());
+		m_ExampleData.VertexArray->AddVertexBuffer(m_ExampleData.VertexBuffer);
 	}
 
 	Renderer::~Renderer()
@@ -55,5 +70,11 @@ namespace KuchCraft {
 	Ref<Renderer> Renderer::Create(Config config)
 	{
 		return Ref<Renderer>(new Renderer(config));
+	}
+	void Renderer::Render()
+	{
+		m_ExampleData.Shader->Bind();
+		m_ExampleData.VertexArray->Bind();
+		glDrawArrays(GL_TRIANGLES, 0, 3);
 	}
 }

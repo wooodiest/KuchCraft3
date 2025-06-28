@@ -3,6 +3,10 @@
 #include "Core/Config.h"
 
 #include "Graphics/Core/IndexBuffer.h"
+#include "Graphics/Core/VertexBuffer.h"
+#include "Graphics/Core/VertexArray.h"
+#include "Graphics/Core/Shader.h"
+#include "Graphics/Core/ShaderLibrary.h"
 
 namespace KuchCraft {
 
@@ -12,6 +16,18 @@ namespace KuchCraft {
 		~Renderer();
 
 		static Ref<Renderer> Create(Config config);
+
+		void Render();
+
+
+	private:
+		ShaderLibrary m_ShaderLibrary;
+
+		struct {
+			Ref<VertexArray>  VertexArray;
+			Ref<VertexBuffer> VertexBuffer;
+			Ref<Shader>       Shader;
+		} m_ExampleData;
 
 	private:
 		Renderer(Config config);

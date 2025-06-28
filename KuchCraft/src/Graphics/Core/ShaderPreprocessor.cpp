@@ -5,7 +5,7 @@
 
 namespace KuchCraft {
 
-	std::map<ShaderType, std::string> ShaderPreprocessor::Process(const std::string& source, const std::filesystem::path& parentPath, Weak<ShaderLibrary> shaderLibrary, const std::unordered_map<std::string, std::string>& localSubstitutions)
+	std::map<ShaderType, std::string> ShaderPreprocessor::Process(const std::string& source, const std::filesystem::path& parentPath, ShaderLibrary* shaderLibrary, const std::unordered_map<std::string, std::string>& localSubstitutions)
 	{
 		m_Library = shaderLibrary;
 		m_IncludeStack .clear();
@@ -15,9 +15,9 @@ namespace KuchCraft {
 		std::string data = source;
 		data = ProcessIncludes(data, parentPath, m_IncludeStack);
 
-		if (Ref<ShaderLibrary> lib = m_Library.lock())
+		if (m_Library)
 		{
-			for (const auto& [k, v] : lib->GetGlobalSubstitutions())
+			for (const auto& [k, v] : m_Library->GetGlobalSubstitutions())
 				m_Substitutions[k] = v;
 		}
 
@@ -28,6 +28,168 @@ namespace KuchCraft {
 		data = SubstituteValues(data, m_Substitutions, visitedKeys);
 
 		return ExtractShaderSources(data);
+	}
+
+	static ShaderVariableType ParseShaderVariableType(const std::string& typeStr)
+	{
+		if (typeStr == "float")       return ShaderVariableType::Float;
+		if (typeStr == "vec2")        return ShaderVariableType::Float2;
+		if (typeStr == "vec3")        return ShaderVariableType::Float3;
+		if (typeStr == "vec4")        return ShaderVariableType::Float4;
+		if (typeStr == "int")         return ShaderVariableType::Int;
+		if (typeStr == "ivec2")       return ShaderVariableType::Int2;
+		if (typeStr == "ivec3")       return ShaderVariableType::Int3;
+		if (typeStr == "ivec4")       return ShaderVariableType::Int4;
+		if (typeStr == "uint")        return ShaderVariableType::Uint;
+		if (typeStr == "bool")        return ShaderVariableType::Bool;
+		if (typeStr == "mat3")        return ShaderVariableType::Mat3;
+		if (typeStr == "mat4")        return ShaderVariableType::Mat4;
+		if (typeStr == "sampler2D")   return ShaderVariableType::Sampler2D;
+		if (typeStr == "samplerCube") return ShaderVariableType::SamplerCube;
+
+		return ShaderVariableType::None;
+	}
+
+	std::map<ShaderType, std::vector<ShaderVariable>> ShaderPreprocessor::ProcessVariables(const std::map<ShaderType, std::string>& sources)
+	{
+		std::map<ShaderType, std::vector<ShaderVariable>> result;
+		static std::regex layoutRegex(R"((layout\s*\(\s*location\s*=\s*(\d+)\s*\)\s*)?(in|out|uniform)\s+(\w+)\s+(\w+)\s*;)");
+
+		for (const auto& [type, source] : sources)
+		{
+			if (source.empty())
+			{
+				KC_CORE_WARN("Shader source for type {} is empty, skipping processing.", ToString(type));
+				continue;
+			}
+
+			std::istringstream stream(source);
+			std::string line;
+
+			while (std::getline(stream, line))
+			{
+				std::smatch match;
+
+				if (std::regex_search(line, match, layoutRegex))
+				{
+					ShaderVariable var;
+
+					const std::string& locationStr  = match[1];
+					const std::string& locationNum  = match[2];
+					const std::string& qualifierStr = match[3];
+					const std::string& typeStr      = match[4];
+					const std::string& nameStr      = match[5];
+
+					var.Name = nameStr;
+
+					var.Qualifier = [&]() {
+						if (qualifierStr == "in")      return ShaderVariableQualifier::In;
+						if (qualifierStr == "out")     return ShaderVariableQualifier::Out;
+						if (qualifierStr == "uniform") return ShaderVariableQualifier::Uniform;
+						return ShaderVariableQualifier::None;
+					}();
+
+					var.Type = ParseShaderVariableType(typeStr);
+
+					if (match[2].matched)
+						var.Location = std::stoi(locationNum);
+					else
+						var.Location = -1;
+
+					result[type].push_back(var);
+				}
+			}
+		}
+
+		return result;
+	}
+
+	std::map<ShaderType, std::vector<ShaderUniformBlock>> ShaderPreprocessor::ProcessUniformBlocks(const std::map<ShaderType, std::string>& sources)
+	{
+		std::map<ShaderType, std::vector<ShaderUniformBlock>> result;
+
+		static std::regex blockHeaderRegex(R"(layout\s*\(\s*(.*?)\s*\)\s*uniform\s+(\w+)\s*\{)");
+		static std::regex blockSimpleRegex(R"(uniform\s+(\w+)\s*\{)");
+		static std::regex blockEndRegex   (R"(\};)");
+		static std::regex memberRegex     (R"((\w+)\s+(\w+)\s*;)");
+
+		for (const auto& [type, source] : sources)
+		{
+			if (source.empty())
+				continue;
+
+			std::istringstream stream(source);
+			std::string line;
+			bool insideBlock = false;
+
+			ShaderUniformBlock currentBlock;
+
+			while (std::getline(stream, line))
+			{
+				std::smatch match;
+
+				if (!insideBlock)
+				{
+					if (std::regex_search(line, match, blockHeaderRegex))
+					{
+						insideBlock = true;
+						currentBlock = ShaderUniformBlock();
+						const std::string& layoutSpec = match[1];
+						currentBlock.Name = match[2];
+
+						std::istringstream layoutStream(layoutSpec);
+						std::string token;
+						while (std::getline(layoutStream, token, ','))
+						{
+							token = Utils::Trim(token);
+							if (token.starts_with("binding"))
+							{
+								size_t eq = token.find('=');
+								if (eq != std::string::npos)
+								{
+									std::string val = Utils::Trim(token.substr(eq + 1));
+									currentBlock.Binding = std::stoi(val);
+								}
+							}
+							else
+							{
+								currentBlock.Layout = token;
+							}
+						}
+					}
+					else if (std::regex_search(line, match, blockSimpleRegex))
+					{
+						insideBlock          = true;
+						currentBlock         = ShaderUniformBlock();
+						currentBlock.Name    = match[1];
+						currentBlock.Layout  = "std140";
+						currentBlock.Binding = -1;
+					}
+				}
+				else
+				{
+					if (std::regex_search(line, match, blockEndRegex))
+					{
+						insideBlock = false;
+						result[type].push_back(currentBlock);
+					}
+					else if (std::regex_search(line, match, memberRegex))
+					{
+						const std::string& typeStr = match[1];
+						const std::string& nameStr = match[2];
+
+						ShaderVariable member;
+						member.Name      = nameStr;
+						member.Qualifier = ShaderVariableQualifier::None;
+						member.Type = ParseShaderVariableType(typeStr);
+
+						currentBlock.Members.push_back(member);
+					}
+				}
+			}
+		}
+
+		return result;
 	}
 
 	std::string ShaderPreprocessor::ProcessIncludes(const std::string& source, const std::filesystem::path& parentPath, std::unordered_set<std::filesystem::path>& includeStack)
@@ -344,7 +506,7 @@ namespace KuchCraft {
 			{
 				flushCurrent();
 
-				std::string typeStr = trimmed.substr(3);
+				std::string typeStr = Utils::Trim(trimmed.substr(3));
 				if (auto typeOpt = FromString<ShaderType>(typeStr); typeOpt.has_value())
 					currentType = *typeOpt;
 				else
