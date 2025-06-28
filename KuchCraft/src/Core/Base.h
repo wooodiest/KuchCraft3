@@ -20,6 +20,9 @@ namespace KuchCraft {
 	{
 		return std::make_shared<T>(std::forward<Args>(args)...);
 	}
+
+	template<typename T>
+	using Weak = std::weak_ptr<T>;
 }
 
 #define KC_VERSION "2025.0.0"

@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <functional>
 #include <random>
+#include <regex>
 #include <filesystem>
 
 #include <string>
@@ -15,6 +16,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <map>
+#include <stack>
 #include <set>
 #include <tuple>
 
@@ -67,5 +69,6 @@
 #include "Core/Config.h"
 #include "Core/Timestep.h"
 #include "Core/EnumUtils.h"
+#include "Core/Utils.h"
 
 #include "Graphics/Core/Core.h"
