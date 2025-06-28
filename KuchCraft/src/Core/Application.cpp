@@ -5,9 +5,6 @@
 #include <backends/imgui_impl_glfw.h>
 #include <backends/imgui_impl_opengl3.h>
 
-/// tmp
-#include <glad/glad.h>
-
 namespace KuchCraft {
 
 	Application::Application(int argc, char** argv)
@@ -66,11 +63,6 @@ namespace KuchCraft {
 			m_Window->Update();
 			ProcessEvents();
 
-			/// tmp
-			glViewport(0, 0, GetWindow()->GetWidth(), GetWindow()->GetHeight());
-			glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
 			Timestep ts = m_Window->GetDeltaTime();
 			if (!m_Minimized)
 			{
@@ -93,12 +85,13 @@ namespace KuchCraft {
 				}
 
 				/// OnRender
+				m_Renderer->NewFrame();
 				for (auto& layer : m_LayerStack)
 				{
 					if (layer->IsVisible())
 						layer->OnRender();
 				}
-				m_Renderer->Render();
+				m_Renderer->EndFrame();
 
 				/// ImGui
 				if (m_Config.Application.EnableImGui)

@@ -17,17 +17,25 @@ namespace KuchCraft {
 
 		static Ref<Renderer> Create(Config config);
 
-		void Render();
+		void NewFrame();
+		void EndFrame();
+	private:
+		void SetGlobalSubstitutions();
 
+		void InitSimpleTriangleData();
 
 	private:
+		void RenderSimpleTriangle();
+
+	private:
+		Config m_Config;
 		ShaderLibrary m_ShaderLibrary;
 
 		struct {
 			Ref<VertexArray>  VertexArray;
 			Ref<VertexBuffer> VertexBuffer;
 			Ref<Shader>       Shader;
-		} m_ExampleData;
+		} m_SimpleTriangleData;
 
 	private:
 		Renderer(Config config);
