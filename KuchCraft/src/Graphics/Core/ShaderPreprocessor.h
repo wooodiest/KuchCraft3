@@ -2,7 +2,7 @@
 
 namespace KuchCraft {
 
-	enum class ShaderVariableQualifier
+	enum class ShaderVariableQualifier : uint8_t
 	{
 		None = 0,
 		In,
@@ -10,7 +10,7 @@ namespace KuchCraft {
 		Uniform
 	};
 
-	enum class ShaderVariableType
+	enum class ShaderVariableType : uint8_t
 	{
 		None = 0,
 

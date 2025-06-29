@@ -7,6 +7,7 @@
 #include "Graphics/Core/VertexArray.h"
 #include "Graphics/Core/Shader.h"
 #include "Graphics/Core/ShaderLibrary.h"
+#include "Graphics/Core/FrameBuffer.h"
 
 namespace KuchCraft {
 
@@ -31,6 +32,9 @@ namespace KuchCraft {
 		void SetupLogging();
 		void SetGlobalSubstitutions();
 
+		void ClearDefaultFrameBuffer();
+		void SetRenderTargetToDefault();
+
 	private:
 		void InitSimpleTriangleData();
 		void RenderSimpleTriangle();
@@ -38,6 +42,7 @@ namespace KuchCraft {
 	private:
 		Config m_Config;
 		ShaderLibrary m_ShaderLibrary;
+		Ref<FrameBuffer> m_OffscreenRenderTarget;
 
 		int m_CurrentLayerIndex = 0;
 

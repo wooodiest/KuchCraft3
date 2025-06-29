@@ -1,5 +1,5 @@
 #include "kcpch.h"
-#include "Core/Utils.h"
+#include "Core/CoreUtils.h"
 
 namespace KuchCraft {
 	namespace Utils {
@@ -98,5 +98,6 @@ namespace KuchCraft {
 		{
 			return std::string_view(source.data() + Start, End - Start);
 		}
+
 	}
 }

@@ -15,6 +15,17 @@ namespace KuchCraft {
 		SetGlobalSubstitutions();
 
 		InitSimpleTriangleData();	
+
+		FrameBufferSpecification fbSpec;
+		fbSpec.Name   = "Offscreen Frame Buffer";
+		fbSpec.Width  = Application::Get().GetWindow()->GetWidth();
+		fbSpec.Height = Application::Get().GetWindow()->GetHeight();
+		fbSpec.Attachments.Attachments = {
+			{ "ColorAttachment", TextureFormat::RGBA},
+			{ "DepthAttachment", TextureFormat::DEPTH24STENCIL8 , }
+		};
+
+		m_OffscreenRenderTarget = FrameBuffer::Create(fbSpec);
 	}
 
 	Renderer::~Renderer()
@@ -29,23 +40,28 @@ namespace KuchCraft {
 	void Renderer::NewFrame()
 	{
 		auto [width, height] = Application::Get().GetWindow()->GetSize();
-		glViewport(0, 0, width, height);
-
-		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+		ClearDefaultFrameBuffer();
 		m_CurrentLayerIndex = 0;
 	}
 
 	void Renderer::EndFrame()
 	{
+		m_OffscreenRenderTarget->Bind();
+		m_OffscreenRenderTarget->ClearAttachments();
+
 		RenderSimpleTriangle();
+
+		m_OffscreenRenderTarget->Unbind();
+		SetRenderTargetToDefault();
+		m_OffscreenRenderTarget->BlitToDefault(FrameBufferBlitMask::Color, TextureFilter::Linear);
 	}
 
 	void Renderer::OnWindowResize(int width, int height)
 	{
 		if (width <= 0 || height <= 0)
 			return;
+
+		m_OffscreenRenderTarget->Resize(width, height);
 	}
 
 	void Renderer::CheckExtensions()
@@ -102,15 +118,22 @@ namespace KuchCraft {
 		m_ShaderLibrary.SetGlobalSubstitution("OPENGL_VERSION_MINOR", std::to_string(m_Config.Renderer.OpenGlMinorVersion));
 		m_ShaderLibrary.SetGlobalSubstitution("SHADER_VERSION", m_Config.Renderer.GetOpenGlVersion());
 		m_ShaderLibrary.SetGlobalSubstitution("SHADER_VERSION_LONG", "#version " + m_Config.Renderer.GetOpenGlVersion());
-
-		const auto& substitutions = m_ShaderLibrary.GetGlobalSubstitutions();
-		KC_CORE_INFO("Global shader substitutions:");
-		for (const auto& [name, value] : substitutions)
-		{
-			KC_CORE_INFO("  {} = {}", name, value);
-		}
-
 		/// Maybe reload shaders??
+	}
+
+	void Renderer::ClearDefaultFrameBuffer()
+	{
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		const auto& color = m_Config.Renderer.ClearColor;
+		glClearColor(color.r, color.g, color.b, color.a);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+	}
+
+	void Renderer::SetRenderTargetToDefault()
+	{
+		auto [width, height] = Application::Get().GetWindow()->GetSize();
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glViewport(0, 0, width, height);
 	}
 
 	void Renderer::InitSimpleTriangleData()
@@ -125,13 +148,17 @@ namespace KuchCraft {
 		m_SimpleTriangleData.Shader = m_ShaderLibrary.Load(std::filesystem::path("assets/shaders/SimpleTriangle.glsl"), "SimpleTriangle");
 
 		m_SimpleTriangleData.VertexArray  = VertexArray::Create();
+		m_SimpleTriangleData.VertexArray->SetDebugName("SimpleTriangleVAO");
+
 		m_SimpleTriangleData.VertexBuffer = VertexBuffer::Create(VertexBufferDataUsage::Static, sizeof(triangleVertices), triangleVertices);
+		m_SimpleTriangleData.VertexBuffer->SetDebugName("SimpleTriangleVBO");
 		m_SimpleTriangleData.VertexBuffer->SetLayout(m_SimpleTriangleData.Shader->GetVertexInputLayout());
 		m_SimpleTriangleData.VertexArray->AddVertexBuffer(m_SimpleTriangleData.VertexBuffer);
 
 		m_SimpleTriangleData.Shader->Bind();
 		m_SimpleTriangleData.Shader->SetFloat4("u_Color", glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
 	}
+
 	void Renderer::RenderSimpleTriangle()
 	{
 		m_SimpleTriangleData.Shader->Bind();
