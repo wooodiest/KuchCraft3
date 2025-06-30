@@ -11,10 +11,6 @@ namespace KuchCraft {
 		static Ref<IndexBuffer> Create(uint32_t* data, uint32_t count);
 
 		void SetData(uint32_t* data, uint32_t count, uint32_t offset = 0);
-
-		void Bind()   const;
-		void Unbind() const;
-
 		bool IsValid() const { return m_RendererID != 0; }
 
 		RendererID GetRendererID() const { return m_RendererID;               }

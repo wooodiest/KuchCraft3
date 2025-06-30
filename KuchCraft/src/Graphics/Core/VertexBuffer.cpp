@@ -62,20 +62,6 @@ namespace KuchCraft {
 		glNamedBufferSubData(m_RendererID, byteOffset, size, data);
 	}
 
-	void VertexBuffer::Bind() const
-	{
-		KC_CORE_ASSERT(IsValid(), "VertexBuffer is not valid.");
-
-		glBindBuffer(GL_ARRAY_BUFFER, m_RendererID);
-	}
-
-	void VertexBuffer::Unbind() const
-	{
-		KC_CORE_ASSERT(IsValid(), "VertexBuffer is not valid.");
-
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-	}
-
 	void VertexBuffer::SetLayout(const BufferLayout& layout)
 	{
 		KC_CORE_ASSERT(IsValid(), "VertexBuffer is not valid.");

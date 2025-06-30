@@ -62,7 +62,6 @@ namespace KuchCraft {
 	private:
 		RendererID m_RendererID = 0;
 		TextureSpecification  m_Specification;
-		std::filesystem::path m_Path;
 		std::string m_DebugName;
 
 		Texture2D(const TextureSpecification& spec, const std::filesystem::path& path = std::filesystem::path());
@@ -99,7 +98,6 @@ namespace KuchCraft {
 	private:
 		RendererID m_RendererID = 0;
 		TextureSpecification  m_Specification;
-		std::filesystem::path m_Path;
 		std::string m_DebugName;
 		int m_LayerCount = 0;
 

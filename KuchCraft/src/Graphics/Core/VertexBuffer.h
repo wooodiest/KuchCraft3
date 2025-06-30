@@ -95,10 +95,6 @@ namespace KuchCraft {
 		static Ref<VertexBuffer> Create(VertexBufferDataUsage usage, size_t size, const void* data = nullptr);
 
 		void SetData(const void* data, size_t size, size_t offset = 0);
-
-		void Bind()   const;
-		void Unbind() const;
-
 		bool IsValid() const { return m_RendererID != 0; }	
 
 		RendererID GetRendererID() const { return m_RendererID; }

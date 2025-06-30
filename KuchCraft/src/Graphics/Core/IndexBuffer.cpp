@@ -60,20 +60,6 @@ namespace KuchCraft {
 		glNamedBufferSubData(m_RendererID, byteOffset, count * sizeof(uint32_t), data);
 	}
 
-	void IndexBuffer::Bind() const
-	{
-		KC_CORE_ASSERT(IsValid(), "IndexBuffer is not valid.");
-
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_RendererID);
-	}
-
-	void IndexBuffer::Unbind() const
-	{
-		KC_CORE_ASSERT(IsValid(), "IndexBuffer is not valid.");
-
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	}
-
 	void IndexBuffer::SetDebugName(const std::string& name)
 	{
 		KC_CORE_ASSERT(!name.empty(), "IndexBuffer debug name must not be empty.");

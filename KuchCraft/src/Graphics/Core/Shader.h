@@ -61,6 +61,8 @@ namespace KuchCraft
 
 		BufferLayout GetVertexInputLayout() const;
 
+		void LogLayout() const;
+
 	private:
 		bool Compile(const std::string& source);
 		void SetUniformLocations();

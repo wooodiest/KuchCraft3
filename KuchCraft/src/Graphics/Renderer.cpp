@@ -146,17 +146,19 @@ namespace KuchCraft {
 
 	void Renderer::InitSimpleTriangleData()
 	{
-		float triangleVertices[] = {
-		//	  x     y     z     r  g  b       u     v
-			 0.0f, 0.5f, 0.0f,  1, 0, 0,     0.5f, 1.0f,
-			-0.5f,-0.5f, 0.0f,  0, 1, 0,     0.0f, 0.0f,
-			 0.5f,-0.5f, 0.0f,  0, 0, 1,     1.0f, 0.0f,
-		};
-
 		m_SimpleTriangleData.Shader = m_ShaderLibrary.Load(std::filesystem::path("assets/shaders/SimpleTriangle.glsl"), "SimpleTriangle");
+		m_SimpleTriangleData.Shader->Bind();
 
 		m_SimpleTriangleData.VertexArray  = VertexArray::Create();
+		m_SimpleTriangleData.VertexArray->Bind();
 		m_SimpleTriangleData.VertexArray->SetDebugName("SimpleTriangleVAO");
+
+		float triangleVertices[] = {
+			//	  x     y     z     r  g  b       u     v
+				 0.0f, 0.5f, 0.0f,  1, 0, 0,     0.5f, 1.0f,
+				-0.5f,-0.5f, 0.0f,  0, 1, 0,     0.0f, 0.0f,
+				 0.5f,-0.5f, 0.0f,  0, 0, 1,     1.0f, 0.0f,
+		};
 
 		m_SimpleTriangleData.VertexBuffer = VertexBuffer::Create(VertexBufferDataUsage::Static, sizeof(triangleVertices), triangleVertices);
 		m_SimpleTriangleData.VertexBuffer->SetDebugName("SimpleTriangleVBO");
@@ -165,7 +167,6 @@ namespace KuchCraft {
 
 		m_SimpleTriangleData.Texture = Texture2D::Create(std::filesystem::path("assets/textures/grid.png"));
 
-		m_SimpleTriangleData.Shader->Bind();
 		m_SimpleTriangleData.Shader->SetFloat4("u_Color", glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
 		m_SimpleTriangleData.Shader->SetInt("u_Texture", 0);
 	}

@@ -208,6 +208,18 @@ namespace KuchCraft {
 		return layout;
 	}
 
+	void Shader::LogLayout() const
+	{
+		for (const auto& [type, variables] : m_Variables)
+		{
+			KC_INFO("{}", ToString(type));
+			for (const auto& var : variables)
+			{
+				KC_INFO("{} : {} : {}, {}", var.Location, var.Name, ToString(var.Qualifier), ToString(var.Type));
+			}
+		}
+	}
+
 	bool Shader::Compile(const std::string& source)
 	{
 		auto shaderSources = m_Preprocessor.Process(source, std::filesystem::path(), m_Library, m_LocalSubstitutions);

@@ -57,9 +57,6 @@ namespace KuchCraft {
 	{
 		KC_CORE_ASSERT(vertexBuffer, "VertexBuffer cannot be null!");
 
-		Bind();
-		vertexBuffer->Bind();
-
 		const BufferLayout& layout = vertexBuffer->GetLayout();
 
 		glVertexArrayVertexBuffer(m_RendererID, m_AttributeBindingIndex, vertexBuffer->GetRendererID(), 0, layout.GetStride());
@@ -81,9 +78,7 @@ namespace KuchCraft {
 	{
 		KC_CORE_ASSERT(indexBuffer, "IndexBuffer cannot be null!");
 
-		Bind();
-		indexBuffer->Bind();
-
+		glVertexArrayElementBuffer(m_RendererID, indexBuffer->GetRendererID());
 		m_IndexBuffer = indexBuffer;
 	}
 	void VertexArray::SetDebugName(const std::string& name)

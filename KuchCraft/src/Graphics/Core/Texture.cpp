@@ -9,7 +9,7 @@
 namespace KuchCraft {
 
 	Texture2D::Texture2D(const TextureSpecification& spec, const std::filesystem::path& path)
-		: m_Specification(spec), m_Path(path)
+		: m_Specification(spec)
 	{
 		stbi_uc* data = nullptr;
 		if (!path.empty())
