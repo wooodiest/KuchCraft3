@@ -54,6 +54,11 @@ namespace KuchCraft {
 
 		bool OpenGlLogging = true;
 
+		int MaxCombinedTextureSlots = 64;
+		int MaxTextureSlots         = 32;
+
+		uint32_t MaxQuadsInBatch = 10'000;
+
 		std::string GetOpenGlVersion() const { return std::to_string(OpenGlMajorVersion * 100 + OpenGlMinorVersion * 10) + " core"; }
 	};
 

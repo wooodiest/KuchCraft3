@@ -2,6 +2,7 @@
 #include "Graphics/Renderer.h"
 
 #include "Core/Application.h"
+#include "Core/LayerStack.h"
 
 #include <glad/glad.h>
 
@@ -40,6 +41,7 @@ namespace KuchCraft {
 		m_OffscreenRenderTarget = FrameBuffer::Create(fbSpec);
 
 		InitSimpleTriangleData();
+		InitQuads2D();
 	}
 
 	Renderer::~Renderer()
@@ -67,7 +69,9 @@ namespace KuchCraft {
 		m_OffscreenRenderTarget->Bind();
 		m_OffscreenRenderTarget->ClearAttachments();
 
-		RenderSimpleTriangle();
+		DrawQuad2D({ 900.0f, 500.0f }, { 100.0f, 100.0f }, m_SimpleTriangleData.Texture);
+
+		RenderQuads2D();
 
 		m_OffscreenRenderTarget->Unbind();
 		SetRenderTargetToDefault();
@@ -86,6 +90,102 @@ namespace KuchCraft {
 			return;
 
 		m_OffscreenRenderTarget->Resize(width, height);
+	}
+
+	void Renderer::DrawQuad2D(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color)
+	{
+		DrawQuad2D({ position.x, position.y, m_CurrentOrthoDepth }, size, color);
+	}
+
+	void Renderer::DrawQuad2D(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color)
+	{
+		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
+			* glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
+
+		int textureID = 0; /// White texture
+		for (uint32_t i = 0; i < quad_vertex_count; i++)
+		{
+			m_Quads2D.Vertices.emplace_back(
+				glm::vec3(transform * quad_vertex_positions[i]),
+				color,
+				quad_vertex_texture_coords[i],
+				textureID
+			);
+		}
+	}
+
+	void Renderer::DrawQuad2D(const glm::vec2& position, const glm::vec2& size, const Ref<Texture2D>& texture, float tilingFactor, const glm::vec4& tintColor, glm::vec2 uv0, glm::vec2 uv1)
+	{
+		DrawQuad2D({ position.x, position.y, m_CurrentOrthoDepth }, size, texture, tilingFactor, tintColor, uv0, uv1);
+	}
+
+	void Renderer::DrawQuad2D(const glm::vec3& position, const glm::vec2& size, const Ref<Texture2D>& texture, float tilingFactor, const glm::vec4& tintColor, glm::vec2 uv0, glm::vec2 uv1)
+	{
+		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
+			* glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
+
+		int textureID = texture->GetRendererID();
+		for (uint32_t i = 0; i < quad_vertex_count; i++)
+		{
+			glm::vec2 baseUV = quad_vertex_texture_coords[i];
+			glm::vec2 uv     = glm::mix(uv0, uv1, baseUV) * tilingFactor;
+
+			m_Quads2D.Vertices.emplace_back(
+				glm::vec3(transform * quad_vertex_positions[i]),
+				tintColor,                                      
+				uv,                                            
+				textureID                                      
+			);
+		}
+	}
+
+	void Renderer::DrawRotatedQuad2D(const glm::vec2& position, const glm::vec2& size, float rotation, const glm::vec4& color)
+	{
+		DrawRotatedQuad2D({ position.x, position.y, m_CurrentOrthoDepth }, size, rotation, color);
+	}
+
+	void Renderer::DrawRotatedQuad2D(const glm::vec3& position, const glm::vec2& size, float rotation, const glm::vec4& color)
+	{
+		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) 
+			* glm::rotate(glm::mat4(1.0f), rotation, { 0.0f, 0.0f, 1.0f })
+			* glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
+
+		int textureID = 0; /// White texture
+		for (uint32_t i = 0; i < quad_vertex_count; i++)
+		{
+			m_Quads2D.Vertices.emplace_back(
+				glm::vec3(transform * quad_vertex_positions[i]),
+				color,
+				quad_vertex_texture_coords[i],
+				textureID
+			);
+		}
+	}
+
+	void Renderer::DrawRotatedQuad2D(const glm::vec2& position, const glm::vec2& size, float rotation, const Ref<Texture2D>& texture, float tilingFactor, const glm::vec4& tintColor, glm::vec2 uv0, glm::vec2 uv1)
+	{
+		DrawRotatedQuad2D({ position.x, position.y, m_CurrentOrthoDepth }, size, rotation, texture, tilingFactor, tintColor, uv0, uv1);
+	}
+
+	void Renderer::DrawRotatedQuad2D(const glm::vec3& position, const glm::vec2& size, float rotation, const Ref<Texture2D>& texture, float tilingFactor, const glm::vec4& tintColor, glm::vec2 uv0, glm::vec2 uv1)
+	{
+		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
+			* glm::rotate(glm::mat4(1.0f), rotation, { 0.0f, 0.0f, 1.0f })
+			* glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
+
+		int textureID = texture->GetRendererID();
+		for (uint32_t i = 0; i < quad_vertex_count; i++)
+		{
+			glm::vec2 baseUV = quad_vertex_texture_coords[i];
+			glm::vec2 uv = glm::mix(uv0, uv1, baseUV) * tilingFactor;
+
+			m_Quads2D.Vertices.emplace_back(
+				glm::vec3(transform * quad_vertex_positions[i]),
+				tintColor,
+				uv,
+				textureID
+			);
+		}
 	}
 
 	void Renderer::CheckExtensions()
@@ -142,6 +242,8 @@ namespace KuchCraft {
 		m_ShaderLibrary.SetGlobalSubstitution("OPENGL_VERSION_MINOR", std::to_string(m_Config.Renderer.OpenGlMinorVersion));
 		m_ShaderLibrary.SetGlobalSubstitution("SHADER_VERSION", m_Config.Renderer.GetOpenGlVersion());
 		m_ShaderLibrary.SetGlobalSubstitution("SHADER_VERSION_LONG", "#version " + m_Config.Renderer.GetOpenGlVersion());
+		m_ShaderLibrary.SetGlobalSubstitution("MAX_TEXTURE_SLOTS",          std::to_string(m_Config.Renderer.MaxTextureSlots));
+		m_ShaderLibrary.SetGlobalSubstitution("MAX_COMBINED_TEXTURE_SLOTS", std::to_string(m_Config.Renderer.MaxCombinedTextureSlots));
 		/// Maybe reload shaders??
 	}
 
@@ -158,6 +260,149 @@ namespace KuchCraft {
 		auto [width, height] = Application::Get().GetWindow()->GetSize();
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		glViewport(0, 0, width, height);
+	}
+
+	void Renderer::InitQuads2D()
+	{
+		/// Graphics
+		m_Quads2D.MaxQuadsInBatch = m_Config.Renderer.MaxQuadsInBatch;
+		m_Quads2D.MaxIndices  = m_Quads2D.MaxQuadsInBatch * quad_index_count;
+		m_Quads2D.MaxVertices = m_Quads2D.MaxQuadsInBatch * quad_vertex_count;
+
+		m_Quads2D.Shader = m_ShaderLibrary.Load(std::filesystem::path("assets/shaders/Quads2D.glsl"));
+		m_Quads2D.Shader->Bind();
+
+		m_Quads2D.Shader->LogLayout();
+
+		m_Quads2D.VertexArray = VertexArray::Create();
+		m_Quads2D.VertexArray->Bind();
+		m_Quads2D.VertexArray->SetDebugName("Quads2D_VAO");
+
+		m_Quads2D.VertexBuffer = VertexBuffer::Create(VertexBufferDataUsage::Dynamic, m_Quads2D.MaxVertices * sizeof(VertexQuad2D));
+		m_Quads2D.VertexBuffer->SetDebugName("Quads2D_VBO");
+		m_Quads2D.VertexBuffer->SetLayout(m_Quads2D.Shader->GetVertexInputLayout());
+		m_Quads2D.VertexArray ->AddVertexBuffer(m_Quads2D.VertexBuffer);
+
+		std::vector<uint32_t> indices;
+		indices.reserve(m_Quads2D.MaxIndices);
+		uint32_t offset = 0;
+		for (uint32_t i = 0; i < m_Quads2D.MaxIndices; i += quad_index_count)
+		{
+			indices.push_back(offset + 0);
+			indices.push_back(offset + 1);
+			indices.push_back(offset + 2);
+			indices.push_back(offset + 2);
+			indices.push_back(offset + 3);
+			indices.push_back(offset + 0);
+
+			offset += quad_vertex_count;
+		}
+
+		m_Quads2D.IndexBuffer = IndexBuffer::Create(indices.data(), m_Quads2D.MaxIndices);
+		m_Quads2D.IndexBuffer->SetDebugName("Quads2D_IBO");
+		m_Quads2D.VertexArray->SetIndexBuffer(m_Quads2D.IndexBuffer);
+
+		KC_TODO("After reloading shader set this again");
+		std::vector<int> samplers;
+		indices.reserve(m_Config.Renderer.MaxCombinedTextureSlots);
+		for (int i = 0; i < m_Config.Renderer.MaxCombinedTextureSlots; i++)
+			samplers.push_back(i);
+
+		m_Quads2D.Shader->SetIntArray("u_Textures", samplers.data(), m_Config.Renderer.MaxCombinedTextureSlots);
+
+		/// Internal
+		m_Quads2D.Textures.resize(m_Config.Renderer.MaxCombinedTextureSlots, 0);
+		m_Quads2D.Textures[0] = m_WhiteTexture->GetRendererID();
+
+		m_Quads2D.Vertices.reserve(m_Quads2D.MaxVertices);
+	}
+
+	void Renderer::RenderQuads2D()
+	{
+		if (m_Quads2D.Vertices.empty())
+			return;
+
+		m_Quads2D.Shader     ->Bind();
+		m_WhiteTexture       ->Bind(0);
+		m_Quads2D.VertexArray->Bind();
+
+		m_Quads2D.VertexOffset = 0;
+
+		StartBatchQuads2D();
+		for (size_t i = 0; i < m_Quads2D.Vertices.size(); i += quad_vertex_count)
+		{
+			if (m_Quads2D.CurrentIndexCount == m_Quads2D.MaxIndices)
+				NextBatchQuads2D();
+
+			/// TextureSlot temporarily holds the texture rendererID
+			if (m_Quads2D.Vertices[i].TextureSlot == 0)
+			{
+				/// Just color, white texture is bound to slot 0
+				m_Quads2D.CurrentIndexCount += quad_index_count;
+			}
+			else
+			{
+				/// Do we already have assigned slot to that texture?
+				int textureSlot = 0;
+				for (size_t j = 1; j < m_Quads2D.CurrentTextureSlot; j++)
+				{
+					if (m_Quads2D.Textures[j] == (RendererID)m_Quads2D.Vertices[i].TextureSlot) /// TextureSlot temporarily holds the texture rendererID
+					{
+						textureSlot = (int)j;
+						break;
+					}
+				}
+
+				/// If not, do it
+				if (textureSlot == 0)
+				{
+					if (m_Quads2D.CurrentTextureSlot >= m_Config.Renderer.MaxCombinedTextureSlots)
+						NextBatchQuads2D();
+
+					textureSlot = (int)m_Quads2D.CurrentTextureSlot;
+					m_Quads2D.Textures[m_Quads2D.CurrentTextureSlot] = (RendererID)m_Quads2D.Vertices[i].TextureSlot;
+					m_Quads2D.CurrentTextureSlot++;
+				}
+
+				m_Quads2D.Vertices[i + 0].TextureSlot = textureSlot;
+				m_Quads2D.Vertices[i + 1].TextureSlot = textureSlot;
+				m_Quads2D.Vertices[i + 2].TextureSlot = textureSlot;
+				m_Quads2D.Vertices[i + 3].TextureSlot = textureSlot;
+
+				m_Quads2D.CurrentIndexCount += quad_index_count;
+			}
+		}
+
+		FlushQuads2D();
+
+		m_Quads2D.Vertices.clear();
+	}
+
+	void Renderer::StartBatchQuads2D()
+	{
+		m_Quads2D.CurrentIndexCount  = 0;
+		m_Quads2D.CurrentTextureSlot = 1; /// 0 is reserved for a default white texture
+	}
+
+	void Renderer::NextBatchQuads2D()
+	{
+		FlushQuads2D();
+		StartBatchQuads2D();
+	}
+
+	void Renderer::FlushQuads2D()
+	{
+		if (m_Quads2D.CurrentIndexCount == 0)
+			return;
+
+		uint32_t vertexCount = m_Quads2D.CurrentIndexCount / quad_index_count * quad_vertex_count;
+		m_Quads2D.VertexBuffer->SetData(&m_Quads2D.Vertices[m_Quads2D.VertexOffset], vertexCount * sizeof(VertexQuad2D));
+
+		m_Quads2D.VertexOffset += vertexCount;
+		for (int slot = 1; slot < (int)m_Quads2D.CurrentTextureSlot; slot++)
+			Texture::Bind(slot, m_Quads2D.Textures[slot]);
+		
+		glDrawElements(GL_TRIANGLES, m_Quads2D.CurrentIndexCount, GL_UNSIGNED_INT, nullptr);
 	}
 
 	void Renderer::InitSimpleTriangleData()

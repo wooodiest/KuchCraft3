@@ -87,6 +87,15 @@ namespace KuchCraft {
 				/// OnRender
 				m_Renderer->NewFrame();
 				int layerIndex = 0;
+
+				m_Renderer->DrawQuad2D({ 100.0f, 100.0f }, { 100.0f, 100.0f }, { 1.0f, 0.0f, 0.0f, 1.0f });
+				m_Renderer->DrawQuad2D({ 300.0f, 100.0f }, { 100.0f, 100.0f }, { 0.0f, 1.0f, 0.0f, 1.0f });
+				m_Renderer->DrawQuad2D({ 500.0f, 100.0f }, { 100.0f, 100.0f }, { 0.0f, 0.0f, 1.0f, 1.0f });
+
+				m_Renderer->DrawRotatedQuad2D({ 100.0f, 400.0f }, { 100.0f, 100.0f }, glm::radians(25.0f), { 0.0f, 0.0f, 1.0f, 1.0f });
+				m_Renderer->DrawRotatedQuad2D({ 300.0f, 400.0f }, { 100.0f, 100.0f }, glm::radians(50.0f), { 0.0f, 1.0f, 0.0f, 1.0f });
+				m_Renderer->DrawRotatedQuad2D({ 500.0f, 400.0f }, { 100.0f, 100.0f }, glm::radians(75.0f), { 1.0f, 0.0f, 0.0f, 1.0f });
+
 				for (auto& layer : m_LayerStack)
 				{
 					if (layer->IsVisible())
