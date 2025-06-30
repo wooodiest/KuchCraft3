@@ -18,6 +18,7 @@ namespace KuchCraft {
 		: m_Specification(spec)
 	{
 		Invalidate();
+		SetDebugNames();
 	}
 
 	Ref<FrameBuffer> FrameBuffer::Create(const FrameBufferSpecification& spec)
@@ -448,6 +449,26 @@ namespace KuchCraft {
 		m_StencilAttachmentRendererID = 0;
 
 		m_Attachments.clear();
+	}
+
+	void FrameBuffer::SetDebugNames()
+	{
+		if (!GLAD_GL_KHR_debug)
+			return;
+
+		glObjectLabel(GL_FRAMEBUFFER, m_RendererID, -1, m_Specification.Name.c_str());
+
+		for (size_t i = 0; i < m_ColorAttachmentsRendererID.size(); ++i)
+		{
+			std::string label = m_Specification.Attachments.Attachments[i].Name;
+			glObjectLabel(GL_TEXTURE, m_ColorAttachmentsRendererID[i], -1, label.c_str());
+		}
+
+		if (m_DepthAttachmentRendererID)
+			glObjectLabel(GL_TEXTURE, m_DepthAttachmentRendererID, -1, m_DepthAttachmentSpecification.Name.c_str());
+
+		if (m_StencilAttachmentRendererID && m_StencilAttachmentRendererID != m_DepthAttachmentRendererID)
+			glObjectLabel(GL_TEXTURE, m_StencilAttachmentRendererID, -1, m_StencilAttachmentSpecification.Name.c_str());
 	}
 
 }
