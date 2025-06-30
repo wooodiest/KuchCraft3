@@ -14,18 +14,26 @@ namespace KuchCraft {
 		SetupLogging();
 		SetGlobalSubstitutions();
 
-		InitSimpleTriangleData();	
+		m_WhiteTexture = Texture2D::Create(TextureSpecification{ .Width = 1, .Height = 1 });
+		uint32_t whiteColor = 0xffffffff;
+		m_WhiteTexture->SetData(&whiteColor, sizeof(whiteColor));
+
+		m_BlackTexture = Texture2D::Create(TextureSpecification{ .Width = 1, .Height = 1 });
+		uint32_t blackColor = 0x000000;
+		m_BlackTexture->SetData(&blackColor, sizeof(blackColor));
 
 		FrameBufferSpecification fbSpec;
 		fbSpec.Name   = "Offscreen Frame Buffer";
 		fbSpec.Width  = Application::Get().GetWindow()->GetWidth();
 		fbSpec.Height = Application::Get().GetWindow()->GetHeight();
 		fbSpec.Attachments.Attachments = {
-			{ "ColorAttachment", TextureFormat::RGBA},
-			{ "DepthAttachment", TextureFormat::DEPTH24STENCIL8 , }
+			{ "ColorAttachment", TextureFormat::RGBA     },
+			{ "DepthAttachment", TextureFormat::DEPTH32F }
 		};
 
 		m_OffscreenRenderTarget = FrameBuffer::Create(fbSpec);
+
+		InitSimpleTriangleData();
 	}
 
 	Renderer::~Renderer()
@@ -139,10 +147,10 @@ namespace KuchCraft {
 	void Renderer::InitSimpleTriangleData()
 	{
 		float triangleVertices[] = {
-			// x     y     z       r     g     b
-			 0.0f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,  // top 
-			-0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,  // bottom left
-			 0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f   // bottom right
+		//	  x     y     z     r  g  b       u     v
+			 0.0f, 0.5f, 0.0f,  1, 0, 0,     0.5f, 1.0f,
+			-0.5f,-0.5f, 0.0f,  0, 1, 0,     0.0f, 0.0f,
+			 0.5f,-0.5f, 0.0f,  0, 0, 1,     1.0f, 0.0f,
 		};
 
 		m_SimpleTriangleData.Shader = m_ShaderLibrary.Load(std::filesystem::path("assets/shaders/SimpleTriangle.glsl"), "SimpleTriangle");
@@ -155,13 +163,17 @@ namespace KuchCraft {
 		m_SimpleTriangleData.VertexBuffer->SetLayout(m_SimpleTriangleData.Shader->GetVertexInputLayout());
 		m_SimpleTriangleData.VertexArray->AddVertexBuffer(m_SimpleTriangleData.VertexBuffer);
 
+		m_SimpleTriangleData.Texture = Texture2D::Create(std::filesystem::path("assets/textures/grid.png"));
+
 		m_SimpleTriangleData.Shader->Bind();
 		m_SimpleTriangleData.Shader->SetFloat4("u_Color", glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
+		m_SimpleTriangleData.Shader->SetInt("u_Texture", 0);
 	}
 
 	void Renderer::RenderSimpleTriangle()
 	{
 		m_SimpleTriangleData.Shader->Bind();
+		m_SimpleTriangleData.Texture->Bind();
 		m_SimpleTriangleData.VertexArray->Bind();
 		glDrawArrays(GL_TRIANGLES, 0, 3);
 	}

@@ -8,6 +8,7 @@
 #include "Graphics/Core/Shader.h"
 #include "Graphics/Core/ShaderLibrary.h"
 #include "Graphics/Core/FrameBuffer.h"
+#include "Graphics/Core/Texture.h"
 
 namespace KuchCraft {
 
@@ -26,6 +27,9 @@ namespace KuchCraft {
 		void SetLayerIndex(int layerIndex) { m_CurrentLayerIndex = layerIndex; }
 
 		void OnWindowResize(int width, int height);
+
+		Ref<Texture2D> GetWhiteTexture() const { return m_WhiteTexture; }
+		Ref<Texture2D> GetBlackTexture() const { return m_BlackTexture; }
 
 	private:
 		void CheckExtensions();
@@ -50,7 +54,11 @@ namespace KuchCraft {
 			Ref<VertexArray>  VertexArray;
 			Ref<VertexBuffer> VertexBuffer;
 			Ref<Shader>       Shader;
+			Ref<Texture2D>	  Texture;
 		} m_SimpleTriangleData;
+
+		Ref<Texture2D> m_WhiteTexture;
+		Ref<Texture2D> m_BlackTexture;
 
 	private:
 		Renderer(Config config);

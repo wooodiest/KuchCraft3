@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Graphics/Core/TextureSpecification.h"
+#include "Graphics/Core/TextureTypes.h"
 
 namespace KuchCraft {
 	namespace Utils {
@@ -163,5 +163,9 @@ namespace KuchCraft {
 			return GetMemorySize(format, size.x, size.y);
 		}
 
+		inline uint32_t CalculateMipCount(uint32_t width, uint32_t height)
+		{
+			return 1 + static_cast<uint32_t>(std::floor(std::log2(std::max(width, height))));
+		}
 	}
 }

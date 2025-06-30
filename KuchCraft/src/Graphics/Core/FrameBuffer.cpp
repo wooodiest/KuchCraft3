@@ -7,8 +7,6 @@
 
 namespace KuchCraft {
 
-	KC_TODO("Add asserts and logs to frame buffer");
-
 	FrameBuffer::~FrameBuffer()
 	{
 		DeleteTextures();
@@ -360,12 +358,15 @@ namespace KuchCraft {
 			}
 			else
 			{
+				GLenum filter = Utils::GetGlTextureFilter(attachment.Filter);
+				GLenum wrap   = Utils::GetGlTextureWrap(attachment.Wrap);
+
 				glTextureStorage2D(textureID, 1, internalFormat, width, height);
-				glTextureParameteri(textureID, GL_TEXTURE_MIN_FILTER, Utils::GetGlTextureFilter(attachment.Filter));
-				glTextureParameteri(textureID, GL_TEXTURE_MAG_FILTER, Utils::GetGlTextureFilter(attachment.Filter));
-				glTextureParameteri(textureID, GL_TEXTURE_WRAP_R, Utils::GetGlTextureWrap(attachment.Wrap));
-				glTextureParameteri(textureID, GL_TEXTURE_WRAP_S, Utils::GetGlTextureWrap(attachment.Wrap));
-				glTextureParameteri(textureID, GL_TEXTURE_WRAP_T, Utils::GetGlTextureWrap(attachment.Wrap));
+				glTextureParameteri(textureID, GL_TEXTURE_MIN_FILTER, filter);
+				glTextureParameteri(textureID, GL_TEXTURE_MAG_FILTER, filter);
+				glTextureParameteri(textureID, GL_TEXTURE_WRAP_R, wrap);
+				glTextureParameteri(textureID, GL_TEXTURE_WRAP_S, wrap);
+				glTextureParameteri(textureID, GL_TEXTURE_WRAP_T, wrap);
 			}
 
 			glNamedFramebufferTexture(m_RendererID, glAttachmentType, textureID, 0);

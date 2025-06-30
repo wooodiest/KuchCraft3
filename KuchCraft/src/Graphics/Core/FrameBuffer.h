@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Graphics/Core/TextureSpecification.h"
+#include "Graphics/Core/TextureTypes.h"
 
 namespace KuchCraft {
 
