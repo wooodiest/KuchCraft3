@@ -8,6 +8,11 @@
 
 namespace KuchCraft {
 
+	void Texture::Bind(int slot, RendererID rendererID)
+	{
+		glBindTextureUnit(slot, rendererID);
+	}
+
 	Texture2D::Texture2D(const TextureSpecification& spec, const std::filesystem::path& path)
 		: m_Specification(spec)
 	{
@@ -141,7 +146,7 @@ namespace KuchCraft {
 
 			m_Specification.Width  = firstWidth;
 			m_Specification.Height = firstHeight;
-			m_LayerCount = paths.size();
+			m_LayerCount = (int)paths.size();
 
 			stbi_image_free(data);
 		}

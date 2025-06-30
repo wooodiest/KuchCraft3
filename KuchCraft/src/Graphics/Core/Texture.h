@@ -21,6 +21,7 @@ namespace KuchCraft {
 		virtual ~Texture() = default;
 
 		virtual void Bind(int slot = 0) const = 0;
+		static void Bind(int slot, RendererID rendererID);
 
 		virtual RendererID GetRendererID() const = 0;
 		virtual bool IsValid() const = 0;

@@ -63,10 +63,18 @@ namespace KuchCraft {
 		for (const auto& element : layout)
 		{
 			glEnableVertexArrayAttrib(m_RendererID, m_AttributeIndex);
-			glVertexArrayAttribFormat(m_RendererID, m_AttributeIndex, element.GetCount(),
-				ShaderDataTypeToOpenGLBaseType(element.Type), element.Normalized ? GL_TRUE : GL_FALSE, element.Offset);
-			glVertexArrayAttribBinding(m_RendererID, m_AttributeIndex, m_AttributeBindingIndex);
+			if (element.Type == ShaderDataType::Int || element.Type == ShaderDataType::Uint)
+			{
+				glVertexArrayAttribIFormat(m_RendererID, m_AttributeIndex, element.GetCount(),
+					ShaderDataTypeToOpenGLBaseType(element.Type), element.Offset);
+			}
+			else
+			{
+				glVertexArrayAttribFormat(m_RendererID, m_AttributeIndex, element.GetCount(),
+					ShaderDataTypeToOpenGLBaseType(element.Type), element.Normalized ? GL_TRUE : GL_FALSE, element.Offset);
+			}
 
+			glVertexArrayAttribBinding(m_RendererID, m_AttributeIndex, m_AttributeBindingIndex);
 			m_AttributeIndex++;
 		}
 

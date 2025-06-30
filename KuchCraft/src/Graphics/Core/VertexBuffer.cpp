@@ -34,7 +34,6 @@ namespace KuchCraft {
 		: m_Usage(usage), m_Size(size)
 	{
 		KC_CORE_ASSERT(size > 0, "VertexBuffer size must be greater than 0.");
-		KC_CORE_ASSERT(data != nullptr, "VertexBuffer data must not be null.");
 
 		glCreateBuffers(1, &m_RendererID);
 		glNamedBufferData(m_RendererID, size, data, (usage == VertexBufferDataUsage::Static) ? GL_STATIC_DRAW : GL_DYNAMIC_DRAW);
