@@ -55,7 +55,7 @@ namespace KuchCraft {
 		None = 0,
 		Texture2D,
 		TextureCube,
-		TextureArray,
+		Texture2DArray,
 	};
 
 	union TextureClearValue

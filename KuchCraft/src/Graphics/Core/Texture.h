@@ -26,16 +26,12 @@ namespace KuchCraft {
 		virtual RendererID GetRendererID() const = 0;
 		virtual bool IsValid() const = 0;
 
-		virtual void SetData(const void* data, size_t size) = 0;
-
 		virtual TextureFormat GetFormat() const = 0;
 		virtual TextureType   GetType()   const = 0;
 
 		virtual int GetWidth()  const = 0;
 		virtual int GetHeight() const = 0;
 		virtual std::pair<int, int> GetSize() const = 0;
-
-		virtual const std::filesystem::path& GetPath() const = 0;
 
 		virtual void SetDebugName(const std::string& name) = 0;
 	};
@@ -54,7 +50,7 @@ namespace KuchCraft {
 		virtual RendererID GetRendererID() const override { return m_RendererID; }
 		virtual bool IsValid() const override { return m_RendererID != 0; }
 
-		virtual void SetData(const void* data, size_t size) override;
+		void SetData(const void* data, size_t size);
 
 		virtual TextureFormat GetFormat() const override { return m_Specification.Format; }
 		virtual TextureType   GetType()   const override { return TextureType::Texture2D; }
@@ -63,7 +59,6 @@ namespace KuchCraft {
 		virtual int GetHeight() const override { return m_Specification.Height; }
 		virtual std::pair<int, int> GetSize() const override { return{ m_Specification.Width, m_Specification.Height };}
 
-		virtual const std::filesystem::path& GetPath() const override { return m_Path; }
 		virtual void SetDebugName(const std::string& name) override;
 
 	private:
@@ -76,6 +71,45 @@ namespace KuchCraft {
 
 		KC_DISALLOW_MOVE(Texture2D);
 		KC_DISALLOW_COPY(Texture2D);
+	};
+
+	class Texture2DArray : public Texture
+	{
+	public:
+		virtual ~Texture2DArray();
+
+		static Ref<Texture2DArray> Create(const TextureSpecification& spec, int LayerCount);
+		static Ref<Texture2DArray> Create(const std::vector<std::filesystem::path>& paths, const TextureSpecification& spec = {});
+
+		virtual void Bind(int slot = 0) const override;
+		virtual void Unbind() const override;
+
+		virtual RendererID GetRendererID() const override { return m_RendererID; }
+		virtual bool IsValid() const override { return m_RendererID != 0; }
+
+		void SetLayerData(const void* data, size_t size, int layer);
+
+		virtual TextureFormat GetFormat() const override { return m_Specification.Format; }
+		virtual TextureType   GetType()   const override { return TextureType::Texture2DArray; }
+		int GetLayerCount() const { return m_LayerCount; }
+
+		virtual int GetWidth()  const override { return m_Specification.Width; }
+		virtual int GetHeight() const override { return m_Specification.Height; }
+		virtual std::pair<int, int> GetSize() const override { return{ m_Specification.Width, m_Specification.Height }; }
+
+		virtual void SetDebugName(const std::string& name) override;
+
+	private:
+		RendererID m_RendererID = 0;
+		TextureSpecification  m_Specification;
+		std::filesystem::path m_Path;
+		std::string m_DebugName;
+		int m_LayerCount = 0;
+
+		Texture2DArray(int LayerCount, const TextureSpecification& spec, const std::vector<std::filesystem::path>& paths);
+
+		KC_DISALLOW_MOVE(Texture2DArray);
+		KC_DISALLOW_COPY(Texture2DArray);
 	};
 
 }

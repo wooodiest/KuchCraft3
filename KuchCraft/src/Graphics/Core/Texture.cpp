@@ -111,9 +111,152 @@ namespace KuchCraft {
 
 	void Texture2D::SetDebugName(const std::string& name)
 	{
+		m_DebugName = name;
+
 		if (!GLAD_GL_KHR_debug)
 			return;
 
 		glObjectLabel(GL_TEXTURE, m_RendererID, -1, name.c_str());
 	}
+
+	Texture2DArray::Texture2DArray(int LayerCount, const TextureSpecification& spec, const std::vector<std::filesystem::path>& paths)
+		: m_LayerCount(LayerCount), m_Specification(spec)
+	{
+		/// Take first image from paths as specification
+		int firstWidth, firstHeight, firstChannels;
+		if (!paths.empty())
+		{
+			stbi_set_flip_vertically_on_load(1);
+			stbi_uc* data = stbi_load(paths[0].string().c_str(), &firstWidth, &firstHeight, &firstChannels, 0);
+
+			switch (firstChannels)
+			{
+				case 1: m_Specification.Format = TextureFormat::RED8UN; break;
+				case 2: m_Specification.Format = TextureFormat::RG8;    break;
+				case 3: m_Specification.Format = TextureFormat::RGB;    break;
+				case 4: m_Specification.Format = TextureFormat::RGBA;   break;
+				default:
+				{
+					KC_CORE_ERROR("Unsupported image format with {0} channels", firstChannels);
+					stbi_image_free(data);
+					return;
+				}
+			}
+
+			m_Specification.Width  = firstWidth;
+			m_Specification.Height = firstHeight;
+			m_LayerCount = paths.size();
+
+			stbi_image_free(data);
+		}
+
+		uint32_t mipLevels = 1;
+		if (m_Specification.GenerateMips)
+		{
+			mipLevels = m_Specification.MipLevels > 0 ? m_Specification.MipLevels :
+				Utils::CalculateMipCount(m_Specification.Width, m_Specification.Height);
+		}
+		m_Specification.MipLevels = mipLevels;
+
+		GLenum internalFormat = Utils::GetGLInternalFormat(m_Specification.Format);
+		GLenum filter         = Utils::GetGlTextureFilter(m_Specification.Filter);
+		GLenum minFilter      = (mipLevels > 1) ? GL_LINEAR_MIPMAP_LINEAR : filter;
+		GLenum wrap           = Utils::GetGlTextureWrap(m_Specification.Wrap);
+
+		glCreateTextures(GL_TEXTURE_2D_ARRAY, 1, &m_RendererID);
+		glTextureStorage3D(m_RendererID, mipLevels, internalFormat, m_Specification.Width, m_Specification.Height, m_LayerCount);
+		glTextureParameteri(m_RendererID, GL_TEXTURE_MIN_FILTER, minFilter);
+		glTextureParameteri(m_RendererID, GL_TEXTURE_MAG_FILTER, filter);
+		glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_S, wrap);
+		glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_T, wrap);
+
+		if (!paths.empty())
+		{
+			GLenum format = Utils::GetGLFormat(m_Specification.Format);
+			GLenum type   = Utils::GetGLType(m_Specification.Format);
+
+			for (int layer = 0; layer < paths.size(); ++layer)
+			{
+				const auto& path = paths[layer];
+
+				int width = 0, height = 0, channels = 0;
+				stbi_set_flip_vertically_on_load(1);
+				stbi_uc* data = stbi_load(path.string().c_str(), &width, &height, &channels, 0);
+
+				if (!data || width != firstWidth || height != firstHeight || channels != firstChannels)
+				{
+					KC_CORE_ERROR("Texture array layer {0} has incompatible dimensions or channels", layer);
+					stbi_image_free(data);
+					continue;
+				}
+
+				size_t layerSize = Utils::GetMemorySize(m_Specification.Format, width, height);
+				SetLayerData(data, layerSize, layer);
+				stbi_image_free(data);
+			}
+
+			if (mipLevels > 1)
+				glGenerateTextureMipmap(m_RendererID);
+		}
+	}
+
+	Texture2DArray::~Texture2DArray()
+	{
+		if (IsValid())
+			glDeleteTextures(1, &m_RendererID);
+	}
+
+	Ref<Texture2DArray> Texture2DArray::Create(const TextureSpecification& spec, int LayerCount)
+	{
+		return Ref<Texture2DArray>(new Texture2DArray(LayerCount, spec, {}));
+	}
+
+	Ref<Texture2DArray> Texture2DArray::Create(const std::vector<std::filesystem::path>& paths, const TextureSpecification& spec)
+	{
+		int layerCount = static_cast<int>(paths.size());
+		return Ref<Texture2DArray>(new Texture2DArray(layerCount, spec, paths));
+	}
+
+	void Texture2DArray::Bind(int slot) const
+	{
+		glBindTextureUnit(slot, m_RendererID);
+	}
+
+	void Texture2DArray::Unbind() const
+	{
+		glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
+	}
+
+	void Texture2DArray::SetLayerData(const void* data, size_t size, int layer)
+	{
+		KC_CORE_ASSERT(layer >= 0 && layer < m_LayerCount, "Invalid layer index!");
+		KC_CORE_ASSERT(size == Utils::GetMemorySize(m_Specification.Format, m_Specification.Width, m_Specification.Height),
+			"Texture2DArray layerData size mismatch!");
+
+		GLenum format = Utils::GetGLFormat(m_Specification.Format);
+		GLenum type = Utils::GetGLType(m_Specification.Format);
+
+		glTextureSubImage3D(
+			m_RendererID,
+			0,
+			0, 0, layer,
+			m_Specification.Width,
+			m_Specification.Height,
+			1,
+			format,
+			type,
+			data
+		);
+	}
+
+	void Texture2DArray::SetDebugName(const std::string& name)
+	{
+		m_DebugName = name;
+
+		if (!GLAD_GL_KHR_debug)
+			return;
+
+		glObjectLabel(GL_TEXTURE, m_RendererID, -1, name.c_str());
+	}
+
 }
