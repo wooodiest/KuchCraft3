@@ -21,7 +21,6 @@ namespace KuchCraft {
 		virtual ~Texture() = default;
 
 		virtual void Bind(int slot = 0) const = 0;
-		virtual void Unbind() const = 0;
 
 		virtual RendererID GetRendererID() const = 0;
 		virtual bool IsValid() const = 0;
@@ -45,7 +44,6 @@ namespace KuchCraft {
 		static Ref<Texture2D> Create(const std::filesystem::path& path, const TextureSpecification& spec = {});
 
 		virtual void Bind(int slot = 0) const override;
-		virtual void Unbind() const override;
 
 		virtual RendererID GetRendererID() const override { return m_RendererID; }
 		virtual bool IsValid() const override { return m_RendererID != 0; }
@@ -82,7 +80,6 @@ namespace KuchCraft {
 		static Ref<Texture2DArray> Create(const std::vector<std::filesystem::path>& paths, const TextureSpecification& spec = {});
 
 		virtual void Bind(int slot = 0) const override;
-		virtual void Unbind() const override;
 
 		virtual RendererID GetRendererID() const override { return m_RendererID; }
 		virtual bool IsValid() const override { return m_RendererID != 0; }
@@ -111,5 +108,41 @@ namespace KuchCraft {
 		KC_DISALLOW_MOVE(Texture2DArray);
 		KC_DISALLOW_COPY(Texture2DArray);
 	};
+
+	class TextureCube : public Texture
+	{
+	public:
+		virtual ~TextureCube();
+
+		static Ref<TextureCube> Create(const TextureSpecification& spec);
+		static Ref<TextureCube> Create(const std::array<std::filesystem::path, 6>& facePaths, const TextureSpecification& spec = {});
+
+		virtual void Bind(int slot = 0) const override;
+
+		virtual RendererID GetRendererID() const override { return m_RendererID; }
+		virtual bool IsValid() const override { return m_RendererID != 0; }
+
+		void SetFaceData(const void* data, size_t size, CubeTextureFaces face);
+
+		virtual TextureFormat GetFormat() const override { return m_Specification.Format; }
+		virtual TextureType   GetType()   const override { return TextureType::TextureCube; }
+
+		virtual int GetWidth()  const override { return m_Specification.Width; }
+		virtual int GetHeight() const override { return m_Specification.Height; }
+		virtual std::pair<int, int> GetSize() const override { return { m_Specification.Width, m_Specification.Height }; }
+
+		virtual void SetDebugName(const std::string& name) override;
+
+	private:
+		TextureCube(const TextureSpecification& spec, const std::array<std::filesystem::path, 6>& facePaths = {});
+
+		RendererID m_RendererID = 0;
+		TextureSpecification m_Specification;
+		std::string m_DebugName;
+
+		KC_DISALLOW_MOVE(TextureCube);
+		KC_DISALLOW_COPY(TextureCube);
+	};
+
 
 }

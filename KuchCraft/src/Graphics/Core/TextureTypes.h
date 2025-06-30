@@ -50,12 +50,22 @@ namespace KuchCraft {
 		Nearest
 	};
 
-	enum class TextureType
+	enum class TextureType : uint8_t
 	{
 		None = 0,
 		Texture2D,
 		TextureCube,
 		Texture2DArray,
+	};
+
+	enum class CubeTextureFaces : uint8_t
+	{
+		Right  = 0, /// +X
+		Left   = 1, /// -X
+		Top    = 2, /// +Y
+		Bottom = 3, /// -Y
+		Front  = 4, /// +Z
+		Back   = 5  /// -Z
 	};
 
 	union TextureClearValue
