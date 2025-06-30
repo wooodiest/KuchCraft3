@@ -18,7 +18,7 @@ namespace KuchCraft {
 
 	struct FrameBufferTextureSpecification
 	{
-		std::string       Name   = "FrameBufferAttachment";
+		std::string       Name   = "UnnamedFrameBufferAttachment";
 		TextureFormat     Format = TextureFormat::None;
 		TextureFilter     Filter = TextureFilter::Linear;
 		TextureWrap	      Wrap   = TextureWrap::Clamp;
@@ -37,12 +37,12 @@ namespace KuchCraft {
 	struct FrameBufferSpecification
 	{
 		FrameBufferAttachmentSpecification Attachments;
-		std::string Name = "FrameBuffer";
+		std::string Name = "UnnamedFrameBuffer";
 		int Width  = 0;
 		int Height = 0;
 
-		int   Samples   = 1;
-		bool  NoResize  = false;
+		int      Samples   = 1;
+		bool     NoResize  = false;
 		float    DepthClearValue   = 0.0f;
 		uint32_t StencilClearValue = 0;
 	};

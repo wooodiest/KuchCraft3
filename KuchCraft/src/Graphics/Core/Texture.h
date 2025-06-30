@@ -33,6 +33,7 @@ namespace KuchCraft {
 		virtual std::pair<int, int> GetSize() const = 0;
 
 		virtual void SetDebugName(const std::string& name) = 0;
+		virtual const std::string& GetDebugName() const = 0;
 	};
 
 	class Texture2D : public Texture
@@ -58,6 +59,7 @@ namespace KuchCraft {
 		virtual std::pair<int, int> GetSize() const override { return{ m_Specification.Width, m_Specification.Height };}
 
 		virtual void SetDebugName(const std::string& name) override;
+		virtual const std::string& GetDebugName() const override { return m_DebugName; };
 
 	private:
 		RendererID m_RendererID = 0;
@@ -94,6 +96,7 @@ namespace KuchCraft {
 		virtual std::pair<int, int> GetSize() const override { return{ m_Specification.Width, m_Specification.Height }; }
 
 		virtual void SetDebugName(const std::string& name) override;
+		virtual const std::string& GetDebugName() const override { return m_DebugName; };
 
 	private:
 		RendererID m_RendererID = 0;
@@ -130,6 +133,7 @@ namespace KuchCraft {
 		virtual std::pair<int, int> GetSize() const override { return { m_Specification.Width, m_Specification.Height }; }
 
 		virtual void SetDebugName(const std::string& name) override;
+		virtual const std::string& GetDebugName() const override { return m_DebugName; };
 
 	private:
 		TextureCube(const TextureSpecification& spec, const std::array<std::filesystem::path, 6>& facePaths = {});
