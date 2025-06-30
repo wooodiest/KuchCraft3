@@ -17,10 +17,16 @@ namespace KuchCraft {
 		m_WhiteTexture = Texture2D::Create(TextureSpecification{ .Width = 1, .Height = 1 });
 		uint32_t whiteColor = 0xffffffff;
 		m_WhiteTexture->SetData(&whiteColor, sizeof(whiteColor));
+		m_WhiteTexture->SetDebugName("WhiteTexture");
 
 		m_BlackTexture = Texture2D::Create(TextureSpecification{ .Width = 1, .Height = 1 });
 		uint32_t blackColor = 0x000000;
 		m_BlackTexture->SetData(&blackColor, sizeof(blackColor));
+		m_BlackTexture->SetDebugName("BlackTexture");
+
+		m_EnvironmentUniformBuffer = UniformBuffer::Create(sizeof(m_EnvironmentUniformBufferData));
+		m_EnvironmentUniformBuffer->SetDebugName("EnvironmentUniformBuffer");
+		m_ShaderLibrary.SetGlobalSubstitution("ENVIRONMENT_UNIFORM_BUFFER_BINDING", std::to_string(m_EnvironmentUniformBuffer->GetBinding()));
 
 		FrameBufferSpecification fbSpec;
 		fbSpec.Name   = "Offscreen Frame Buffer";
@@ -50,6 +56,10 @@ namespace KuchCraft {
 		auto [width, height] = Application::Get().GetWindow()->GetSize();
 		ClearDefaultFrameBuffer();
 		m_CurrentLayerIndex = 0;
+
+		m_EnvironmentUniformBufferData.ViewProjection  = glm::mat4(1.0f);
+		m_EnvironmentUniformBufferData.OrthoProjection = glm::ortho(0.0f, (float)width, 0.0f, (float)height);
+		m_EnvironmentUniformBuffer->SetData(&m_EnvironmentUniformBufferData, sizeof(m_EnvironmentUniformBufferData));
 	}
 
 	void Renderer::EndFrame()
@@ -154,10 +164,10 @@ namespace KuchCraft {
 		m_SimpleTriangleData.VertexArray->SetDebugName("SimpleTriangleVAO");
 
 		float triangleVertices[] = {
-			//	  x     y     z     r  g  b       u     v
-				 0.0f, 0.5f, 0.0f,  1, 0, 0,     0.5f, 1.0f,
-				-0.5f,-0.5f, 0.0f,  0, 1, 0,     0.0f, 0.0f,
-				 0.5f,-0.5f, 0.0f,  0, 0, 1,     1.0f, 0.0f,
+		//	       x       y     z     r  g  b       u     v
+				600.0f, 540.0f, 0.0f,  1, 0, 0,     0.5f, 1.0f,
+				300.0f, 180.0f, 0.0f,  0, 1, 0,     0.0f, 0.0f,
+				900.0f, 180.0f, 0.0f,  0, 0, 1,     1.0f, 0.0f,
 		};
 
 		m_SimpleTriangleData.VertexBuffer = VertexBuffer::Create(VertexBufferDataUsage::Static, sizeof(triangleVertices), triangleVertices);

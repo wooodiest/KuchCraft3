@@ -9,6 +9,7 @@
 #include "Graphics/Core/ShaderLibrary.h"
 #include "Graphics/Core/FrameBuffer.h"
 #include "Graphics/Core/Texture.h"
+#include "Graphics/Core/UniformBuffer.h"
 
 namespace KuchCraft {
 
@@ -50,15 +51,22 @@ namespace KuchCraft {
 
 		int m_CurrentLayerIndex = 0;
 
+		Ref<Texture2D> m_WhiteTexture;
+		Ref<Texture2D> m_BlackTexture;
+
+		struct {
+			glm::mat4 ViewProjection;
+			glm::mat4 OrthoProjection;
+		} m_EnvironmentUniformBufferData;
+
+		Ref<UniformBuffer> m_EnvironmentUniformBuffer;
+
 		struct {
 			Ref<VertexArray>  VertexArray;
 			Ref<VertexBuffer> VertexBuffer;
 			Ref<Shader>       Shader;
 			Ref<Texture2D>	  Texture;
 		} m_SimpleTriangleData;
-
-		Ref<Texture2D> m_WhiteTexture;
-		Ref<Texture2D> m_BlackTexture;
 
 	private:
 		Renderer(Config config);
