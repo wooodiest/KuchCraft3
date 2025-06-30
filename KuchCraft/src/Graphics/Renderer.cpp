@@ -55,7 +55,7 @@ namespace KuchCraft {
 	{
 		auto [width, height] = Application::Get().GetWindow()->GetSize();
 		ClearDefaultFrameBuffer();
-		m_CurrentLayerIndex = 0;
+		SetLayerIndex(0);
 
 		m_EnvironmentUniformBufferData.ViewProjection  = glm::mat4(1.0f);
 		m_EnvironmentUniformBufferData.OrthoProjection = glm::ortho(0.0f, (float)width, 0.0f, (float)height);
@@ -72,6 +72,12 @@ namespace KuchCraft {
 		m_OffscreenRenderTarget->Unbind();
 		SetRenderTargetToDefault();
 		m_OffscreenRenderTarget->BlitToDefault(FrameBufferBlitMask::Color, TextureFilter::Linear);
+	}
+
+	void Renderer::SetLayerIndex(int layerIndex)
+	{
+		m_CurrentLayerIndex = layerIndex;
+		m_CurrentOrthoDepth = ortho_near + (ortho_far - ortho_near) * (1.0f - (float)m_CurrentLayerIndex / (float)LayerStack::s_MaxLayers);
 	}
 
 	void Renderer::OnWindowResize(int width, int height)

@@ -24,6 +24,12 @@ namespace KuchCraft {
 	{
 		KC_CORE_ASSERT(layer, "Layer cannot be null");
 
+		if (Size() >= s_MaxLayers)
+		{
+			KC_CORE_ERROR("LayerStack has maximum layer size");
+			return;
+		}
+
 		const std::string& name = layer->GetName();
 		auto named = m_NamedLayers.find(name);
 		if (named != m_NamedLayers.end())

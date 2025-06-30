@@ -23,10 +23,12 @@ namespace KuchCraft {
 		void NewFrame();
 		void EndFrame();
 
+	public:
 		/// Sets the current rendering layer index (used as implicit Z-depth).
 		/// This approach allows layering UI, game objects, and overlays without relying on manual Z-positioning.
-		void SetLayerIndex(int layerIndex) { m_CurrentLayerIndex = layerIndex; }
+		void SetLayerIndex(int layerIndex);
 
+		/// Should be called by application when window is resized
 		void OnWindowResize(int width, int height);
 
 		Ref<Texture2D> GetWhiteTexture() const { return m_WhiteTexture; }
@@ -49,7 +51,8 @@ namespace KuchCraft {
 		ShaderLibrary m_ShaderLibrary;
 		Ref<FrameBuffer> m_OffscreenRenderTarget;
 
-		int m_CurrentLayerIndex = 0;
+		int   m_CurrentLayerIndex = 0;
+		float m_CurrentOrthoDepth = 1.0f;
 
 		Ref<Texture2D> m_WhiteTexture;
 		Ref<Texture2D> m_BlackTexture;

@@ -10,4 +10,6 @@ namespace KuchCraft {
 	using GLuint = unsigned int;
 	using GLint  = int;
 
+	inline constexpr float ortho_near = -1.0f;
+	inline constexpr float ortho_far  =  1.0f;
 }
