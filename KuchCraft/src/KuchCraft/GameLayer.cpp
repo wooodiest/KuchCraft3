@@ -6,6 +6,7 @@ namespace KuchCraft {
 	GameLayer::GameLayer(const Ref<Renderer>& renderer)
 		: Layer("GameLayer", LayerType::Game), m_Renderer(renderer)
 	{
+		m_GridTexture = Texture2D::Create(std::filesystem::path("assets/textures/grid.png"));
 	}
 
 	GameLayer::~GameLayer()
@@ -33,6 +34,8 @@ namespace KuchCraft {
 	void GameLayer::OnRender()
 	{
 		m_Renderer->DrawQuad2D({ 800.0f, 100.0f }, { 100.0f, 100.0f }, { 1.0f, 0.0f, 1.0f, 1.0f });
+
+		m_Renderer->DrawQuad2D({ 300.0f, 600.0f }, { 200.0f, 100.0f }, m_GridTexture);
 
 		m_Renderer->DrawQuad2D({ 100.0f, 100.0f }, { 100.0f, 100.0f }, { 1.0f, 0.0f, 0.0f, 1.0f });
 		m_Renderer->DrawQuad2D({ 300.0f, 100.0f }, { 100.0f, 100.0f }, { 0.0f, 1.0f, 0.0f, 1.0f });

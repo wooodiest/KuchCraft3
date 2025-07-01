@@ -20,7 +20,8 @@ namespace KuchCraft {
 		virtual void OnApplicationEvent(ApplicationEvent& e) override;
 
 	private:
-		Ref<Renderer> m_Renderer;
+		Ref<Renderer>  m_Renderer;
+		Ref<Texture2D> m_GridTexture;
 
 		float m_Rotation = glm::radians(0.0f);
 		float m_ColorR   = 0.0f;

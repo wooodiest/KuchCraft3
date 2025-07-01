@@ -30,6 +30,8 @@ namespace KuchCraft {
 		void RemoveGlobalSubstitution(const std::string& name);
 		void ClearGlobalSubstitutions();
 
+		const std::string& GetName() const { return m_Name; }
+
 	private:
 		std::string m_Name = "DefaultShaderLibrary";
 		std::unordered_map<std::string, Ref<Shader>> m_Shaders;

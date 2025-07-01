@@ -20,8 +20,14 @@ namespace KuchCraft {
 		virtual void OnApplicationEvent(ApplicationEvent& e) override;
 
 	private:
+		struct {
+			int Selected = -1;
+			std::string SelectedName = "NONE";
+
+		} m_ShadersInfo;
+
+	private:
 		Ref<Renderer> m_Renderer;
-		Ref<Texture2D> m_GridTexture;
 	};
 
 }

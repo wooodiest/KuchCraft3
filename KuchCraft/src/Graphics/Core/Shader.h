@@ -58,9 +58,10 @@ namespace KuchCraft
 		const std::string& GetSource() const { return m_Source; }
 		const std::filesystem::path& GetPath() const { return m_Path; }
 
-		const std::map<ShaderType, std::string>&                     GetShaderSources() const { return m_ShaderSources; }
-		const std::map<ShaderType, std::vector<ShaderVariable>>&     GetVariables()     const { return m_Variables;     }
-		const std::map<ShaderType, std::vector<ShaderUniformBlock>>& GetUniformBlocks() const { return m_UniformBlocks; }
+		const auto& GetShaderSources()    const { return m_ShaderSources;    }
+		const auto& GetVariables()        const { return m_Variables;        }
+		const auto& GetUniformBlocks()    const { return m_UniformBlocks;    }
+		const auto& GetUniformLocations() const { return m_UniformLocations; }
 
 		BufferLayout GetVertexInputLayout() const;
 

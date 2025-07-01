@@ -113,6 +113,8 @@ namespace KuchCraft {
 	private:
 		Renderer(Config config);
 
+		friend class RendererLayer;
+
 		KC_DISALLOW_COPY(Renderer);
 		KC_DISALLOW_MOVE(Renderer);
 	};
