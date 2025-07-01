@@ -65,9 +65,31 @@ namespace KuchCraft {
 			std::string shaderLibrarySeparatorText = "Library: " + m_Renderer->m_ShaderLibrary.GetName();
 			ImGui::SeparatorText(shaderLibrarySeparatorText.c_str());
 
-			if (ImGui::Button("Reload All##RendererLayer", ImVec2(ImGui::GetContentRegionAvail().x, 0.0f)))
+			if (ImGui::CollapsingHeader("Global substitutions##RendererLayer"))
 			{
-				m_Renderer->m_ShaderLibrary.ReloadAll();
+				const auto& globalSubstitutions = m_Renderer->m_ShaderLibrary.GetGlobalSubstitutions();
+				if (!globalSubstitutions.empty())
+				{
+					if (ImGui::BeginTable("TwoColumnTable", 2, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg))
+					{
+						ImGui::TableSetupColumn("Key", ImGuiTableColumnFlags_WidthStretch);
+						ImGui::TableSetupColumn("Vaule", ImGuiTableColumnFlags_WidthStretch);
+						ImGui::TableHeadersRow();
+						for (const auto& [key, value] : globalSubstitutions)
+						{
+							ImGui::TableNextRow();
+							ImGui::TableSetColumnIndex(0);
+							ImGui::TextUnformatted(key.c_str());
+							ImGui::TableSetColumnIndex(1);
+							ImGui::TextUnformatted(value.c_str());
+						}
+						ImGui::EndTable();
+					}
+				}
+				else
+				{
+					ImGui::Text("No data");
+				}
 			}
 
 			ImGui::SeparatorText("Shader list");
@@ -91,6 +113,11 @@ namespace KuchCraft {
 			}
 			ImGui::EndChild();
 
+			if (ImGui::Button("Reload All##RendererLayer", ImVec2(ImGui::GetContentRegionAvail().x, 0.0f)))
+			{
+				m_Renderer->m_ShaderLibrary.ReloadAll();
+			}
+
 			if (m_ShadersInfo.Selected != -1)
 			{
 				const auto& shader = m_Renderer->m_ShaderLibrary.Get(m_ShadersInfo.SelectedName);
@@ -100,6 +127,11 @@ namespace KuchCraft {
 					ImGui::Text("Name: %s", shader->GetName());
 					ImGui::Text("Path: %s", shader->GetPath().string().c_str());
 					ImGui::Text("RendererID: %d", shader->GetRendererID());
+
+					if (ImGui::Button("Reload##RendererLayer", ImVec2(ImGui::GetContentRegionAvail().x, 0.0f)))
+					{
+						shader->Reload();
+					}
 
 					ImGui::SeparatorText("");
 
@@ -164,9 +196,9 @@ namespace KuchCraft {
 									for (const auto& var : vars)
 									{
 										if (var.Location != -1)
-											ImGui::TextWrapped("Location %d - %s: %s - %s", var.Location, var.Name, std::string(ToString(var.Qualifier)), std::string(ToString(var.Type)));
+											ImGui::TextWrapped("Location %d %s -> %s: %s", var.Location, std::string(ToString(var.Qualifier)), var.Name, std::string(ToString(var.Type)));
 										else
-											ImGui::TextWrapped("%s: %s - %s", var.Name, std::string(ToString(var.Qualifier)), std::string(ToString(var.Type)));
+											ImGui::TextWrapped("%s: %s -> %s", std::string(ToString(var.Qualifier)), var.Name, std::string(ToString(var.Type)));
 									}
 								}
 								ImGui::Unindent(margin);
@@ -214,7 +246,7 @@ namespace KuchCraft {
 						}
 					}
 
-					if (ImGui::CollapsingHeader("UniformLocations##RendererLayer"))
+					if (ImGui::CollapsingHeader("Uniform Locations##RendererLayer"))
 					{
 						const auto& locations = shader->GetUniformLocations();
 						if (!locations.empty())
