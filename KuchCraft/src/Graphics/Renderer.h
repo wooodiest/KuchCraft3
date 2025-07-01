@@ -98,17 +98,6 @@ namespace KuchCraft {
 		void NextBatchQuads2D();
 		void FlushQuads2D();
 
-		/// Simple Triangle
-		struct {
-			Ref<VertexArray>  VertexArray;
-			Ref<VertexBuffer> VertexBuffer;
-			Ref<Shader>       Shader;
-			Ref<Texture2D>	  Texture;
-		} m_SimpleTriangleData;
-
-		void InitSimpleTriangleData();
-		void RenderSimpleTriangle();
-
 	private:
 		Renderer(Config config);
 

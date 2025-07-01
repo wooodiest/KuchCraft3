@@ -5,6 +5,9 @@
 #include "Core/LayerStack.h"
 
 #include "Graphics/Renderer.h"
+#include "Graphics/RendererLayer.h"
+
+#include "KuchCraft/GameLayer.h"
 
 namespace KuchCraft {
 
@@ -59,6 +62,9 @@ namespace KuchCraft {
 		Timestep m_TickTimer = 0.0f;
 
 		Ref<Renderer> m_Renderer;
+
+		Ref<GameLayer>     m_GameLayer;
+		Ref<RendererLayer> m_RendererLayer;
 
 	private:
 		static inline Application* s_Instance = nullptr;
