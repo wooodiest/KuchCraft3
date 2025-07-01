@@ -302,13 +302,17 @@ namespace KuchCraft {
 		m_Quads2D.IndexBuffer->SetDebugName("Quads2D_IBO");
 		m_Quads2D.VertexArray->SetIndexBuffer(m_Quads2D.IndexBuffer);
 
-		KC_TODO("After reloading shader set this again");
-		std::vector<int> samplers;
-		indices.reserve(m_Config.Renderer.MaxCombinedTextureSlots);
-		for (int i = 0; i < m_Config.Renderer.MaxCombinedTextureSlots; i++)
-			samplers.push_back(i);
+		auto setupTexturesSamplers = [this](Shader* shader) {
+			std::vector<int> samplers;
+			samplers.reserve(m_Config.Renderer.MaxCombinedTextureSlots);
+			for (int i = 0; i < m_Config.Renderer.MaxCombinedTextureSlots; i++)
+				samplers.push_back(i);
 
-		m_Quads2D.Shader->SetIntArray("u_Textures", samplers.data(), m_Config.Renderer.MaxCombinedTextureSlots);
+			shader->SetIntArray("u_Textures", samplers.data(), m_Config.Renderer.MaxCombinedTextureSlots);
+		};	
+
+		setupTexturesSamplers(m_Quads2D.Shader.get());
+		m_Quads2D.Shader->AddReloadCallback(setupTexturesSamplers);
 
 		/// Internal
 		m_Quads2D.Textures.resize(m_Config.Renderer.MaxCombinedTextureSlots, 0);

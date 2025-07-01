@@ -88,6 +88,9 @@ namespace KuchCraft {
 		if (success)
 			m_Source = source;
 		
+		for (auto& callback : m_ReloadCallbacks)
+			callback(this);
+
 		return success;
 	}
 

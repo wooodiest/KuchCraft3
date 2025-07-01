@@ -5,6 +5,7 @@
 
 namespace KuchCraft
 {
+	
 	enum class ShaderType
 	{
 		None = 0,
@@ -16,6 +17,8 @@ namespace KuchCraft
 	};
 
 	class ShaderLibrary;
+	class Shader;
+	using ShaderReloadCallback = std::function<void(Shader*)>;
 
 	class Shader
 	{
@@ -63,6 +66,10 @@ namespace KuchCraft
 
 		void LogLayout() const;
 
+		void AddReloadCallback(ShaderReloadCallback callback) {
+			m_ReloadCallbacks.push_back(std::move(callback));
+		}
+
 	private:
 		bool Compile(const std::string& source);
 		void SetUniformLocations();
@@ -84,6 +91,8 @@ namespace KuchCraft
 		std::unordered_map<std::string, int> m_UniformLocations;
 		std::map<ShaderType, std::vector<ShaderVariable>>     m_Variables;
 		std::map<ShaderType, std::vector<ShaderUniformBlock>> m_UniformBlocks;
+
+		std::vector<ShaderReloadCallback> m_ReloadCallbacks;
 
 	private:
 		Shader(const std::string& name, const std::string& source, const std::filesystem::path& path = std::filesystem::path(), ShaderLibrary* shaderLibrary = nullptr);
