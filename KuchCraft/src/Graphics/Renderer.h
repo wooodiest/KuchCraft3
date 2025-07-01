@@ -47,6 +47,8 @@ namespace KuchCraft {
 		Ref<Texture2D> GetWhiteTexture() const { return m_WhiteTexture; }
 		Ref<Texture2D> GetBlackTexture() const { return m_BlackTexture; }
 
+		const auto& GetStats() const { return m_Stats; }
+
 	private:
 		void CheckExtensions();
 		void SetupLogging();
@@ -72,6 +74,16 @@ namespace KuchCraft {
 		} m_EnvironmentUniformBufferData;
 
 		Ref<UniformBuffer> m_EnvironmentUniformBuffer;
+
+		/// Stats
+		struct {
+			uint32_t DrawCalls = 0;
+			uint32_t Vertices  = 0;
+			uint32_t Quads     = 0;
+
+		} m_Stats;
+		
+		void ResetStats();
 
 		/// Quads 2D
 		struct {

@@ -72,21 +72,21 @@ namespace KuchCraft {
 			Timestep ts = m_Window->GetDeltaTime();
 			if (!m_Minimized)
 			{
-				/// OnTick
+				/// Process fixed-time logic (Tick)
 				m_TickTimer += ts;
 				while (m_TickTimer >= tick_interval)
 				{
 					for (auto& layer : m_LayerStack)
-						if (layer->IsActive())
+						if (layer->ShouldUpdate())
 							layer->OnTick(tick_interval);
 
 					m_TickTimer -= tick_interval;
 				}
 
-				/// OnUpdate
+				/// Process frame-dependent logic (Update)
 				for (auto& layer : m_LayerStack)
 				{
-					if (layer->IsActive())
+					if (layer->ShouldUpdate())
 						layer->OnUpdate(ts);
 				}
 
@@ -95,7 +95,7 @@ namespace KuchCraft {
 				int layerIndex = 0;
 				for (auto& layer : m_LayerStack)
 				{
-					if (layer->IsVisible())
+					if (layer->ShouldRender())
 					{
 						m_Renderer->SetLayerIndex(layerIndex);
 						layer->OnRender();
@@ -114,7 +114,7 @@ namespace KuchCraft {
 					ImGui::NewFrame();
 					for (const auto& layer : m_LayerStack)
 					{
-						if (layer->IsVisible())
+						if (layer->ShouldRender())
 							layer->OnImGuiRender();
 					}
 					ImGui::EndFrame();
@@ -195,7 +195,7 @@ namespace KuchCraft {
 			if (e.Handled)
 				break;
 
-			if (!(*it)->IsActive())
+			if (!(*it)->ShouldHandleEvents())
 				continue;
 
 			(*it)->OnApplicationEvent(e);

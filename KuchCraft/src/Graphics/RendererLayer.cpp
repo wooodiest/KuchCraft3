@@ -1,6 +1,8 @@
 #include "kcpch.h"
 #include "Graphics/RendererLayer.h"
 
+#include <imgui.h>
+
 namespace KuchCraft {
 
 	RendererLayer::RendererLayer(const Ref<Renderer>& renderer)
@@ -23,6 +25,13 @@ namespace KuchCraft {
 
 	void RendererLayer::OnUpdate(Timestep ts)
 	{
+		if (Input::IsKeyPressed(KeyCode::F10))
+		{
+			if (m_State == LayerState::Active)
+				SetState(LayerState::NotVisible);
+			else if (m_State == LayerState::NotVisible)
+				SetState(LayerState::Active);
+		}
 	}
 
 	void RendererLayer::OnTick(const Timestep ts)
@@ -38,9 +47,22 @@ namespace KuchCraft {
 
 	void RendererLayer::OnImGuiRender()
 	{
+		ImGui::Begin("Render Debug Tools");
+
+		if (ImGui::CollapsingHeader("Statistics##Renderer", ImGuiTreeNodeFlags_DefaultOpen))
+		{
+			const auto& stats = m_Renderer->GetStats();
+
+			ImGui::Text("Draw calls: %d", stats.DrawCalls);
+			ImGui::Text("Vertices: %d", stats.Vertices);
+			ImGui::Text("Quads: %d", stats.Quads);
+		}
+
+		ImGui::End();
 	}
 
 	void RendererLayer::OnApplicationEvent(ApplicationEvent& e)
 	{
+
 	}
 }

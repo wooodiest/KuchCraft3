@@ -18,10 +18,12 @@ namespace KuchCraft {
 
 	enum class LayerState : uint8_t
 	{
-		Active, 
-		Visible,
-		Disabled
+		Active,       // Fully active: receives updates, events, and is rendered
+		Visible,      // Rendered only, no updates or events
+		NotVisible,   // Updates and receives events, but not rendered
+		Disabled      // Completely inactive: no rendering, updates, or events
 	};
+
 
 	class Layer
 	{
@@ -43,8 +45,9 @@ namespace KuchCraft {
 		void SetState(LayerState state) { m_State = state; }
 		LayerState GetState() const { return m_State; }
 
-		bool IsVisible() const { return m_State == LayerState::Active || m_State == LayerState::Visible; }
-		bool IsActive()  const { return m_State == LayerState::Active; }
+		bool ShouldRender() const { return m_State == LayerState::Active || m_State == LayerState::Visible; }
+		bool ShouldUpdate() const { return m_State == LayerState::Active || m_State == LayerState::NotVisible; }
+		bool ShouldHandleEvents() const { return m_State == LayerState::Active || m_State == LayerState::NotVisible; }
 
 	protected:
 		std::string m_Name;

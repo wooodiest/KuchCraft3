@@ -57,6 +57,7 @@ namespace KuchCraft {
 		auto [width, height] = Application::Get().GetWindow()->GetSize();
 		ClearDefaultFrameBuffer();
 		SetLayerIndex(0);
+		ResetStats();
 
 		m_EnvironmentUniformBufferData.ViewProjection  = glm::mat4(1.0f);
 		m_EnvironmentUniformBufferData.OrthoProjection = glm::ortho(0.0f, (float)width, 0.0f, (float)height);
@@ -259,6 +260,13 @@ namespace KuchCraft {
 		glViewport(0, 0, width, height);
 	}
 
+	void Renderer::ResetStats()
+	{
+		m_Stats.DrawCalls = 0;
+		m_Stats.Vertices  = 0;
+		m_Stats.Quads     = 0;
+	}
+
 	void Renderer::InitQuads2D()
 	{
 		/// Graphics
@@ -268,8 +276,6 @@ namespace KuchCraft {
 
 		m_Quads2D.Shader = m_ShaderLibrary.Load(std::filesystem::path("assets/shaders/Quads2D.glsl"));
 		m_Quads2D.Shader->Bind();
-
-		m_Quads2D.Shader->LogLayout();
 
 		m_Quads2D.VertexArray = VertexArray::Create();
 		m_Quads2D.VertexArray->Bind();
@@ -404,6 +410,10 @@ namespace KuchCraft {
 			Texture::Bind(slot, m_Quads2D.Textures[slot]);
 		
 		glDrawElements(GL_TRIANGLES, m_Quads2D.CurrentIndexCount, GL_UNSIGNED_INT, nullptr);
+
+		m_Stats.DrawCalls++;
+		m_Stats.Vertices += vertexCount;
+		m_Stats.Quads    += vertexCount / quad_vertex_count;
 	}
 
 }
