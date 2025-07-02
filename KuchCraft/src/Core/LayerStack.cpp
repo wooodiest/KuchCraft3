@@ -24,7 +24,7 @@ namespace KuchCraft {
 	{
 		KC_CORE_ASSERT(layer, "Layer cannot be null");
 
-		if (Size() >= s_MaxLayers)
+		if (Size() >= max_layers)
 		{
 			KC_CORE_ERROR("LayerStack has maximum layer size");
 			return;
@@ -47,6 +47,8 @@ namespace KuchCraft {
 		m_Layers.insert(it, layer);
 		m_NamedLayers[name] = layer;
 
+		AssignZIndices();
+
 		layer->OnAttach();
 	}
 
@@ -58,6 +60,8 @@ namespace KuchCraft {
 			(*it)->OnDetach();
 			m_NamedLayers.erase(layer->GetName());
 			m_Layers.erase(it);
+
+			AssignZIndices();
 		}
 		else
 		{
@@ -76,6 +80,7 @@ namespace KuchCraft {
 
 			oldLayer->OnDetach();
 			*it = newLayer;
+			AssignZIndices();
 			newLayer->OnAttach();
 
 			m_NamedLayers[name] = newLayer; 
@@ -84,6 +89,7 @@ namespace KuchCraft {
 		{
 			KC_CORE_WARN("Old layer not found, adding new layer instead");
 			AddLayer(newLayer);
+			AssignZIndices();
 		}
 	}
 
@@ -128,6 +134,20 @@ namespace KuchCraft {
 	size_t  LayerStack::GetPriority(LayerType type) const
 	{
 		return static_cast<size_t>(type);
+	}
+
+	void LayerStack::AssignZIndices()
+	{
+		const size_t count = m_Layers.size();
+		if (count == 0)
+			return;
+
+		const float step = static_cast<float>(max_layers) / static_cast<float>(count);
+		for (size_t i = 0; i < count; ++i)
+		{
+			const float z = (count - i - 1) * step;
+			m_Layers[i]->SetZIndex(z);
+		}
 	}
 
 }

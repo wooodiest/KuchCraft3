@@ -49,10 +49,15 @@ namespace KuchCraft {
 		bool ShouldUpdate() const { return m_State == LayerState::Active || m_State == LayerState::NotVisible; }
 		bool ShouldHandleEvents() const { return m_State == LayerState::Active || m_State == LayerState::NotVisible; }
 
+		void  SetZIndex(float z) { m_ZIndex = z; }
+		float GetZIndex() const  { return m_ZIndex; }
+
 	protected:
 		std::string m_Name;
 		LayerState  m_State  = LayerState::Active;
 		LayerType   m_Type   = LayerType::None;
+
+		float m_ZIndex = 0.0f;
 
 	};
 }

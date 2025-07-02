@@ -40,6 +40,7 @@ namespace KuchCraft {
 
 	void RendererLayer::OnRender()
 	{
+		m_Renderer->DrawQuad2D({ 120.0f, 120.0f}, { 150.0f, 100.0f }, { 1.0f, 0.5f, 0.0f, 1.0f });
 	}
 
 	void RendererLayer::OnImGuiRender()

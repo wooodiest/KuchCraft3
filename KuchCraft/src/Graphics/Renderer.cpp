@@ -2,7 +2,6 @@
 #include "Graphics/Renderer.h"
 
 #include "Core/Application.h"
-#include "Core/LayerStack.h"
 
 #include <glad/glad.h>
 
@@ -56,7 +55,6 @@ namespace KuchCraft {
 	{
 		auto [width, height] = Application::Get().GetWindow()->GetSize();
 		ClearDefaultFrameBuffer();
-		SetLayerIndex(0);
 		ResetStats();
 
 		m_EnvironmentUniformBufferData.ViewProjection  = glm::mat4(1.0f);
@@ -76,12 +74,6 @@ namespace KuchCraft {
 		m_OffscreenRenderTarget->BlitToDefault(FrameBufferBlitMask::Color, TextureFilter::Linear);
 	}
 
-	void Renderer::SetLayerIndex(int layerIndex)
-	{
-		m_CurrentLayerIndex = layerIndex;
-		m_CurrentOrthoDepth = ortho_near + (ortho_far - ortho_near) * (1.0f - (float)m_CurrentLayerIndex / (float)LayerStack::s_MaxLayers);
-	}
-
 	void Renderer::OnWindowResize(int width, int height)
 	{
 		if (width <= 0 || height <= 0)
@@ -92,7 +84,7 @@ namespace KuchCraft {
 
 	void Renderer::DrawQuad2D(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color)
 	{
-		DrawQuad2D({ position.x, position.y, m_CurrentOrthoDepth }, size, color);
+		DrawQuad2D({ position.x, position.y, m_DepthFromZIndex }, size, color);
 	}
 
 	void Renderer::DrawQuad2D(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color)
@@ -114,7 +106,7 @@ namespace KuchCraft {
 
 	void Renderer::DrawQuad2D(const glm::vec2& position, const glm::vec2& size, const Ref<Texture2D>& texture, float tilingFactor, const glm::vec4& tintColor, glm::vec2 uv0, glm::vec2 uv1)
 	{
-		DrawQuad2D({ position.x, position.y, m_CurrentOrthoDepth }, size, texture, tilingFactor, tintColor, uv0, uv1);
+		DrawQuad2D({ position.x, position.y, m_DepthFromZIndex }, size, texture, tilingFactor, tintColor, uv0, uv1);
 	}
 
 	void Renderer::DrawQuad2D(const glm::vec3& position, const glm::vec2& size, const Ref<Texture2D>& texture, float tilingFactor, const glm::vec4& tintColor, glm::vec2 uv0, glm::vec2 uv1)
@@ -139,7 +131,7 @@ namespace KuchCraft {
 
 	void Renderer::DrawRotatedQuad2D(const glm::vec2& position, const glm::vec2& size, float rotation, const glm::vec4& color)
 	{
-		DrawRotatedQuad2D({ position.x, position.y, m_CurrentOrthoDepth }, size, rotation, color);
+		DrawRotatedQuad2D({ position.x, position.y, m_DepthFromZIndex }, size, rotation, color);
 	}
 
 	void Renderer::DrawRotatedQuad2D(const glm::vec3& position, const glm::vec2& size, float rotation, const glm::vec4& color)
@@ -162,7 +154,7 @@ namespace KuchCraft {
 
 	void Renderer::DrawRotatedQuad2D(const glm::vec2& position, const glm::vec2& size, float rotation, const Ref<Texture2D>& texture, float tilingFactor, const glm::vec4& tintColor, glm::vec2 uv0, glm::vec2 uv1)
 	{
-		DrawRotatedQuad2D({ position.x, position.y, m_CurrentOrthoDepth }, size, rotation, texture, tilingFactor, tintColor, uv0, uv1);
+		DrawRotatedQuad2D({ position.x, position.y, m_DepthFromZIndex }, size, rotation, texture, tilingFactor, tintColor, uv0, uv1);
 	}
 
 	void Renderer::DrawRotatedQuad2D(const glm::vec3& position, const glm::vec2& size, float rotation, const Ref<Texture2D>& texture, float tilingFactor, const glm::vec4& tintColor, glm::vec2 uv0, glm::vec2 uv1)
@@ -328,6 +320,12 @@ namespace KuchCraft {
 	{
 		if (m_Quads2D.Vertices.empty())
 			return;
+
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glDisable(GL_CULL_FACE);
+		glEnable(GL_DEPTH_TEST);
+		glDepthFunc(GL_LESS);
 
 		m_Quads2D.Shader     ->Bind();
 		m_WhiteTexture       ->Bind(0);

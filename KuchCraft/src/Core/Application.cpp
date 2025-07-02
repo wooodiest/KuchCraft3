@@ -92,16 +92,13 @@ namespace KuchCraft {
 
 				/// OnRender
 				m_Renderer->NewFrame();
-				int layerIndex = 0;
 				for (auto& layer : m_LayerStack)
 				{
 					if (layer->ShouldRender())
 					{
-						m_Renderer->SetLayerIndex(layerIndex);
+						m_Renderer->SetZIndex(layer->GetZIndex());
 						layer->OnRender();
 					}
-
-					layerIndex++;
 				}
 				m_Renderer->EndFrame();
 

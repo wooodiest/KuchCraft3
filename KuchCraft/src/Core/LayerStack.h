@@ -5,6 +5,8 @@
 
 namespace KuchCraft {
 
+	inline constexpr int max_layers = 1000;
+
 	class LayerStack
 	{
 	public:
@@ -30,10 +32,9 @@ namespace KuchCraft {
 		std::vector<Ref<Layer>>::reverse_iterator rbegin() { return m_Layers.rbegin(); }
 		std::vector<Ref<Layer>>::reverse_iterator rend()   { return m_Layers.rend();   }
 
-		inline static int s_MaxLayers = 1000;
-
 	private:
 		size_t GetPriority(LayerType type) const;
+		void AssignZIndices();
 
 	private:
 		std::vector<Ref<Layer>> m_Layers;
