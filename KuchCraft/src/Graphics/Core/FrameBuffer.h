@@ -43,7 +43,7 @@ namespace KuchCraft {
 
 		int      Samples   = 1;
 		bool     NoResize  = false;
-		float    DepthClearValue   = 0.0f;
+		float    DepthClearValue   = 1.0f;
 		uint32_t StencilClearValue = 0;
 	};
 

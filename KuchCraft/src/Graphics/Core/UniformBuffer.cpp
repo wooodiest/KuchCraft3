@@ -29,7 +29,7 @@ namespace KuchCraft {
 		return Ref<UniformBuffer>(new UniformBuffer(size));
 	}
 
-	void UniformBuffer::SetData(const void* data, uint32_t size, uint32_t offset)
+	void UniformBuffer::SetData(const void* data, size_t size, uint32_t offset)
 	{
 		glNamedBufferSubData(m_RendererID, offset, size, data);
 	}

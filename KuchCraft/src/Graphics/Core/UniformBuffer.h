@@ -9,7 +9,7 @@ namespace KuchCraft {
 
 		static Ref<UniformBuffer> Create(size_t size);
 
-		void SetData(const void* data, uint32_t size, uint32_t offset = 0);
+		void SetData(const void* data, size_t size, uint32_t offset = 0);
 
 		bool IsValid() const { return m_RendererID != 0; }
 
