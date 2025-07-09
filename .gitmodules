@@ -13,3 +13,6 @@
 [submodule "KuchCraft/vendor/imgui"]
 	path = KuchCraft/vendor/imgui
 	url = https://github.com/wooodiest/imgui
+[submodule "KuchCraft/vendor/entt"]
+	path = KuchCraft/vendor/entt
+	url = https://github.com/wooodiest/entt
