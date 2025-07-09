@@ -70,5 +70,9 @@
 #include "Core/Timestep.h"
 #include "Core/EnumUtils.h"
 #include "Core/CoreUtils.h"
+#include "Core/UUID.h"
 
 #include "Graphics/Core/Core.h"
+
+#include "Scene/Components.h"
+#include "Scene/Entity.h"

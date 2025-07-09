@@ -12,7 +12,6 @@ namespace KuchCraft {
 		UUID(const UUID&) = default;
 
 		inline operator uint64_t() const { return m_UUID; }
-		operator const uint64_t() const { return m_UUID; }
 
 	private:
 		uint64_t m_UUID;
@@ -33,7 +32,7 @@ namespace std {
 	{
 		std::size_t operator()(const KuchCraft::UUID& uuid) const
 		{
-			return (uint64_t)uuid;
+			return static_cast<uint64_t>(uuid);
 		}
 	};
 
