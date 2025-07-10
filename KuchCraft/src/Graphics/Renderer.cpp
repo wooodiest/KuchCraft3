@@ -178,6 +178,37 @@ namespace KuchCraft {
 		}
 	}
 
+	void Renderer::DrawQuad2D(const glm::mat4& transform, const glm::vec4& color)
+	{
+		int textureID = 0; /// White texture
+		for (uint32_t i = 0; i < quad_vertex_count; i++)
+		{
+			m_Quads2D.Vertices.emplace_back(
+				glm::vec3(transform * quad_vertex_positions[i]),
+				color,
+				quad_vertex_texture_coords[i],
+				textureID
+			);
+		}
+	}
+
+	void Renderer::DrawQuad2D(const glm::mat4& transform, const Ref<Texture2D>& texture, float tilingFactor, const glm::vec4& tintColor, glm::vec2 uv0, glm::vec2 uv1)
+	{
+		int textureID = texture->GetRendererID();
+		for (uint32_t i = 0; i < quad_vertex_count; i++)
+		{
+			glm::vec2 baseUV = quad_vertex_texture_coords[i];
+			glm::vec2 uv = glm::mix(uv0, uv1, baseUV) * tilingFactor;
+
+			m_Quads2D.Vertices.emplace_back(
+				glm::vec3(transform * quad_vertex_positions[i]),
+				tintColor,
+				uv,
+				textureID
+			);
+		}
+	}
+
 	void Renderer::CheckExtensions()
 	{
 		if (!GLAD_GL_KHR_debug)

@@ -3,6 +3,8 @@
 #include "Core/Layer.h"
 #include "Graphics/Renderer.h"
 
+#include "Scene/Scene.h"
+
 namespace KuchCraft {
 
 	class GameLayer : public Layer
@@ -22,6 +24,8 @@ namespace KuchCraft {
 	private:
 		Ref<Renderer>  m_Renderer;
 		Ref<Texture2D> m_GridTexture;
+
+		Ref<Scene> m_Scene;
 
 		float m_Rotation = glm::radians(0.0f);
 		float m_ColorR   = 0.0f;

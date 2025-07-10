@@ -1,5 +1,8 @@
 #pragma once
 
+#include "Graphics/Core/Camera.h"
+#include "Graphics/Core/Texture.h"
+
 namespace KuchCraft {
 
 	struct IDComponent
@@ -55,4 +58,35 @@ namespace KuchCraft {
 				* glm::scale(glm::mat4(1.0f), Scale);
 		}
 	};
+
+	struct CameraComponent
+	{
+		Camera Camera;
+
+		/// Flag indicating if the camera's aspect ratio should remain fixed.
+		bool FixedAspectRatio = false;
+
+		/// Flag indicating if the camera automaticly should set position and rotation from transform component
+		bool UseTransformComponent = true;
+
+		CameraComponent() = default;
+		CameraComponent(const CameraComponent& other) = default;
+	};
+
+	struct SpriteRendererComponent
+	{
+		glm::vec4 Color = { 1.0f, 1.0f, 1.0f, 1.0f };
+
+		KC_TODO("Add texture manager and use texture by AssetHandle")
+		/// AssetHandle Texture = 0;
+		Ref<Texture2D> Texture;
+
+		float TilingFactor = 1.0f;
+		glm::vec2 UVStart  = { 0.0f, 0.0f };
+		glm::vec2 UVEnd    = { 1.0f, 1.0f };
+
+		SpriteRendererComponent() = default;
+		SpriteRendererComponent(const SpriteRendererComponent& other) = default;
+	};
+
 }
