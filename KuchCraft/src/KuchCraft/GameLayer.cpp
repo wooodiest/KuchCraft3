@@ -1,6 +1,9 @@
 #include "kcpch.h"
 #include "KuchCraft/GameLayer.h"
 
+#include "Scene/Entity.h"
+#include "KuchCraft/CameraController.h"
+
 namespace KuchCraft {
 
 	GameLayer::GameLayer(const Ref<Renderer>& renderer)
@@ -13,6 +16,8 @@ namespace KuchCraft {
 
 		auto camera = m_Scene->CreateEntity("Camera");
 		camera.AddComponent<CameraComponent>();
+		auto& script = camera.AddComponent<NativeScriptComponent>();
+		script.Bind<CameraController>();
 		m_Scene->SetPrimaryCamera(camera);
 
 		auto quad = m_Scene->CreateEntity("Quad");

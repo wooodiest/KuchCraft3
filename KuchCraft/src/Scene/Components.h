@@ -39,6 +39,33 @@ namespace KuchCraft {
 			: ParentHandle(parent) {}
 	};
 
+	class ScriptableEntity;
+
+	struct NativeScriptComponent
+	{
+		ScriptableEntity* Instance = nullptr;
+
+		ScriptableEntity* (*InstantiateScript)();
+		void (*DestroyScript)(NativeScriptComponent*);
+
+		std::string ScriptName;
+
+		template<typename T>
+		void Bind()
+		{
+			ScriptName = typeid(T).name();
+
+			InstantiateScript = []() {
+				return static_cast<ScriptableEntity*>(new T());
+			};
+
+			DestroyScript = [](NativeScriptComponent* nsc) {
+				delete nsc->Instance;
+				nsc->Instance = nullptr;
+			};
+		}
+	};
+
 	struct TransformComponent
 	{
 		glm::vec3 Translation = { 0.0f, 0.0f, 0.0f };

@@ -46,7 +46,7 @@ namespace KuchCraft {
 
 		Entity GetEntityWithUUID(UUID id) const;
 		Entity TryGetEntityWithUUID(UUID id) const;
-		Entity GetEntityNyName(const std::string& name);
+		Entity GetEntityByName(const std::string& name);
 
 		template<typename Fn>
 		void SubmitPreUpdateFunc(Fn&& func)
@@ -68,6 +68,8 @@ namespace KuchCraft {
 
 	private:
 		bool OnWindowResize(WindowResizeEvent& e);
+		void OnNativeScriptComponentAdded(entt::registry& registry, entt::entity entity);
+		void OnNativeScriptComponentRemoved(entt::registry& registry, entt::entity entity);
 
 	private:
 		UUID m_SceneID;

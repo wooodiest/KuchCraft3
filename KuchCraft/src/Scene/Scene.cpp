@@ -3,11 +3,15 @@
 
 #include "Core/Application.h"
 
+#include "Scene/Entity.h"
+#include "Scene/ScriptableEntity.h"
+
 namespace KuchCraft {
 
 	Scene::Scene(const std::string& name)
 	{
-
+		m_Registry.on_construct<NativeScriptComponent>().connect<&Scene::OnNativeScriptComponentAdded>(this);
+		m_Registry.on_destroy<NativeScriptComponent>().connect<&Scene::OnNativeScriptComponentRemoved>(this);
 	}
 
 	Scene::~Scene()
@@ -16,6 +20,8 @@ namespace KuchCraft {
 			DestroyEntity({ entity, this }, true, false);
 
 		m_Registry.clear();
+		m_Registry.on_construct<NativeScriptComponent>().disconnect<&Scene::OnNativeScriptComponentAdded>(this);
+		m_Registry.on_destroy<NativeScriptComponent>().disconnect<&Scene::OnNativeScriptComponentRemoved>(this);
 	}
 
 	void Scene::OnUpdate(Timestep ts)
@@ -27,19 +33,18 @@ namespace KuchCraft {
 			fn();
 		m_PreUpdateQueue.clear();
 
-		Entity cameraEntity = GetPrimaryCameraEntity();
-		if (cameraEntity)
-		{
-			auto& cameraComponent    = cameraEntity.GetComponent<CameraComponent>();
-			auto& transformComponent = cameraEntity.GetComponent<TransformComponent>();
+		m_Registry.view<NativeScriptComponent>().each([&](auto entity, auto& script) {
+			script.Instance->OnPreUpdate(ts);
+		});
 
-			if (cameraComponent.UseTransformComponent)
-				cameraComponent.Camera.UpdateTransform(transformComponent.Translation, transformComponent.Rotation);
-		}
+		m_Registry.view<NativeScriptComponent>().each([&](auto entity, auto& script){
+			script.Instance->OnUpdate(ts);
+		});
 
-		/// Update scripts
+		m_Registry.view<NativeScriptComponent>().each([&](auto entity, auto& script) {
+			script.Instance->OnPostUpdate(ts);
+		});
 
-		/// ...
 		for (auto&& fn : m_PostUpdateQueue)
 			fn();
 		m_PostUpdateQueue.clear();
@@ -54,8 +59,23 @@ namespace KuchCraft {
 
 	void Scene::OnRender()
 	{
-		Camera* mainCamera = GetPrimaryCamera();
-		if (!mainCamera || !m_Renderer)
+		if (!m_Renderer)
+			return;
+
+		Entity  cameraEntity = GetPrimaryCameraEntity();
+		Camera* mainCamera   = nullptr;
+		if (cameraEntity)
+		{
+			auto& cameraComponent    = cameraEntity.GetComponent<CameraComponent>();
+			auto& transformComponent = cameraEntity.GetComponent<TransformComponent>();
+
+			if (cameraComponent.UseTransformComponent)
+				cameraComponent.Camera.UpdateTransform(transformComponent.Translation, transformComponent.Rotation);
+
+			mainCamera = &cameraComponent.Camera;
+		}
+
+		if (!mainCamera)
 			return;
 
 		m_Registry.view<TransformComponent, SpriteRendererComponent>().each([&](auto entity, auto& transformComponent, auto& spriteComponent) {	
@@ -172,7 +192,7 @@ namespace KuchCraft {
 		return Entity{};
 	}
 
-	Entity Scene::GetEntityNyName(const std::string& name)
+	Entity Scene::GetEntityByName(const std::string& name)
 	{
 		auto view = m_Registry.view<TagComponent>();
 		for (auto entity : view)
@@ -224,6 +244,28 @@ namespace KuchCraft {
 		});
 
 		return false;
+	}
+
+	void Scene::OnNativeScriptComponentAdded(entt::registry& registry, entt::entity entity)
+	{
+		SubmitPreUpdateFunc([&]() {
+			auto& script = registry.get<NativeScriptComponent>(entity);
+			script.Instance = script.InstantiateScript();
+			script.Instance->m_Entity = Entity{ entity, this };
+			script.Instance->OnCreate(); 
+		});
+	}
+
+	void Scene::OnNativeScriptComponentRemoved(entt::registry& registry, entt::entity entity)
+	{
+		auto& script = registry.get<NativeScriptComponent>(entity);
+
+		if (script.Instance)
+		{
+			script.Instance->OnDestroy();
+			script.DestroyScript(&script);
+			script.Instance = nullptr;
+		}
 	}
 
 }

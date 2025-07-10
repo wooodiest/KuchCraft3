@@ -156,6 +156,7 @@ namespace KuchCraft {
 		inline static std::string NoName = "Unnamed";
 
 		friend class Scene;
+		friend class ScriptableEntity;
 	};
 
 }
