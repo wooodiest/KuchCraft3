@@ -248,11 +248,17 @@ namespace KuchCraft {
 
 	void Scene::OnNativeScriptComponentAdded(entt::registry& registry, entt::entity entity)
 	{
-		SubmitPreUpdateFunc([&]() {
-			auto& script = registry.get<NativeScriptComponent>(entity);
+		SubmitPreUpdateFunc([=, this]() {
+			if (!m_Registry.valid(entity))
+				return;
+
+			auto& script = m_Registry.get<NativeScriptComponent>(entity);
+			if (!script.InstantiateScript)
+				return;
+
 			script.Instance = script.InstantiateScript();
 			script.Instance->m_Entity = Entity{ entity, this };
-			script.Instance->OnCreate(); 
+			script.Instance->OnCreate();
 		});
 	}
 
