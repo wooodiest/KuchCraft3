@@ -82,23 +82,18 @@ namespace KuchCraft {
 
 		UUID GetSceneUUID() const;
 
-		const std::string&        GetName()      const { return HasComponent<TagComponent>() ? GetComponent<TagComponent>().Tag : NoName; }
-		const UUID                GetUUID()      const { return GetComponent<IDComponent>().ID; }
-
-		TransformComponent&       GetTransform()       { return GetComponent<TransformComponent>(); }
-		const TransformComponent& GetTransform() const { return GetComponent<TransformComponent>(); }
+		const std::string& GetTag() const { return GetComponent<TagComponent>().Tag; }
+		const UUID         GetUUID() const { return GetComponent<IDComponent>().ID; }
 
 		std::vector<UUID>&       GetChildren()       { return GetComponent<RelationshipComponent>().Children; }
 		const std::vector<UUID>& GetChildren() const { return GetComponent<RelationshipComponent>().Children; }
 
 		const UUID GetParentUUID() const { return GetComponent<RelationshipComponent>().ParentHandle; }
-		void SetParentUUID(UUID parent)  { GetComponent<RelationshipComponent>().ParentHandle = parent; }
 
-		bool RemoveChild(Entity child)
+		bool RemoveChild(UUID child)
 		{
-			UUID childId = child.GetUUID();
 			std::vector<UUID>& children = GetChildren();
-			auto it = std::find(children.begin(), children.end(), childId);
+			auto it = std::find(children.begin(), children.end(), child);
 			if (it != children.end())
 			{
 				children.erase(it);
@@ -106,6 +101,25 @@ namespace KuchCraft {
 			}
 
 			return false;
+		}
+
+		bool RemoveChild(Entity child) { return RemoveChild(child.GetUUID()); }
+
+		void AddChild(UUID child)
+		{
+			if (child == UUID{ 0 })
+				return;
+
+			auto& children = GetComponent<RelationshipComponent>().Children;
+			if (std::find(children.begin(), children.end(), child) != children.end())
+				return;
+
+			children.push_back(child);
+		}
+
+		void AddChild(Entity child)
+		{
+			AddChild(child.GetUUID());
 		}
 
 		Entity GetParent() const;
@@ -149,11 +163,13 @@ namespace KuchCraft {
 			return !(*this == other);
 		}
 
+		private:
+			void SetParentUUID(UUID parent) { GetComponent<RelationshipComponent>().ParentHandle = parent; }
+			void AddChildUUID(UUID child)   { GetComponent<RelationshipComponent>().Children.push_back(child); }
+
 	private:
 		entt::entity m_EntityHandle{ entt::null };
 		Scene* m_Scene = nullptr;
-
-		inline static std::string NoName = "Unnamed";
 
 		friend class Scene;
 		friend class ScriptableEntity;

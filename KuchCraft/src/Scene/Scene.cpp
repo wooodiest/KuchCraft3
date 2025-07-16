@@ -9,6 +9,7 @@
 namespace KuchCraft {
 
 	Scene::Scene(const std::string& name)
+		: m_Name(name)
 	{
 		m_Registry.on_construct<NativeScriptComponent>().connect<&Scene::OnNativeScriptComponentAdded>(this);
 		m_Registry.on_destroy<NativeScriptComponent>().connect<&Scene::OnNativeScriptComponentRemoved>(this);
@@ -16,10 +17,8 @@ namespace KuchCraft {
 
 	Scene::~Scene()
 	{
-		for (auto entity : GetAllEntitiesWith<IDComponent>())
-			DestroyEntity({ entity, this }, true, false);
 
-		m_Registry.clear();
+		DestroyAllEntities();
 		m_Registry.on_construct<NativeScriptComponent>().disconnect<&Scene::OnNativeScriptComponentAdded>(this);
 		m_Registry.on_destroy<NativeScriptComponent>().disconnect<&Scene::OnNativeScriptComponentRemoved>(this);
 	}
@@ -67,10 +66,13 @@ namespace KuchCraft {
 		if (cameraEntity)
 		{
 			auto& cameraComponent    = cameraEntity.GetComponent<CameraComponent>();
-			auto& transformComponent = cameraEntity.GetComponent<TransformComponent>();
 
-			if (cameraComponent.UseTransformComponent)
-				cameraComponent.Camera.UpdateTransform(transformComponent.Translation, transformComponent.Rotation);
+			if (cameraEntity.HasComponent<TransformComponent>())
+			{
+				auto& transformComponent = cameraEntity.GetComponent<TransformComponent>();
+				if (cameraComponent.UseTransformComponent)
+					cameraComponent.Camera.UpdateTransform(transformComponent.Translation, transformComponent.Rotation);
+			}
 
 			mainCamera = &cameraComponent.Camera;
 		}
@@ -105,10 +107,8 @@ namespace KuchCraft {
 		auto& idComponent = entity.AddComponent<IDComponent>();
 		idComponent.ID = UUID();
 
-		entity.AddComponent<TransformComponent>();
 		entity.AddComponent<RelationshipComponent>();
-		if (!name.empty())
-			entity.AddComponent<TagComponent>(name);
+		entity.AddComponent<TagComponent>(name.empty() ? "Unnamed" : name);
 
 		if (parent)
 			entity.SetParent(parent);
@@ -118,17 +118,15 @@ namespace KuchCraft {
 		return entity;
 	}
 
-	Entity Scene::CreateEntityWithID(UUID uuid, const std::string& name)
+	Entity Scene::CreateEntityWithUUID(UUID uuid, const std::string& name)
 	{
 		Entity entity = Entity{ m_Registry.create(), this };
 
 		auto& idComponent = entity.AddComponent<IDComponent>();
 		idComponent.ID = uuid;
 
-		entity.AddComponent<TransformComponent>();
 		entity.AddComponent<RelationshipComponent>();
-		if (!name.empty())
-			entity.AddComponent<TagComponent>(name);
+		entity.AddComponent<TagComponent>(name.empty() ? "Unnamed" : name);
 
 		m_EntityIDMap[idComponent.ID] = entity;
 
@@ -176,7 +174,16 @@ namespace KuchCraft {
 			return;
 
 		DestroyEntity(it->second, excludeChildren, first);
-	}	
+	}
+
+	void Scene::DestroyAllEntities()
+	{
+		for (auto entity : GetAllEntitiesWith<IDComponent>())
+			DestroyEntity({ entity, this }, true, false);
+
+		m_Registry.clear();
+		m_EntityIDMap.clear();
+	}
 
 	Entity Scene::GetEntityWithUUID(UUID id) const
 	{
@@ -256,8 +263,13 @@ namespace KuchCraft {
 			if (!script.InstantiateScript)
 				return;
 
-			script.Instance = script.InstantiateScript();
-			script.Instance->m_Entity = Entity{ entity, this };
+			/// Can be instantiated in different place (e.g. deserialization) but here will be called OnCreate
+			if (!script.Instance)
+			{
+				script.Instance = script.InstantiateScript();
+				script.Instance->m_Entity = Entity{ entity, this };
+			}
+
 			script.Instance->OnCreate();
 		});
 	}

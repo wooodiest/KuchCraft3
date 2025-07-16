@@ -19,6 +19,7 @@ namespace KuchCraft {
 		auto camera = m_Scene->CreateEntity("Camera");
 		{
 			camera.AddComponent<CameraComponent>();
+			camera.AddComponent<TransformComponent>();
 			camera.AddComponent<NativeScriptComponent>().Bind<CameraController>();
 			m_Scene->SetPrimaryCamera(camera);
 		}
@@ -27,18 +28,20 @@ namespace KuchCraft {
 		{
 			auto& sprite = quad.AddComponent<SpriteRendererComponent>();
 			sprite.Color = { 1.0f, 0.0f, 0.0f, 1.0f };
-			auto& transform = quad.GetTransform();
+
+			auto& transform = quad.AddComponent<TransformComponent>();
 			transform.Translation = { 500.0f, 200.0f, 0.0f };
-			transform.Scale = { 175.0f, 200.0f, 1.0f };
+			transform.Scale       = { 175.0f, 200.0f, 1.0f };
 		}
 		
 		auto texturedEntity = m_Scene->CreateChildEntity(quad, "Textured Entity");
 		{
 			auto& sprite = texturedEntity.AddComponent<SpriteRendererComponent>();
 			sprite.Texture = Texture2D::Create(std::filesystem::path("assets/textures/grid.png"), TextureSpecification{.Wrap = TextureWrap::Repeat});
-			auto& transform = texturedEntity.GetTransform();
+			
+			auto& transform = texturedEntity.AddComponent<TransformComponent>();
 			transform.Translation = { 200.0f, 200.0f, 0.0f };
-			transform.Scale = { 300.0f, 300.0f, 1.0f };
+			transform.Scale       = { 300.0f, 300.0f, 1.0f };
 		}
 	}
 
@@ -115,7 +118,7 @@ namespace KuchCraft {
 			{
 				ImGui::SeparatorText("Entity info");
 				ImGui::Text("UUID: %llu", selectedEntity.GetUUID());
-				ImGui::Text("Name: %s", selectedEntity.GetName());
+				ImGui::Text("Tag: %s", selectedEntity.GetTag());
 
 				DrawComponent<TagComponent>("Tag Component", selectedEntity, [](auto& tag) {
 					std::string entityTag = tag.Tag;
@@ -133,7 +136,7 @@ namespace KuchCraft {
 						if (!entity)
 							continue;
 
-						ImGui::BulletText("%s", entity.GetName().c_str());
+						ImGui::BulletText("%s", entity.GetTag().c_str());
 					}	
 					ImGui::Unindent(margin);
 				});
@@ -249,7 +252,7 @@ namespace KuchCraft {
 		if (entity.GetUUID() == m_HierarchyPanelSelectedEntity)
 			flags |= ImGuiTreeNodeFlags_Selected;
 
-		bool opened = ImGui::TreeNodeEx((void*)(uint64_t)entity.GetUUID(), flags, "%s", entity.GetName().c_str());
+		bool opened = ImGui::TreeNodeEx((void*)(uint64_t)entity.GetUUID(), flags, "%s", entity.GetTag().c_str());
 		
 		if (ImGui::IsItemClicked())
 			m_HierarchyPanelSelectedEntity = entity.GetUUID();

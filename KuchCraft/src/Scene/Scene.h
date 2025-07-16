@@ -29,14 +29,16 @@ namespace KuchCraft {
 
 		void SetRenderer(const Ref<Renderer>& renderer) { m_Renderer = renderer; }
 
+
 		/// Entities
-		Entity CreateEntity(const std::string& name = "");
-		Entity CreateChildEntity(Entity parent, const std::string& name = "");
-		Entity CreateEntityWithID(UUID uuid, const std::string& name = "");
+		Entity CreateEntity(const std::string& name = "Unnamed");
+		Entity CreateChildEntity(Entity parent, const std::string& name = "Unnamed");
+		Entity CreateEntityWithUUID(UUID uuid, const std::string& name = "Unnamed");
 
 		void SubmitToDestroyEntity(Entity entity);
 		void DestroyEntity(Entity entity, bool excludeChildren = false, bool first = true);
 		void DestroyEntity(UUID entityID, bool excludeChildren = false, bool first = true);
+		void DestroyAllEntities();
 
 		template<typename... Components>
 		auto GetAllEntitiesWith()
