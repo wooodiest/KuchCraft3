@@ -22,9 +22,13 @@ namespace KuchCraft {
 		virtual void OnApplicationEvent(ApplicationEvent& e) override;
 
 	private:
-		Ref<Renderer>  m_Renderer;
-		Ref<Texture2D> m_GridTexture;
+		void DrawEntityNode(Entity entity);
 
+	private:
+		UUID m_HierarchyPanelSelectedEntity = 0;
+
+	private:
+		Ref<Renderer>  m_Renderer;
 		Ref<Scene> m_Scene;
 
 		float m_Rotation = glm::radians(0.0f);

@@ -63,6 +63,7 @@ namespace KuchCraft {
 		const auto& GetEntityMap() const { return m_EntityIDMap; }
 
 		void SetPrimaryCamera(Entity entity);
+		void ResetPrimaryCamera() { m_PrimaryCameraEntity = entt::null; }
 		Entity GetPrimaryCameraEntity();
 		Camera* GetPrimaryCamera();
 

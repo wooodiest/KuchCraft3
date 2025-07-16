@@ -40,7 +40,7 @@ namespace KuchCraft {
 
 	void RendererLayer::OnRender()
 	{
-		m_Renderer->DrawQuad2D({ 120.0f, 120.0f}, { 150.0f, 100.0f }, { 1.0f, 0.5f, 0.0f, 1.0f });
+		
 	}
 
 	void RendererLayer::OnImGuiRender()
@@ -49,7 +49,6 @@ namespace KuchCraft {
 
 		constexpr float margin = 6.0f;
 		
-		ImGui::Indent(margin);
 		if (ImGui::CollapsingHeader("Statistics##RendererLayer", ImGuiTreeNodeFlags_DefaultOpen))
 		{
 			const auto& stats = m_Renderer->GetStats();
@@ -58,9 +57,7 @@ namespace KuchCraft {
 			ImGui::Text("Vertices: %d", stats.Vertices);
 			ImGui::Text("Quads: %d", stats.Quads);
 		}
-		ImGui::Unindent(margin);
 		
-		ImGui::Indent(margin);
 		if (ImGui::CollapsingHeader("Shaders##RendererLayer"))
 		{
 			std::string shaderLibrarySeparatorText = "Library: " + m_Renderer->m_ShaderLibrary.GetName();
@@ -271,8 +268,6 @@ namespace KuchCraft {
 				}	
 			}
 		}
-		ImGui::Unindent(margin);
-
 		ImGui::End();
 	}
 
