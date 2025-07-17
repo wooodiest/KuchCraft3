@@ -23,6 +23,9 @@ namespace KuchCraft {
 		void Reload(const std::string& name);
 		void ReloadAll();
 
+		void SetPath(const std::filesystem::path& path) { m_Path = path; }
+		const std::filesystem::path& GetPath() const { return m_Path; }
+
 		const std::unordered_map<std::string, Ref<Shader>>& GetShaders() const { return m_Shaders; }
 
 		const std::map<std::string, std::string>& GetGlobalSubstitutions() const { return m_GlobalSubstitutions; }
@@ -34,6 +37,7 @@ namespace KuchCraft {
 
 	private:
 		std::string m_Name = "DefaultShaderLibrary";
+		std::filesystem::path m_Path;
 		std::unordered_map<std::string, Ref<Shader>> m_Shaders;
 		std::map<std::string, std::string> m_GlobalSubstitutions;
 

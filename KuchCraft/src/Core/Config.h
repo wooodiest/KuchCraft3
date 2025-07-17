@@ -47,6 +47,8 @@ namespace KuchCraft {
 
 	struct RendererConfig
 	{
+		std::string ShadersPath = "assets/shaders/";
+
 		int OpenGlMajorVersion = 4;
 		int OpenGlMinorVersion = 6;
 

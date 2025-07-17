@@ -14,6 +14,8 @@ namespace KuchCraft {
 		SetupLogging();
 		SetGlobalSubstitutions();
 
+		m_ShaderLibrary.SetPath(m_Config.Renderer.ShadersPath);
+
 		m_WhiteTexture = Texture2D::Create(TextureSpecification{ .Width = 1, .Height = 1 });
 		uint32_t whiteColor = 0xffffffff;
 		m_WhiteTexture->SetData(&whiteColor, sizeof(whiteColor));
@@ -297,7 +299,7 @@ namespace KuchCraft {
 		m_Quads2D.MaxIndices  = m_Quads2D.MaxQuadsInBatch * quad_index_count;
 		m_Quads2D.MaxVertices = m_Quads2D.MaxQuadsInBatch * quad_vertex_count;
 
-		m_Quads2D.Shader = m_ShaderLibrary.Load(std::filesystem::path("assets/shaders/Quads2D.glsl"));
+		m_Quads2D.Shader = m_ShaderLibrary.Load(std::filesystem::path("Quads2D.glsl"));
 		m_Quads2D.Shader->Bind();
 
 		m_Quads2D.VertexArray = VertexArray::Create();

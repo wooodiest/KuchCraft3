@@ -24,7 +24,7 @@ namespace KuchCraft {
 
 	Ref<Shader> ShaderLibrary::Load(const std::filesystem::path& path, const std::string& name)
 	{
-		Ref<Shader> shader = Shader::Create(this, path, name);
+		Ref<Shader> shader = Shader::Create(this, m_Path / path, name);
 		AddShader(shader);
 		return shader;
 	}
