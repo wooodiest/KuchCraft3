@@ -188,17 +188,13 @@ namespace KuchCraft {
 
 			if (entityJson.contains("NativeScript"))
 			{
-#if 0
 				nlohmann::json nativeScriptJson = entityJson["NativeScript"];
 				if (nativeScriptJson.contains("ScriptName"))
 				{
 					const auto& scriptName = nativeScriptJson["ScriptName"];
 					auto& nsc = entity.AddComponent<NativeScriptComponent>();
 
-					/// Find and bind script
-					/// ....
-					bool scriptFound = false;
-					if (scriptFound)
+					if (NativeScriptRegistry::BindScript(scriptName, nsc))
 					{
 						if (nativeScriptJson.contains("State") && !nativeScriptJson["State"].is_null())
 						{
@@ -209,14 +205,13 @@ namespace KuchCraft {
 					}
 					else
 					{
-						KC_CORE_WARN("Entity has NativeScriptComponent but ScriptName is invalid or not found");
+						KC_CORE_WARN("NativeScript not found: {}", scriptName);
 					}
 				}
 				else
 				{
 					KC_CORE_WARN("Entity has NativeScriptComponent but no ScriptName");
 				}
-#endif
 			}
 
 			if (entityJson.contains("Transform"))

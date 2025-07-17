@@ -51,9 +51,9 @@ namespace KuchCraft {
 		std::string ScriptName;
 
 		template<typename T>
-		void Bind()
+		void Bind(const std::string& scriptName)
 		{
-			ScriptName = typeid(T).name();
+			ScriptName = scriptName;
 
 			InstantiateScript = []() {
 				return static_cast<ScriptableEntity*>(new T());

@@ -16,4 +16,6 @@ namespace KuchCraft {
 
 	};
 
+	REGISTER_NATIVE_SCRIPT(CameraController);
+
 }
