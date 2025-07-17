@@ -10,7 +10,7 @@ namespace KuchCraft {
 	class GameLayer : public Layer
 	{
 	public:
-		GameLayer(const Ref<Renderer>& renderer);
+		GameLayer(const Ref<Renderer>& renderer, Config config);
 		virtual ~GameLayer();
 
 		virtual void OnAttach() override;
@@ -21,6 +21,10 @@ namespace KuchCraft {
 		virtual void OnImGuiRender() override;
 		virtual void OnApplicationEvent(ApplicationEvent& e) override;
 
+		void CreateWorld(const std::string& name);
+		void LoadWorld  (const std::string& name);
+		void DeleteWorld(const std::string& name);
+
 	private:
 		void DrawEntityNode(Entity entity);
 
@@ -28,11 +32,10 @@ namespace KuchCraft {
 		UUID m_HierarchyPanelSelectedEntity = 0;
 
 	private:
-		Ref<Renderer>  m_Renderer;
+		Ref<Renderer> m_Renderer;
 		Ref<Scene> m_Scene;
-
-		float m_Rotation = glm::radians(0.0f);
-		float m_ColorR   = 0.0f;
+		Config m_Config;
+		std::string m_CurrentWorldName;
 	};
 
 }

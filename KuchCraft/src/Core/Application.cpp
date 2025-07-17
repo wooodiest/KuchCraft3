@@ -43,7 +43,7 @@ namespace KuchCraft {
 
 		m_Renderer = Renderer::Create(m_Config);
 
-		m_GameLayer     = CreateRef<GameLayer>(m_Renderer);
+		m_GameLayer     = CreateRef<GameLayer>(m_Renderer, m_Config);
 		m_RendererLayer = CreateRef<RendererLayer>(m_Renderer);
 
 		m_LayerStack.AddLayer(m_GameLayer);

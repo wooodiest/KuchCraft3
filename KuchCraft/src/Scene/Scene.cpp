@@ -5,25 +5,28 @@
 
 #include "Scene/Entity.h"
 #include "Scene/ScriptableEntity.h"
+#include "Scene/SceneSerializer.h"
 
 namespace KuchCraft {
 
 	Scene::Scene(const std::string& name)
 		: m_Name(name)
 	{
+		m_Path      = m_Config.Game.WorldsDir + m_Name + "/";
+		m_ScenePath = m_Path.string() + m_Name + SceneSerializer::DefaultExtension;
+
 		m_Registry.on_construct<NativeScriptComponent>().connect<&Scene::OnNativeScriptComponentAdded>(this);
 		m_Registry.on_destroy<NativeScriptComponent>().connect<&Scene::OnNativeScriptComponentRemoved>(this);	
 		m_Registry.on_construct<CameraComponent>().connect<&Scene::OnCameraComponentAdded>(this);
 
-		/// SceneSerializer serializer(this);
-		/// std::filesystem::path path = "data/worlds/" + m_Name + SceneSerializer::DefaultExtension;
-		/// serializer.Deserialize(path);
+		Load();
 	}
 
 	Scene::~Scene()
 	{
-
+		Save();
 		DestroyAllEntities();
+
 		m_Registry.on_construct<NativeScriptComponent>().disconnect<&Scene::OnNativeScriptComponentAdded>(this);
 		m_Registry.on_destroy<NativeScriptComponent>().disconnect<&Scene::OnNativeScriptComponentRemoved>(this);
 		m_Registry.on_construct<CameraComponent>().disconnect<&Scene::OnCameraComponentAdded>(this);
@@ -59,7 +62,6 @@ namespace KuchCraft {
 	{
 		if (m_IsPaused)
 			return;
-
 	}
 
 	void Scene::OnRender()
@@ -99,6 +101,18 @@ namespace KuchCraft {
 	{
 		ApplicationEventDispatcher dispatcher(e);
 		dispatcher.Dispatch<WindowResizeEvent>(KC_BIND_EVENT_FN(Scene::OnWindowResize));
+	}
+
+	void Scene::Load()
+	{
+		SceneSerializer serializer(this);
+		serializer.Deserialize(std::filesystem::path(m_ScenePath));
+	}
+
+	void Scene::Save()
+	{
+		SceneSerializer serializer(this);
+		serializer.Serialize(m_ScenePath);
 	}
 
 	Entity Scene::CreateEntity(const std::string& name)

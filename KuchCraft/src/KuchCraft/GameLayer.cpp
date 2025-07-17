@@ -10,39 +10,11 @@
 
 namespace KuchCraft {
 
-	GameLayer::GameLayer(const Ref<Renderer>& renderer)
-		: Layer("GameLayer", LayerType::Game), m_Renderer(renderer)
+	GameLayer::GameLayer(const Ref<Renderer>& renderer, Config config)
+		: Layer("GameLayer", LayerType::Game), m_Renderer(renderer), m_Config(config)
 	{
-		m_Scene = CreateRef<Scene>("Example Scene");
-		m_Scene->SetRenderer(renderer);
-
-		auto camera = m_Scene->CreateEntity("Camera");
-		{
-			camera.AddComponent<CameraComponent>();
-			camera.AddComponent<TransformComponent>();
-			camera.AddComponent<NativeScriptComponent>().Bind<CameraController>();
-			m_Scene->SetPrimaryCamera(camera);
-		}
-		
-		auto quad = m_Scene->CreateEntity("Quad");
-		{
-			auto& sprite = quad.AddComponent<SpriteRendererComponent>();
-			sprite.Color = { 1.0f, 0.0f, 0.0f, 1.0f };
-
-			auto& transform = quad.AddComponent<TransformComponent>();
-			transform.Translation = { 500.0f, 200.0f, 0.0f };
-			transform.Scale       = { 175.0f, 200.0f, 1.0f };
-		}
-		
-		auto texturedEntity = m_Scene->CreateChildEntity(quad, "Textured Entity");
-		{
-			auto& sprite = texturedEntity.AddComponent<SpriteRendererComponent>();
-			sprite._Texture = Texture2D::Create(std::filesystem::path("assets/textures/grid.png"), TextureSpecification{.Wrap = TextureWrap::Repeat});
-			
-			auto& transform = texturedEntity.AddComponent<TransformComponent>();
-			transform.Translation = { 200.0f, 200.0f, 0.0f };
-			transform.Scale       = { 300.0f, 300.0f, 1.0f };
-		}
+		if (config.Application.argc > 1 && config.Application.argv[1])
+			LoadWorld(config.Application.argv[1]);
 	}
 
 	GameLayer::~GameLayer()
@@ -59,20 +31,20 @@ namespace KuchCraft {
 
 	void GameLayer::OnUpdate(Timestep ts)
 	{
-		m_Rotation += glm::radians(30.0f) * ts;
-		m_ColorR = glm::abs(glm::sin(m_Rotation));		
-
-		m_Scene->OnUpdate(ts);
+		if (m_Scene)
+			m_Scene->OnUpdate(ts);
 	}
 
 	void GameLayer::OnTick(const Timestep ts)
 	{
-		m_Scene->OnTick(ts);
+		if (m_Scene)
+			m_Scene->OnTick(ts);
 	}
 
 	void GameLayer::OnRender()
 	{
-		m_Scene->OnRender();
+		if (m_Scene)
+			m_Scene->OnRender();
 	}
 
 	template<typename T, typename UIFunction>
@@ -94,8 +66,12 @@ namespace KuchCraft {
 
 	void GameLayer::OnImGuiRender()
 	{
-		ImGui::Begin("Game Debug Tools");
+		/// ...
 
+		if (!m_Scene)
+			return;
+
+		ImGui::Begin("Game Debug Tools");
 		constexpr float margin = 6.0f;
 
 		if (ImGui::CollapsingHeader("Scene##GameLayer", ImGuiTreeNodeFlags_DefaultOpen))
@@ -240,7 +216,84 @@ namespace KuchCraft {
 
 	void GameLayer::OnApplicationEvent(ApplicationEvent& e)
 	{
-		m_Scene->OnApplicationEvent(e);
+		if (m_Scene)
+			m_Scene->OnApplicationEvent(e);
+	}
+
+	void GameLayer::CreateWorld(const std::string& name)
+	{
+		if (name.empty())
+		{
+			KC_CORE_WARN("Cannot create world with empty name.");
+			return;
+		}
+
+		std::filesystem::path worldPath = m_Config.Game.WorldsDir / std::filesystem::path(name);
+
+		if (std::filesystem::exists(worldPath))
+		{
+			KC_CORE_WARN("World already exists: {}", worldPath.string());
+			return;
+		}
+
+		try
+		{
+			if (!std::filesystem::create_directories(worldPath))
+			{
+				KC_CORE_ERROR("Failed to create world: {}", worldPath.string());
+				return;
+			}
+
+			LoadWorld(name);
+		}
+		catch (const std::exception& e)
+		{
+			KC_CORE_ERROR("Exception while creating world: {}", e.what());
+		}
+	}
+
+	void GameLayer::LoadWorld(const std::string& name)
+	{
+		if (!name.empty())
+		{
+			std::filesystem::path worldPath = m_Config.Game.WorldsDir / std::filesystem::path(name);
+			if (std::filesystem::exists(worldPath) && std::filesystem::is_directory(worldPath))
+			{
+				m_Scene = CreateRef<Scene>(name);
+				m_Scene->SetRenderer(m_Renderer);
+				m_Scene->SetConfig(m_Config);
+			}
+			else
+			{
+				KC_CORE_ERROR("World folder does not exist: {}", worldPath.string());
+			}
+		}
+	}
+
+	void GameLayer::DeleteWorld(const std::string& name)
+	{
+		if (name.empty())
+		{
+			KC_CORE_WARN("Cannot delete world with empty name.");
+			return;
+		}
+
+		std::filesystem::path worldPath = m_Config.Game.WorldsDir / std::filesystem::path(name);
+
+		if (!std::filesystem::exists(worldPath))
+		{
+			KC_CORE_WARN("World does not exist: {}", worldPath.string());
+			return;
+		}
+
+		try
+		{
+			std::filesystem::remove_all(worldPath);
+		}
+		catch (const std::exception& e)
+		{
+			KC_CORE_ERROR("Exception while deleting world '{}': {}", name, e.what());
+		}
 	}
 
 	void GameLayer::DrawEntityNode(Entity entity)

@@ -62,11 +62,17 @@ namespace KuchCraft {
 		std::string GetOpenGlVersion() const { return std::to_string(OpenGlMajorVersion * 100 + OpenGlMinorVersion * 10) + " core"; }
 	};
 
+	struct GameConfig
+	{
+		std::string WorldsDir = "data/worlds/";
+	};
+
 	struct Config
 	{
 		ApplicationConfig Application;
 		WindowConfig      Window;
 		RendererConfig    Renderer;
+		GameConfig        Game;
 
 		void Serialize(const std::filesystem::path& path) const;
 		void Deserialize(const std::filesystem::path& path);

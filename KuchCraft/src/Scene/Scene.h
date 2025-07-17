@@ -28,7 +28,13 @@ namespace KuchCraft {
 		void Pause(bool value) { m_IsPaused = value; }
 
 		void SetRenderer(const Ref<Renderer>& renderer) { m_Renderer = renderer; }
+		void SetConfig(const Config& config) { m_Config = config; }
 
+		void Load();
+		void Save();
+
+		const std::filesystem::path& GetPath()      const { return m_Path;      }
+		const std::filesystem::path& GetScenePath() const { return m_ScenePath; }
 
 		/// Entities
 		Entity CreateEntity(const std::string& name = "Unnamed");
@@ -82,6 +88,10 @@ namespace KuchCraft {
 		bool m_IsPaused = false;
 
 		Ref<Renderer> m_Renderer;
+		Config m_Config;
+
+		std::filesystem::path m_Path;
+		std::filesystem::path m_ScenePath;
 
 		std::unordered_map<UUID, Entity> m_EntityIDMap;
 		std::vector<std::function<void()>> m_PostUpdateQueue;
