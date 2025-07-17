@@ -31,6 +31,8 @@ namespace KuchCraft {
 
 		nlohmann::json sceneJson;
 
+		sceneJson["SceneUUID"] = m_Scene->GetUUID();
+
 		Entity primaryCameraEntity = m_Scene->GetPrimaryCameraEntity();
 		if (primaryCameraEntity)
 			sceneJson["PrimaryCameraEntityUUID"] = primaryCameraEntity.GetUUID();
@@ -151,6 +153,9 @@ namespace KuchCraft {
 			KC_CORE_ERROR("Failed to parse JSON: {}", e.what());
 			return false;
 		}
+
+		if (sceneJson.contains("SceneUUID"))
+			m_Scene->m_SceneID = sceneJson["SceneUUID"].get<UUID>();
 
 		m_Scene->DestroyAllEntities();
 		for (auto& entityJson : sceneJson["Entities"])

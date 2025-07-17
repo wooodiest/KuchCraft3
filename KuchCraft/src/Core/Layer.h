@@ -24,7 +24,6 @@ namespace KuchCraft {
 		Disabled      // Completely inactive: no rendering, updates, or events
 	};
 
-
 	class Layer
 	{
 	public:

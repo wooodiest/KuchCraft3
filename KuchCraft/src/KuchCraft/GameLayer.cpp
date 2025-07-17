@@ -136,7 +136,7 @@ namespace KuchCraft {
 					ImGui::DragFloat3("Scale",       glm::value_ptr(tc.Scale),       1.0f);
 				});
 
-				ImGui_DrawComponent<CameraComponent>("Camera", selectedEntity, [&](auto& cam) {
+				ImGui_DrawComponent<CameraComponent>("Camera Component", selectedEntity, [&](auto& cam) {
 					bool primary = false;
 					if (m_Scene->GetPrimaryCameraEntity())
 						primary = m_Scene->GetPrimaryCameraEntity().GetUUID() == selectedEntity.GetUUID();

@@ -82,7 +82,7 @@ namespace KuchCraft {
 		void OnCameraComponentAdded(entt::registry& registry, entt::entity entity);
 
 	private:
-		UUID m_SceneID;
+		UUID m_SceneID = UUID();
 		std::string m_Name;
 		entt::registry m_Registry;
 		bool m_IsPaused = false;
@@ -100,6 +100,7 @@ namespace KuchCraft {
 		entt::entity m_PrimaryCameraEntity = entt::null;
 
 		friend class Entity;
+		friend class SceneSerializer;
 	};
 
 }
