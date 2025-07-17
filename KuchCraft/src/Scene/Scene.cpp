@@ -12,7 +12,12 @@ namespace KuchCraft {
 		: m_Name(name)
 	{
 		m_Registry.on_construct<NativeScriptComponent>().connect<&Scene::OnNativeScriptComponentAdded>(this);
-		m_Registry.on_destroy<NativeScriptComponent>().connect<&Scene::OnNativeScriptComponentRemoved>(this);
+		m_Registry.on_destroy<NativeScriptComponent>().connect<&Scene::OnNativeScriptComponentRemoved>(this);	
+		m_Registry.on_construct<CameraComponent>().connect<&Scene::OnCameraComponentAdded>(this);
+
+		/// SceneSerializer serializer(this);
+		/// std::filesystem::path path = "data/worlds/" + m_Name + SceneSerializer::DefaultExtension;
+		/// serializer.Deserialize(path);
 	}
 
 	Scene::~Scene()
@@ -21,6 +26,7 @@ namespace KuchCraft {
 		DestroyAllEntities();
 		m_Registry.on_construct<NativeScriptComponent>().disconnect<&Scene::OnNativeScriptComponentAdded>(this);
 		m_Registry.on_destroy<NativeScriptComponent>().disconnect<&Scene::OnNativeScriptComponentRemoved>(this);
+		m_Registry.on_construct<CameraComponent>().disconnect<&Scene::OnCameraComponentAdded>(this);
 	}
 
 	void Scene::OnUpdate(Timestep ts)
@@ -65,7 +71,7 @@ namespace KuchCraft {
 		Camera* mainCamera   = nullptr;
 		if (cameraEntity)
 		{
-			auto& cameraComponent    = cameraEntity.GetComponent<CameraComponent>();
+			auto& cameraComponent = cameraEntity.GetComponent<CameraComponent>();
 
 			if (cameraEntity.HasComponent<TransformComponent>())
 			{
@@ -81,8 +87,8 @@ namespace KuchCraft {
 			return;
 
 		m_Registry.view<TransformComponent, SpriteRendererComponent>().each([&](auto entity, auto& transformComponent, auto& spriteComponent) {	
-			if (spriteComponent.Texture)
-				m_Renderer->DrawQuad2D(transformComponent.GetTransform(), spriteComponent.Texture,
+			if (spriteComponent._Texture)
+				m_Renderer->DrawQuad2D(transformComponent.GetTransform(), spriteComponent._Texture,
 					spriteComponent.TilingFactor, spriteComponent.Color, spriteComponent.UVStart, spriteComponent.UVEnd);
 			else
 				m_Renderer->DrawQuad2D(transformComponent.GetTransform(), spriteComponent.Color);
@@ -284,6 +290,22 @@ namespace KuchCraft {
 			script.DestroyScript(&script);
 			script.Instance = nullptr;
 		}
+	}
+
+	void Scene::OnCameraComponentAdded(entt::registry& registry, entt::entity entity)
+	{
+		SubmitPreUpdateFunc([=, this]() {
+			if (!m_Registry.valid(entity))
+				return;
+
+			auto& camera = m_Registry.get<CameraComponent>(entity);
+			if (!camera.FixedAspectRatio)
+			{
+				auto [width, height] = Application::Get().GetWindow()->GetSize();
+				float aspectRatio = (float)width / (float)height;
+				camera.Camera.SetAspectRatio(aspectRatio);
+			}
+		});
 	}
 
 }

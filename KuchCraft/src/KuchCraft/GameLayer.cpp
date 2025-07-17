@@ -37,7 +37,7 @@ namespace KuchCraft {
 		auto texturedEntity = m_Scene->CreateChildEntity(quad, "Textured Entity");
 		{
 			auto& sprite = texturedEntity.AddComponent<SpriteRendererComponent>();
-			sprite.Texture = Texture2D::Create(std::filesystem::path("assets/textures/grid.png"), TextureSpecification{.Wrap = TextureWrap::Repeat});
+			sprite._Texture = Texture2D::Create(std::filesystem::path("assets/textures/grid.png"), TextureSpecification{.Wrap = TextureWrap::Repeat});
 			
 			auto& transform = texturedEntity.AddComponent<TransformComponent>();
 			transform.Translation = { 200.0f, 200.0f, 0.0f };
@@ -216,12 +216,12 @@ namespace KuchCraft {
 					ImGui::DragFloat2("UV Start", glm::value_ptr(sprite.UVStart), 0.01f);
 					ImGui::DragFloat2("UV End", glm::value_ptr(sprite.UVEnd), 0.01f);
 
-					if (sprite.Texture && sprite.Texture->IsValid())
+					if (sprite._Texture && sprite._Texture->IsValid())
 					{
-						ImVec2 size = { ImGui::GetContentRegionAvail().x , (float)sprite.Texture->GetHeight() * ImGui::GetContentRegionAvail().x / (float)sprite.Texture->GetWidth() };
+						ImVec2 size = { ImGui::GetContentRegionAvail().x , (float)sprite._Texture->GetHeight() * ImGui::GetContentRegionAvail().x / (float)sprite._Texture->GetWidth() };
 
 						ImGui::Image(
-							(ImTextureID)(sprite.Texture->GetRendererID()),
+							(ImTextureID)(sprite._Texture->GetRendererID()),
 							size,
 							ImVec2{ 0, 1 },
 							ImVec2{ 1, 0 }

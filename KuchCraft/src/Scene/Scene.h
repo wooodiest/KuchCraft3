@@ -73,6 +73,7 @@ namespace KuchCraft {
 		bool OnWindowResize(WindowResizeEvent& e);
 		void OnNativeScriptComponentAdded(entt::registry& registry, entt::entity entity);
 		void OnNativeScriptComponentRemoved(entt::registry& registry, entt::entity entity);
+		void OnCameraComponentAdded(entt::registry& registry, entt::entity entity);
 
 	private:
 		UUID m_SceneID;

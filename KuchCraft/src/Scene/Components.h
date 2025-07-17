@@ -104,9 +104,9 @@ namespace KuchCraft {
 	{
 		glm::vec4 Color = { 1.0f, 1.0f, 1.0f, 1.0f };
 
-		KC_TODO("Add texture manager and use texture by AssetHandle")
-		/// AssetHandle Texture = 0;
-		Ref<Texture2D> Texture;
+		KC_TODO("Use texture by AssetHandle")
+		AssetHandle Texture = 0;
+		Ref<Texture2D> _Texture;
 
 		float TilingFactor = 1.0f;
 		glm::vec2 UVStart  = { 0.0f, 0.0f };
