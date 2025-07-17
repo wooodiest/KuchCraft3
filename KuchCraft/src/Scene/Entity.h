@@ -173,6 +173,7 @@ namespace KuchCraft {
 
 		friend class Scene;
 		friend class ScriptableEntity;
+		friend class SceneSerializer;
 	};
 
 }

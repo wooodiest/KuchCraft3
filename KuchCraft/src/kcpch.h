@@ -71,6 +71,7 @@
 #include "Core/EnumUtils.h"
 #include "Core/CoreUtils.h"
 #include "Core/UUID.h"
+#include "Core/JsonConverters.h"
 
 #include "Graphics/Core/Core.h"
 

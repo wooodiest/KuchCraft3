@@ -57,7 +57,8 @@ project "KuchCraft"
         "%{wks.location}/KuchCraft/vendor/stb_image",
         "%{wks.location}/KuchCraft/vendor/magic_enum",
         "%{wks.location}/KuchCraft/vendor/imgui",
-        "%{wks.location}/KuchCraft/vendor/entt/src"
+        "%{wks.location}/KuchCraft/vendor/entt/src",
+        "%{wks.location}/KuchCraft/vendor/nlohmann_json",
     }
 
     links

@@ -60,6 +60,7 @@ namespace KuchCraft {
 		Entity m_Entity;
 
 		friend class Scene;
+		friend class SceneSerializer;
 	};
 
 }
