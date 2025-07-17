@@ -64,8 +64,14 @@ namespace KuchCraft {
 				auto& script = entity.GetComponent<NativeScriptComponent>();
 				entityJson["NativeScript"] = {
 					{ "ScriptName", script.ScriptName }
-					/// State = ...
 				};
+
+				if (script.Instance)
+				{
+					nlohmann::json stateJson;
+					script.Instance->OnSerialize(stateJson);
+					entityJson["NativeScript"]["State"] = stateJson;
+				}
 			}
 
 			if (entity.HasComponent<TransformComponent>())
@@ -95,11 +101,11 @@ namespace KuchCraft {
 			{
 				auto& sprite = entity.GetComponent<SpriteRendererComponent>();
 				entityJson["SpriteRenderer"] = {
-					{ "Color",         sprite.Color },
+					{ "Color",        sprite.Color },
 					{ "TilingFactor", sprite.TilingFactor },
-					{ "UVStart",       sprite.UVStart },
-					{ "UVEnd",         sprite.UVEnd   },
-					{ "Texture",       sprite.Texture }
+					{ "UVStart",      sprite.UVStart },
+					{ "UVEnd",        sprite.UVEnd   },
+					{ "Texture",      sprite.Texture }
 				};
 			}
 
@@ -200,7 +206,7 @@ namespace KuchCraft {
 						{
 							nsc.Instance = nsc.InstantiateScript();
 							nsc.Instance->m_Entity = entity;
-							/// nsc.Instance->Deserialize(nativeScriptJson["State"]);
+							nsc.Instance->OnDeserialize(nativeScriptJson["State"]);
 						}
 					}
 					else

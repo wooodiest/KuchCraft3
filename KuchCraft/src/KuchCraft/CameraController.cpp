@@ -3,6 +3,8 @@
 
 #include "Core/Application.h"
 
+#include <imgui/imgui.h>
+
 namespace KuchCraft {
 
 	void CameraController::OnCreate()
@@ -53,6 +55,27 @@ namespace KuchCraft {
 			transformComponent.Translation += cameraComponent.Camera.GetUpDirection() * m_MovementSpeed * ts.GetSeconds();
 
 		cameraComponent.Camera.UpdateTransform(transformComponent.Translation, transformComponent.Rotation);
+	}
+
+	void CameraController::OnSerialize(nlohmann::json& state)
+	{
+		state["MouseSensitivity"] = m_MouseSensitivity;
+		state["MovementSpeed"]    = m_MovementSpeed;
+	}
+
+	void CameraController::OnDeserialize(const nlohmann::json& state)
+	{
+		if (state.contains("MouseSensitivity"))
+			m_MouseSensitivity = state["MouseSensitivity"].get<float>();
+
+		if (state.contains("MovementSpeed"))
+			m_MovementSpeed = state["MovementSpeed"].get<float>();
+	}
+
+	void CameraController::OnImGuiHierarchyPanel()
+	{
+		ImGui::DragFloat("Mouse sensitivity", &m_MouseSensitivity, 0.05f);
+		ImGui::DragFloat("Movement speed", &m_MovementSpeed, 0.5f);
 	}
 
 }

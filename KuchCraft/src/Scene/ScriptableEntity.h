@@ -4,6 +4,8 @@
 #include "Scene/Entity.h"
 #include "Scene/Components.h"
 
+#include <nlohmann_json/json.hpp>
+
 namespace KuchCraft {
 
 	class ScriptableEntity
@@ -54,6 +56,11 @@ namespace KuchCraft {
 		virtual void OnUpdate(Timestep ts) {} 
 		virtual void OnPostUpdate(Timestep ts) {}
 
+		virtual void OnSerialize(nlohmann::json& state) {}
+		virtual void OnDeserialize(const nlohmann::json& state) {}
+
+		virtual void OnImGuiHierarchyPanel() {}
+
 		Scene* GetScene() { return m_Entity.m_Scene; }
 
 	private:
@@ -61,6 +68,7 @@ namespace KuchCraft {
 
 		friend class Scene;
 		friend class SceneSerializer;
+		friend class GameLayer;
 	};
 
 }

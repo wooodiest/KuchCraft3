@@ -120,9 +120,7 @@ namespace KuchCraft {
 				DrawComponent<NativeScriptComponent>("Native Script Component", selectedEntity, [](auto& script) {
 					ImGui::Text("Bound Script: %s", script.ScriptName.c_str());
 					if (script.Instance)
-					{
-						KC_TODO("Draw native script hierarchy info");
-					}
+						script.Instance->OnImGuiHierarchyPanel();
 				});
 
 				DrawComponent<TransformComponent>("Transform Component", selectedEntity, [](auto& tc) {
