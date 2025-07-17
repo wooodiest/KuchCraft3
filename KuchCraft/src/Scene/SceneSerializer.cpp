@@ -129,7 +129,7 @@ namespace KuchCraft {
 	{
 		if (!std::filesystem::exists(filepath))
 		{
-			KC_CORE_ERROR("File does not exist: {}", filepath.string());
+			KC_CORE_WARN("File does not exist: {}", filepath.string());
 			return false;
 		}
 

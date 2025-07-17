@@ -52,8 +52,6 @@ namespace KuchCraft {
 		int OpenGlMajorVersion = 4;
 		int OpenGlMinorVersion = 6;
 
-		glm::vec4 ClearColor = glm::vec4(0.1f, 0.1f, 0.1f, 1.0f);
-
 		bool OpenGlLogging = true;
 
 		int MaxCombinedTextureSlots = 64;

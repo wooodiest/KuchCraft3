@@ -1,0 +1,34 @@
+{
+    "Application": {
+        "CoreLogLevel": "Info",
+        "EnableImGui": true,
+        "GameLogLevel": "Info"
+    },
+    "Game": {
+        "WorldsDir": "data/worlds/"
+    },
+    "Renderer": {
+        "MaxCombinedTextureSlots": 64,
+        "MaxQuadsInBatch": 10000,
+        "MaxTextureSlots": 32,
+        "OpenGlLogging": true,
+        "OpenGlMajorVersion": 4,
+        "OpenGlMinorVersion": 6,
+        "ShadersPath": "assets/shaders/"
+    },
+    "Window": {
+        "Borderless": false,
+        "ContentScaleX": 1.0,
+        "ContentScaleY": 1.0,
+        "CursorMode": "Normal",
+        "FullScreen": false,
+        "Height": 1017,
+        "IconPath": "",
+        "PositionX": 0,
+        "PositionY": 32,
+        "Resizable": true,
+        "Title": "KuchCraft",
+        "VSync": true,
+        "Width": 1920
+    }
+}

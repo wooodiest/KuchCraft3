@@ -273,8 +273,8 @@ namespace KuchCraft {
 	void Renderer::ClearDefaultFrameBuffer()
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		const auto& color = m_Config.Renderer.ClearColor;
-		glClearColor(color.r, color.g, color.b, color.a);
+		constexpr glm::vec4 clear_color = glm::vec4(0.1f, 0.1f, 0.1f, 1.0f);
+		glClearColor(clear_color.r, clear_color.g, clear_color.b, clear_color.a);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	}
 
