@@ -7,6 +7,13 @@
 
 namespace KuchCraft {
 
+	enum class GameState
+	{
+		MainMenu,
+		InGame,
+		PauseMenu
+	};
+
 	class GameLayer : public Layer
 	{
 	public:
@@ -21,21 +28,30 @@ namespace KuchCraft {
 		virtual void OnImGuiRender() override;
 		virtual void OnApplicationEvent(ApplicationEvent& e) override;
 
+		GameState GetGameState() const { return m_GameState; }
+
 		void CreateWorld(const std::string& name);
 		void LoadWorld  (const std::string& name);
 		void DeleteWorld(const std::string& name);
 
 	private:
-		void DrawEntityNode(Entity entity);
+		bool OnKeyPressed(KeyPressedEvent& e);
+
+	private:
+		void ImGui_DrawEntityNode(Entity entity);
+		void ImGui_DrawMainMenuUI();
+		void ImGui_DrawGameUI();
+		void ImGui_DrawPauseMenuUI();
 
 	private:
 		UUID m_HierarchyPanelSelectedEntity = 0;
 
 	private:
 		Ref<Renderer> m_Renderer;
-		Ref<Scene> m_Scene;
-		Config m_Config;
-		std::string m_CurrentWorldName;
+		Ref<Scene>    m_Scene;
+		Config        m_Config;
+		GameState     m_GameState = GameState::MainMenu;
+		std::string   m_CurrentWorldName;
 	};
 
 }

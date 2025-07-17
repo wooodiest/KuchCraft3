@@ -48,7 +48,7 @@ namespace KuchCraft {
 	}
 
 	template<typename T, typename UIFunction>
-	static void DrawComponent(const std::string& name, Entity entity, UIFunction uiFunction)
+	static void ImGui_DrawComponent(const std::string& name, Entity entity, UIFunction uiFunction)
 	{
 		if (!entity.HasComponent<T>())
 			return;
@@ -66,7 +66,12 @@ namespace KuchCraft {
 
 	void GameLayer::OnImGuiRender()
 	{
-		/// ...
+		switch (m_GameState)
+		{
+			case GameState::MainMenu:	  ImGui_DrawMainMenuUI();      break;
+			case GameState::InGame:       ImGui_DrawGameUI();          break;
+			case GameState::PauseMenu:    ImGui_DrawPauseMenuUI();     break;
+		}
 
 		if (!m_Scene)
 			return;
@@ -85,7 +90,7 @@ namespace KuchCraft {
 			for (const auto& [uuid, entity] : enities)
 			{
 				if (!entity.GetParent())
-					DrawEntityNode(entity);
+					ImGui_DrawEntityNode(entity);
 			}
 			ImGui::EndChild();
 
@@ -96,13 +101,13 @@ namespace KuchCraft {
 				ImGui::Text("UUID: %llu", selectedEntity.GetUUID());
 				ImGui::Text("Tag: %s", selectedEntity.GetTag());
 
-				DrawComponent<TagComponent>("Tag Component", selectedEntity, [](auto& tag) {
+				ImGui_DrawComponent<TagComponent>("Tag Component", selectedEntity, [](auto& tag) {
 					std::string entityTag = tag.Tag;
 					if (ImGui::InputText("Tag", &entityTag))
 						tag.Tag = entityTag;
 				});
 
-				DrawComponent<RelationshipComponent>("Relationship Component", selectedEntity, [&](auto& rel) {
+				ImGui_DrawComponent<RelationshipComponent>("Relationship Component", selectedEntity, [&](auto& rel) {
 					ImGui::Text("Parent: %llu", rel.ParentHandle);
 					ImGui::Text("Children: %zu", rel.Children.size());
 					ImGui::Indent(margin);
@@ -117,13 +122,13 @@ namespace KuchCraft {
 					ImGui::Unindent(margin);
 				});
 
-				DrawComponent<NativeScriptComponent>("Native Script Component", selectedEntity, [](auto& script) {
+				ImGui_DrawComponent<NativeScriptComponent>("Native Script Component", selectedEntity, [](auto& script) {
 					ImGui::Text("Bound Script: %s", script.ScriptName.c_str());
 					if (script.Instance)
 						script.Instance->OnImGuiHierarchyPanel();
 				});
 
-				DrawComponent<TransformComponent>("Transform Component", selectedEntity, [](auto& tc) {
+				ImGui_DrawComponent<TransformComponent>("Transform Component", selectedEntity, [](auto& tc) {
 					ImGui::DragFloat3("Translation", glm::value_ptr(tc.Translation), 1.0f);
 					glm::vec3 rotation = glm::degrees(tc.Rotation);
 					if (ImGui::DragFloat3("Rotation", glm::value_ptr(rotation), 1.0f))
@@ -131,7 +136,7 @@ namespace KuchCraft {
 					ImGui::DragFloat3("Scale",       glm::value_ptr(tc.Scale),       1.0f);
 				});
 
-				DrawComponent<CameraComponent>("Camera", selectedEntity, [&](auto& cam) {
+				ImGui_DrawComponent<CameraComponent>("Camera", selectedEntity, [&](auto& cam) {
 					bool primary = false;
 					if (m_Scene->GetPrimaryCameraEntity())
 						primary = m_Scene->GetPrimaryCameraEntity().GetUUID() == selectedEntity.GetUUID();
@@ -184,7 +189,7 @@ namespace KuchCraft {
 					ImGui::Text("Forward: %f, %f, %f", forwardDirection.x, forwardDirection.y, forwardDirection.z);
 				});
 
-				DrawComponent<SpriteRendererComponent>("Sprite Renderer", selectedEntity, [](auto& sprite) {
+				ImGui_DrawComponent<SpriteRendererComponent>("Sprite Renderer", selectedEntity, [](auto& sprite) {
 					ImGui::ColorEdit4("Color", glm::value_ptr(sprite.Color));
 					ImGui::DragFloat("Tiling Factor", &sprite.TilingFactor, 0.1f, 0.1f, 10.0f);
 					ImGui::DragFloat2("UV Start", glm::value_ptr(sprite.UVStart), 0.01f);
@@ -214,6 +219,9 @@ namespace KuchCraft {
 
 	void GameLayer::OnApplicationEvent(ApplicationEvent& e)
 	{
+		ApplicationEventDispatcher dispatcher(e);
+		dispatcher.Dispatch<KeyPressedEvent>(KC_BIND_EVENT_FN(GameLayer::OnKeyPressed));
+
 		if (m_Scene)
 			m_Scene->OnApplicationEvent(e);
 	}
@@ -257,6 +265,8 @@ namespace KuchCraft {
 			std::filesystem::path worldPath = m_Config.Game.WorldsDir / std::filesystem::path(name);
 			if (std::filesystem::exists(worldPath) && std::filesystem::is_directory(worldPath))
 			{
+				m_GameState = GameState::InGame;
+
 				m_Scene = CreateRef<Scene>(name);
 				m_Scene->SetRenderer(m_Renderer);
 				m_Scene->SetConfig(m_Config);
@@ -294,7 +304,23 @@ namespace KuchCraft {
 		}
 	}
 
-	void GameLayer::DrawEntityNode(Entity entity)
+	bool GameLayer::OnKeyPressed(KeyPressedEvent& e)
+	{
+		if (e.IsRepeat())
+			return false;
+
+		switch (e.GetKeyCode())
+		{
+			case Key::Escape: {
+				if (m_Scene)
+					m_GameState = m_GameState == GameState::PauseMenu ? GameState::InGame : GameState::PauseMenu;
+			}
+		}
+
+		return false;
+	}
+
+	void GameLayer::ImGui_DrawEntityNode(Entity entity)
 	{
 		ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_DefaultOpen;
 
@@ -316,11 +342,71 @@ namespace KuchCraft {
 				if (!entity)
 					continue;
 
-				DrawEntityNode(entity);
+				ImGui_DrawEntityNode(entity);
 			}
 
 			ImGui::TreePop();
 		}
 		
 	}
+
+	void GameLayer::ImGui_DrawMainMenuUI()
+	{
+		ImGui::Begin("Main Menu");
+
+		if (ImGui::Button("Close", ImVec2(ImGui::GetContentRegionAvail().x, 0.0f)))
+			Application::Get().Close();
+
+		std::vector<std::string> worldNames;
+		for (const auto& entry : std::filesystem::directory_iterator(m_Config.Game.WorldsDir))
+		{
+			if (entry.is_directory())
+				worldNames.push_back(entry.path().filename().string());
+		}
+
+		ImGui::SeparatorText("Create new world");
+		static const char* default_world_name = "New World";
+		static std::string newWorldName       = default_world_name;
+		ImGui::InputText("New world name", &newWorldName);
+		if (ImGui::Button("Create world", ImVec2(ImGui::GetContentRegionAvail().x, 0.0f)))
+		{
+			CreateWorld(m_Config.Game.WorldsDir + newWorldName);
+			newWorldName = default_world_name;
+		}
+
+		ImGui::SeparatorText("Worlds");
+		for (const auto& worldName : worldNames)
+		{
+			if (ImGui::Button(worldName.c_str(), ImVec2(ImGui::GetContentRegionAvail().x - 80.0f, 0.0f)))
+				LoadWorld(worldName);
+
+			ImGui::SameLine();
+			if (ImGui::Button(std::string("Delete##" + worldName).c_str(), ImVec2(70.0f, 0.0f)))
+				DeleteWorld(worldName);
+		}
+
+		ImGui::End();
+	}
+
+	void GameLayer::ImGui_DrawGameUI()
+	{
+		
+	}
+
+	void GameLayer::ImGui_DrawPauseMenuUI()
+	{
+		ImGui::Begin("Game Menu");
+
+		if (ImGui::Button("Save", ImVec2(ImGui::GetContentRegionAvail().x, 0.0f)))
+			m_Scene->Save();
+
+		if (ImGui::Button("Quit", ImVec2(ImGui::GetContentRegionAvail().x, 0.0f)))
+		{
+			m_GameState = GameState::MainMenu;
+			m_Scene.reset();
+		}
+
+		ImGui::End();
+	}
+
 }
