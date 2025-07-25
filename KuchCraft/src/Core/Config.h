@@ -64,7 +64,8 @@ namespace KuchCraft {
 
 	struct GameConfig
 	{
-		std::string WorldsDir = "data/worlds/";
+		std::string WorldsDir    = "data/worlds/";
+		std::string DataPacksDir = "data/packs/";
 	};
 
 	struct Config

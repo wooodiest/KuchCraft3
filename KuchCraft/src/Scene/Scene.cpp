@@ -107,6 +107,13 @@ namespace KuchCraft {
 	{
 		SceneSerializer serializer(this);
 		serializer.Deserialize(std::filesystem::path(m_ScenePath));
+
+		m_ItemManager = CreateRef<ItemManager>(m_Config);
+		if (!m_ItemManager->SetDataPack(m_DataPackName))
+		{
+			KC_CORE_ERROR("Failed to set data pack: {}", m_DataPackName);
+			return;
+		}
 	}
 
 	void Scene::Save()

@@ -2,6 +2,7 @@
 
 #include <entt/entt.hpp>
 
+#include "KuchCraft/World/ItemManager.h"
 #include "Graphics/Renderer.h"
 
 namespace KuchCraft {
@@ -35,6 +36,9 @@ namespace KuchCraft {
 
 		const std::filesystem::path& GetPath()      const { return m_Path;      }
 		const std::filesystem::path& GetScenePath() const { return m_ScenePath; }
+
+		const std::string& GetDataPackName() const { return m_DataPackName; }
+		Ref<ItemManager> GetItemManager() const { return m_ItemManager; }
 
 		/// Entities
 		Entity CreateEntity(const std::string& name = "Unnamed");
@@ -87,11 +91,14 @@ namespace KuchCraft {
 		entt::registry m_Registry;
 		bool m_IsPaused = false;
 
-		Ref<Renderer> m_Renderer;
+		Ref<Renderer>    m_Renderer;
+		Ref<ItemManager> m_ItemManager;
 		Config m_Config;
 
 		std::filesystem::path m_Path;
 		std::filesystem::path m_ScenePath;
+
+		std::string m_DataPackName = "default";
 
 		std::unordered_map<UUID, Entity> m_EntityIDMap;
 		std::vector<std::function<void()>> m_PostUpdateQueue;

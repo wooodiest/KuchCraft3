@@ -214,6 +214,19 @@ namespace KuchCraft {
 			}
 		}
 
+		if (m_Scene && ImGui::CollapsingHeader("Item Manager##GameLayer", ImGuiTreeNodeFlags_DefaultOpen))
+		{
+			Ref<ItemManager> itemManager = m_Scene->GetItemManager();
+
+			ImGui::Text("Data Pack: %s", itemManager->GetDataPackName().c_str());
+
+			ImGui::SeparatorText("Items");
+			for (const auto& [id, item] : itemManager->GetItemsData())
+			{
+				ImGui::Text("ID: %d, Name: %s", id, item.Name.c_str());
+			}
+		}
+
 		ImGui::End();
 	}
 
