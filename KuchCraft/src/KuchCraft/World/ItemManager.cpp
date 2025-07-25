@@ -44,25 +44,38 @@ namespace KuchCraft {
 		return true;
 	}
 
-	/// const ItemData& ItemManager::GetItemData(ItemID id) const
-	/// {
-	/// 	// TODO: insert return statement here
-	/// }
-	/// 
-	/// const BlockData& ItemManager::GetBlockData(ItemID id) const
-	/// {
-	/// 	// TODO: insert return statement here
-	/// }
-	/// 
-	/// const ItemData& ItemManager::GetItemData(const std::string_view& name) const
-	/// {
-	/// 	// TODO: insert return statement here
-	/// }
-	/// 
-	/// const BlockData& ItemManager::GetBlockData(const std::string_view& name) const
-	/// {
-	/// 	// TODO: insert return statement here
-	/// }
+	const ItemData* ItemManager::GetItemData(ItemID id) const
+	{
+		auto it = m_ItemsData.find(id);
+		if (it == m_ItemsData.end())
+			return nullptr;
+		return &it->second;
+	}
+
+	const ItemData* ItemManager::GetItemData(const std::string& name) const
+	{
+		auto it = m_NameToID.find(name);
+		if (it == m_NameToID.end())
+			return nullptr;
+
+		return GetItemData(it->second);
+	}
+
+	const BlockData* ItemManager::GetBlockData(ItemID id) const
+	{
+		const ItemData* item = GetItemData(id);
+		if (!item || !item->Block.has_value())
+			return nullptr;
+		return &item->Block.value();
+	}
+
+	const BlockData* ItemManager::GetBlockData(const std::string& name) const
+	{
+		const ItemData* item = GetItemData(name);
+		if (!item || !item->Block.has_value())
+			return nullptr;
+		return &item->Block.value();
+	}
 
 	void ItemManager::LoadConfig()
 	{
@@ -153,9 +166,7 @@ namespace KuchCraft {
 				}
 
 				m_ItemsData[currentID] = item;
-				m_NameToID[item.Name] = currentID;
-				if (item.Block.has_value())
-					m_BlocksData[currentID] = item.Block.value();
+				m_NameToID[item.Name]  = currentID;
 
 				currentID++;
 			}
