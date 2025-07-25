@@ -245,6 +245,22 @@ namespace KuchCraft {
 		);
 	}
 
+	void Texture2DArray::CopyTo(const Ref<Texture2D>& target, int layer) const
+	{
+		KC_CORE_ASSERT(target->GetType() == TextureType::Texture2D, "Target texture must be of type Texture2D!");
+		KC_CORE_ASSERT(layer >= 0 && layer < m_LayerCount, "Invalid layer index!");
+		if (!target->IsValid())
+		{
+			KC_CORE_ERROR("Target texture is not valid!");
+			return;
+		}
+		glCopyImageSubData(
+			m_RendererID, GL_TEXTURE_2D_ARRAY, 0, 0, 0, layer,
+			target->GetRendererID(), GL_TEXTURE_2D, 0, 0, 0, 0,
+			m_Specification.Width, m_Specification.Height, 1
+		);
+	}
+
 	void Texture2DArray::SetDebugName(const std::string& name)
 	{
 		m_DebugName = name;

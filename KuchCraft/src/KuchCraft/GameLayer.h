@@ -46,6 +46,10 @@ namespace KuchCraft {
 	private:
 		UUID m_HierarchyPanelSelectedEntity = 0;
 
+		ItemID m_PerviousItemID = -1;
+		ItemID m_SelectedItemID = 0;
+		Ref<Texture2D> m_SelectedItemTexture;
+
 	private:
 		Ref<Renderer> m_Renderer;
 		Ref<Scene>    m_Scene;

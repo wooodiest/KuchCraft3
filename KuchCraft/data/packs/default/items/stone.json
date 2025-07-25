@@ -1,0 +1,21 @@
+{
+    "Name": "stone",
+    "DisplayName": "Stone",
+    "Description": "A hard block used for building and crafting.",
+    "MaxStackSize": 64,
+    "Texture" : "textures/blocks/stone.png",
+    "Block": {
+      "GeometryType": "Cube",
+      "BreakingTime": 1.5,
+      "Weight": 2.0,
+      "Friction": 0.8,
+      "EmitsLight": false,
+      "LightLevel": 0,
+      "Transparent": false,
+      "IsSolid": true,
+      "IsOpaque": true,
+      "HasCollision": true,
+      "IsFluid": false,
+      "IsReplaceable": false
+    }
+  }

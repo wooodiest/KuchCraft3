@@ -219,11 +219,78 @@ namespace KuchCraft {
 			Ref<ItemManager> itemManager = m_Scene->GetItemManager();
 
 			ImGui::Text("Data Pack: %s", itemManager->GetDataPackName().c_str());
+			ImGui::SeparatorText("Items List");
 
-			ImGui::SeparatorText("Items");
-			for (const auto& [id, item] : itemManager->GetItemsData())
+			constexpr float items_list_height = 250.0f;
+			ImGui::BeginChild("ItemsList", ImVec2(0.0f, items_list_height), true);
+
+			m_PerviousItemID = m_SelectedItemID;
+
+			const auto& items = itemManager->GetItemsData();
+			for (const auto& [id, item] : items)
 			{
-				ImGui::Text("ID: %d, Name: %s", id, item.Name.c_str());
+				bool isSelected = (m_SelectedItemID == id);
+				if (ImGui::Selectable(item.DisplayName.c_str(), isSelected))
+					m_SelectedItemID = id;
+
+				if (isSelected)
+					ImGui::SetItemDefaultFocus();
+			}
+			ImGui::EndChild();
+
+			ItemData selected = items.at(m_SelectedItemID);
+
+			ImGui::SeparatorText("Item info");
+			ImGui::Text("ID: %d", m_SelectedItemID);
+			ImGui::Text("Name: %s", selected.Name.c_str());
+
+			if (m_PerviousItemID != m_SelectedItemID)
+			{
+				TextureSpecification spec;
+				spec.Format = itemManager->GetItemTexture()->GetFormat();
+				spec.Width  = itemManager->GetItemTexture()->GetWidth();
+				spec.Height = itemManager->GetItemTexture()->GetHeight();
+				spec.Filter = TextureFilter::Nearest;
+
+				m_SelectedItemTexture = Texture2D::Create(spec);
+				itemManager->GetItemTexture()->CopyTo(m_SelectedItemTexture, m_SelectedItemID);
+			}
+
+			ImGui::Text("Texture:");
+			if (m_SelectedItemTexture)
+			{
+				ImVec2 size = { ImGui::GetContentRegionAvail().x * 0.2f , (float)m_SelectedItemTexture->GetHeight() * ImGui::GetContentRegionAvail().x / (float)m_SelectedItemTexture->GetWidth() * 0.2f } ;
+				ImGui::Image(
+					(ImTextureID)(uintptr_t)(m_SelectedItemTexture->GetRendererID()),
+					size,
+					ImVec2{ 0, 1 },
+					ImVec2{ 1, 0 }
+				);
+			}
+
+			ImGui::Text("Display Name: %s", selected.DisplayName.c_str());
+			ImGui::Text("Description: %s", selected.Description.c_str());
+			ImGui::Text("Max Stack Size: %d", selected.MaxStackSize);
+
+			if (selected.Block.has_value())
+			{
+				ImGui::SeparatorText("Block Data");
+				const BlockData& blockData = selected.Block.value();
+
+				ImGui::Text("Geometry Type: %s", std::string(ToString(blockData.GeometryType)));
+				ImGui::Text("Breaking Time: %f", blockData.BreakingTime);
+				ImGui::Text("Weight: %f", blockData.Weight);
+				ImGui::Text("Friction: %f", blockData.Friction);
+
+				ImGui::Text("Emits Light: %s", blockData.EmitsLight ? "True" : "False");
+				ImGui::Text("Light Level: %d", blockData.LightLevel);
+
+				ImGui::Text("Transparent: %s", blockData.Transparent ? "True" : "False");
+				ImGui::Text("Is Solid: %s", blockData.IsSolid ? "True" : "False");
+				ImGui::Text("Is Opaque: %s", blockData.IsOpaque ? "True" : "False");
+				ImGui::Text("Has Collision: %s", blockData.HasCollision ? "True" : "False");
+				ImGui::Text("Is Fluid: %s", blockData.IsFluid ? "True" : "False");
+				ImGui::Text("Is Replaceable: %s", blockData.IsReplaceable ? "True" : "False");
 			}
 		}
 

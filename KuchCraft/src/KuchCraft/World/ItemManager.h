@@ -6,8 +6,9 @@
 
 #include "Core/Config.h"
 
-namespace KuchCraft {
+#include "Graphics/Core/Texture.h"
 
+namespace KuchCraft {
 
 	class ItemManager
 	{
@@ -29,11 +30,18 @@ namespace KuchCraft {
 		const auto& GetBlocksData()   const { return m_BlocksData; }
 		const auto& GetNameToID()     const { return m_NameToID;   }
 
+		const auto& GetItemTexture() const { return m_ItemTexture; }
+
 	private:
+		void LoadConfig();
+		void LoadItems();
 		ItemData ParseItemJson(const nlohmann::json& itemJson);
+		void LoadItemTextures();
 
 	private:
 		Config m_Config;
+		std::filesystem::path m_DataPackPath;
+		std::filesystem::path m_ItemsDirPath;
 
 		struct DataPackConfig
 		{
@@ -45,6 +53,8 @@ namespace KuchCraft {
 		std::map<ItemID, BlockData> m_BlocksData;
 
 		std::map<std::string_view, ItemID>  m_NameToID;
+
+		Ref<Texture2DArray> m_ItemTexture;
 	};
 
 }

@@ -88,6 +88,8 @@ namespace KuchCraft {
 
 		void SetLayerData(const void* data, size_t size, int layer);
 
+		void CopyTo(const Ref<Texture2D>& target, int layer = 0) const;
+
 		virtual TextureFormat GetFormat() const override { return m_Specification.Format; }
 		virtual TextureType   GetType()   const override { return TextureType::Texture2DArray; }
 		int GetLayerCount() const { return m_LayerCount; }

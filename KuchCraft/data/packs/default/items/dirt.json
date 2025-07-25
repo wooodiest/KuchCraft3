@@ -1,0 +1,21 @@
+{
+    "Name": "dirt",
+    "DisplayName": "Dirt",
+    "Description": "A block of dirt.",
+    "MaxStackSize": 64,
+    "Texture" : "textures/blocks/dirt.png",
+    "Block": {
+      "GeometryType": "Cube",
+      "BreakingTime": 0.5,
+      "Weight": 1.0,
+      "Friction": 0.6,
+      "EmitsLight": false,
+      "LightLevel": 0,
+      "Transparent": false,
+      "IsSolid": true,
+      "IsOpaque": true,
+      "HasCollision": true,
+      "IsFluid": false,
+      "IsReplaceable": false
+    }
+  }

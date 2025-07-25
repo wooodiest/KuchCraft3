@@ -20,6 +20,8 @@ namespace KuchCraft {
 		std::string DisplayName;
 		std::string Description;
 
+		std::filesystem::path TexturePath;
+
 		uint8_t MaxStackSize = 64;
 
 		std::optional<BlockData> Block;

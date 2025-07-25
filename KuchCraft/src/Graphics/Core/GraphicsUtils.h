@@ -153,12 +153,12 @@ namespace KuchCraft {
 			return 0;
 		}
 
-		inline uint32_t GetMemorySize(TextureFormat format, uint32_t width, uint32_t height = 1)
+		inline size_t GetMemorySize(TextureFormat format, uint32_t width, uint32_t height = 1)
 		{
 			return width * height * GetTextureFormatSize(format);
 		}
 
-		inline uint32_t GetMemorySize(TextureFormat format, const glm::ivec2& size)
+		inline size_t GetMemorySize(TextureFormat format, const glm::ivec2& size)
 		{
 			return GetMemorySize(format, size.x, size.y);
 		}
