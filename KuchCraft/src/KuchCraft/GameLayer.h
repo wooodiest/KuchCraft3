@@ -51,6 +51,8 @@ namespace KuchCraft {
 		Ref<Texture2D> m_SelectedItemTexture;
 		Ref<Texture2D> m_SelectedBlockTexture;
 
+		AssetHandle m_SelectedItemHandle;
+
 	private:
 		Ref<Renderer> m_Renderer;
 		Ref<Scene>    m_Scene;

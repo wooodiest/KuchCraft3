@@ -42,6 +42,10 @@ namespace KuchCraft {
 		AssetHandle Load(const std::string& name);
 		void LoadAll();
 
+		const auto& GetAssetsPaths() const { return m_AssetsPaths; }
+		const auto& GetAssetsTypes() const { return m_AssetsTypes; }
+		const auto& GetAssetsNames() const { return m_AssetsNames; }
+
 		Ref<Texture2D> GetTexture2D(const AssetHandle& handle) const
 		{
 			auto it = m_Textures2D.find(handle.ID);

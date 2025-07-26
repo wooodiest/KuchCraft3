@@ -116,6 +116,10 @@ namespace KuchCraft {
 		std::filesystem::path filePath;
 		if (assetJson.contains("FilePath"))
 			filePath = m_DataPackPath / assetJson["FilePath"].get<std::filesystem::path>();
+		else
+		{
+			KC_CORE_WARN("Asset JSON does not contain 'FilePath' field: {}", handle.ID);
+		}
 
 		TextureSpecification spec;
 		if (assetJson.contains("Specification"))

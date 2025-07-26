@@ -81,7 +81,7 @@ namespace KuchCraft {
 		ImGui::Begin("Game Debug Tools");
 		constexpr float margin = 6.0f;
 
-		if (ImGui::CollapsingHeader("Scene##GameLayer", ImGuiTreeNodeFlags_DefaultOpen))
+		if (ImGui::CollapsingHeader("Scene##GameLayer"))
 		{
 			ImGui::SeparatorText("Entities List");
 
@@ -197,22 +197,13 @@ namespace KuchCraft {
 					ImGui::DragFloat2("UV Start", glm::value_ptr(sprite.UVStart), 0.01f);
 					ImGui::DragFloat2("UV End", glm::value_ptr(sprite.UVEnd), 0.01f);
 
-					ImGui::Text("Asset:");	
-					ImGui::Text("ID: %llu", sprite.Asset.ID);
-					ImGui::Text("Name: %s", m_Scene->GetAssetManager()->GetName(sprite.Asset).c_str());
+					ImGui::Text("Asset: %s", m_Scene->GetAssetManager()->GetName(sprite.Asset).c_str());
+					ImGui::Text("UUID: %llu", sprite.Asset.ID);
 					if (sprite.Asset.IsValid())
 					{
 						auto texture = m_Scene->GetAssetManager()->GetTexture2D(sprite.Asset);
 						if (texture && texture->IsValid())
 						{
-							const auto& spec = texture->GetSpecification();
-							ImGui::Text("Format: %s", std::string(ToString(spec.Format)).c_str());
-							ImGui::Text("Size: %dx%d", spec.Width, spec.Height);
-							ImGui::Text("Filter: %s", std::string(ToString(spec.Filter)).c_str());
-							ImGui::Text("Wrap: %s", std::string(ToString(spec.Wrap)).c_str());
-							ImGui::Text("Memory Size: %zu bytes", Utils::GetMemorySize(spec.Format, spec.Width, spec.Height));
-							ImGui::Text("Renderer ID: %llu", texture->GetRendererID());
-
 							ImVec2 size = { ImGui::GetContentRegionAvail().x , (float)texture->GetHeight() * ImGui::GetContentRegionAvail().x / (float)texture->GetWidth() };
 							ImGui::Image(
 								(ImTextureID)(uintptr_t)(texture->GetRendererID()),
@@ -234,7 +225,7 @@ namespace KuchCraft {
 			}
 		}
 
-		if (m_Scene && ImGui::CollapsingHeader("Item Manager##GameLayer", ImGuiTreeNodeFlags_DefaultOpen))
+		if (ImGui::CollapsingHeader("Item Manager##GameLayer"))
 		{
 			Ref<ItemManager> itemManager = m_Scene->GetItemManager();
 
@@ -336,6 +327,63 @@ namespace KuchCraft {
 				ImGui::Text("Has Collision: %s", blockData.HasCollision ? "True" : "False");
 				ImGui::Text("Is Fluid: %s", blockData.IsFluid ? "True" : "False");
 				ImGui::Text("Is Replaceable: %s", blockData.IsReplaceable ? "True" : "False");
+			}
+		}
+
+		if (ImGui::CollapsingHeader("Asset Manager##GameLayer"))
+		{
+			Ref<AssetManager> assetManager = m_Scene->GetAssetManager();
+
+			ImGui::SeparatorText("Assets List");
+
+			constexpr float assets_list_height = 250.0f;
+			ImGui::BeginChild("AssetsList", ImVec2(0.0f, assets_list_height), true);
+
+			const auto& items = assetManager->GetAssetsNames();
+			for (const auto& [id, name] : items)
+			{
+				bool isSelected = (m_SelectedItemHandle.ID == id);
+				if (ImGui::Selectable(name.c_str(), isSelected))
+					m_SelectedItemHandle.ID = id;
+
+				if (isSelected)
+					ImGui::SetItemDefaultFocus();
+			}
+			ImGui::EndChild();
+
+			switch (assetManager->GetType(m_SelectedItemHandle))
+			{
+				case AssetType::Texture2D:
+				{
+					ImGui::SeparatorText("Texture2D Asset Info");
+					auto texture = assetManager->GetTexture2D(m_SelectedItemHandle);
+					if (texture && texture->IsValid())
+					{
+						const auto& spec = texture->GetSpecification();
+						ImGui::Text("ID: %llu", m_SelectedItemHandle.ID);
+						ImGui::Text("Name: %s", assetManager->GetName(m_SelectedItemHandle).c_str());
+						ImGui::Text("Format: %s", std::string(ToString(spec.Format)).c_str());
+						ImGui::Text("Size: %dx%d", spec.Width, spec.Height);
+						ImGui::Text("Filter: %s", std::string(ToString(spec.Filter)).c_str());
+						ImGui::Text("Wrap: %s", std::string(ToString(spec.Wrap)).c_str());
+						ImGui::Text("Memory Size: %zu bytes", Utils::GetMemorySize(spec.Format, spec.Width, spec.Height));
+						ImGui::Text("Renderer ID: %llu", texture->GetRendererID());
+						ImVec2 size = { ImGui::GetContentRegionAvail().x , (float)texture->GetHeight() * ImGui::GetContentRegionAvail().x / (float)texture->GetWidth() };
+						ImGui::Image(
+							(ImTextureID)(uintptr_t)(texture->GetRendererID()),
+							size,
+							ImVec2{ 0, 1 },
+							ImVec2{ 1, 0 }
+						);
+					}
+					else
+					{
+						ImGui::Text("No texture loaded.");
+					}
+					break;
+				} 
+				default:
+					ImGui::Text("No asset selected.");
 			}
 		}
 
