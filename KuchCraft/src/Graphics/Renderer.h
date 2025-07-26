@@ -24,6 +24,10 @@ namespace KuchCraft {
 		void NewFrame();
 		void EndFrame();
 
+		/// Should be called by application when window is resized
+		void OnWindowResize(int width, int height);
+
+#pragma region DrawCommands
 	public:
 		void DrawQuad2D(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color);
 		void DrawQuad2D(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color);
@@ -40,6 +44,9 @@ namespace KuchCraft {
 		void DrawQuad2D(const glm::mat4& transform, const glm::vec4& color);
 		void DrawQuad2D(const glm::mat4& transform, const Ref<Texture2D>& texture, float tilingFactor = 1.0f, const glm::vec4& tintColor = glm::vec4(1.0f), glm::vec2 uv0 = glm::vec2(0.0f), glm::vec2 uv1 = glm::vec2(1.0f));
 
+#pragma endregion
+
+#pragma region ZIndex
 	public:
 		/// Updates the object's Z index and maps it to a normalized depth value used for depth buffering.
 		void SetZIndex(float zIndex) {
@@ -47,33 +54,38 @@ namespace KuchCraft {
 			m_DepthFromZIndex = 1.0f - m_ZIndex / max_layers;
 		}
 
-		/// Should be called by application when window is resized
-		void OnWindowResize(int width, int height);
-
-		Ref<Texture2D> GetWhiteTexture() const { return m_WhiteTexture; }
-		Ref<Texture2D> GetBlackTexture() const { return m_BlackTexture; }
-
-		const auto& GetStats() const { return m_Stats; }
-
 	private:
-		void CheckExtensions();
-		void SetupLogging();
-		void SetGlobalSubstitutions();
-
-		void ClearDefaultFrameBuffer();
-		void SetRenderTargetToDefault();
-
-	private:
-		Config           m_Config;
-		ShaderLibrary    m_ShaderLibrary;
-		Ref<FrameBuffer> m_OffscreenRenderTarget;
-
 		float m_ZIndex = 0.0f;
 		float m_DepthFromZIndex = 0.0f;
 
-		Ref<Texture2D> m_WhiteTexture;
-		Ref<Texture2D> m_BlackTexture;
+#pragma endregion
 
+#pragma region RendererInitialization
+	private:
+		void CheckExtensions();
+		void SetupLogging();
+
+#pragma endregion
+
+#pragma region FrameBuffers
+	private:
+		void ClearDefaultFrameBuffer();
+		void SetRenderTargetToDefault();
+
+		Ref<FrameBuffer> m_OffscreenRenderTarget;
+
+#pragma endregion
+
+#pragma region Shaders
+	private:
+		void SetGlobalSubstitutions();
+
+		ShaderLibrary m_ShaderLibrary;
+
+#pragma endregion
+
+#pragma region UniformBuffers
+	private:
 		struct {
 			glm::mat4 ViewProjection;
 			glm::mat4 OrthoProjection;
@@ -81,7 +93,21 @@ namespace KuchCraft {
 
 		Ref<UniformBuffer> m_EnvironmentUniformBuffer;
 
-		/// Renderer state
+#pragma endregion
+
+#pragma region Textures
+	public:
+		Ref<Texture2D> GetWhiteTexture() const { return m_WhiteTexture; }
+		Ref<Texture2D> GetBlackTexture() const { return m_BlackTexture; }
+
+	private:	
+		Ref<Texture2D> m_WhiteTexture;
+		Ref<Texture2D> m_BlackTexture;
+
+#pragma endregion
+
+#pragma region RendererState
+	private:
 		struct {
 			bool ForceSet = false;
 
@@ -114,8 +140,13 @@ namespace KuchCraft {
 		void SetFrontFaceWinding(FaceWinding mode);
 		void SetCullMode(CullMode mode);
 		void SetPolygonOffset(bool enabled, float factor = 0.0f, float units = 0.0f);
+	
+#pragma endregion
 
 		/// Stats
+
+#pragma region Stats
+	private:
 		struct {
 			uint32_t DrawCalls = 0;
 			uint32_t Vertices  = 0;
@@ -125,7 +156,13 @@ namespace KuchCraft {
 		
 		void ResetStats();
 
-		/// Quads 2D
+	public:
+		const auto& GetStats() const { return m_Stats; }
+
+#pragma endregion
+
+#pragma region Quads2D
+	private:
 		struct {
 			uint32_t MaxQuadsInBatch = 10'000;
 			uint32_t MaxIndices  = MaxQuadsInBatch * quad_index_count;
@@ -150,7 +187,10 @@ namespace KuchCraft {
 		void NextBatchQuads2D();
 		void FlushQuads2D();
 
+#pragma endregion
+
 	private:
+		Config m_Config;
 		Renderer(Config config);
 
 		friend class RendererLayer;
