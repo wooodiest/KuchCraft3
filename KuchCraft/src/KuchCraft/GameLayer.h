@@ -49,6 +49,7 @@ namespace KuchCraft {
 		ItemID m_PerviousItemID = -1;
 		ItemID m_SelectedItemID = 0;
 		Ref<Texture2D> m_SelectedItemTexture;
+		Ref<Texture2D> m_SelectedBlockTexture;
 
 	private:
 		Ref<Renderer> m_Renderer;

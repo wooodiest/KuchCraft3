@@ -246,14 +246,27 @@ namespace KuchCraft {
 
 			if (m_PerviousItemID != m_SelectedItemID)
 			{
-				TextureSpecification spec;
-				spec.Format = itemManager->GetItemTexture()->GetFormat();
-				spec.Width  = itemManager->GetItemTexture()->GetWidth();
-				spec.Height = itemManager->GetItemTexture()->GetHeight();
-				spec.Filter = TextureFilter::Nearest;
+				{
+					TextureSpecification spec;
+					spec.Format = itemManager->GetItemTexture()->GetFormat();
+					spec.Width  = itemManager->GetItemTexture()->GetWidth();
+					spec.Height = itemManager->GetItemTexture()->GetHeight();
+					spec.Filter = TextureFilter::Nearest;
 
-				m_SelectedItemTexture = Texture2D::Create(spec);
-				itemManager->GetItemTexture()->CopyTo(m_SelectedItemTexture, m_SelectedItemID);
+					m_SelectedItemTexture = Texture2D::Create(spec);
+					itemManager->GetItemTexture()->CopyTo(m_SelectedItemTexture, m_SelectedItemID);
+				}
+				{
+					TextureSpecification spec;
+					spec.Format = itemManager->GetBlockTexture()->GetFormat();
+					spec.Width  = itemManager->GetBlockTexture()->GetWidth();
+					spec.Height = itemManager->GetBlockTexture()->GetHeight();
+					spec.Filter = TextureFilter::Nearest;
+
+					m_SelectedBlockTexture = Texture2D::Create(spec);
+					itemManager->GetBlockTexture()->CopyTo(m_SelectedBlockTexture, itemManager->GetBlockTextureLayers().at(m_SelectedItemID));
+				}
+				
 			}
 
 			ImGui::Text("Texture:");
@@ -276,6 +289,18 @@ namespace KuchCraft {
 			{
 				ImGui::SeparatorText("Block Data");
 				const BlockData& blockData = selected.Block.value();
+
+				ImGui::Text("Texture (Front, Left, Back, Right, Bottom)");
+				if (m_SelectedBlockTexture)
+				{
+					ImVec2 size = { ImGui::GetContentRegionAvail().x , (float)m_SelectedBlockTexture->GetHeight() * ImGui::GetContentRegionAvail().x / (float)m_SelectedBlockTexture->GetWidth() };
+					ImGui::Image(
+						(ImTextureID)(uintptr_t)(m_SelectedBlockTexture->GetRendererID()),
+						size,
+						ImVec2{ 0, 1 },
+						ImVec2{ 1, 0 }
+					);
+				}
 
 				ImGui::Text("Geometry Type: %s", std::string(ToString(blockData.GeometryType)));
 				ImGui::Text("Breaking Time: %f", blockData.BreakingTime);

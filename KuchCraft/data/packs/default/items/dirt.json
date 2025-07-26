@@ -5,6 +5,10 @@
     "MaxStackSize": 64,
     "Texture" : "textures/blocks/dirt.png",
     "Block": {
+      "Textures": {
+        "All": "textures/blocks/stone.png"
+      },
+      
       "GeometryType": "Cube",
       "BreakingTime": 0.5,
       "Weight": 1.0,

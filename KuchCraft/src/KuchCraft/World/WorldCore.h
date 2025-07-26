@@ -11,6 +11,8 @@ namespace KuchCraft {
 	constexpr uint32_t block_bits_for_flags  = 6;
 	constexpr uint32_t block_bits_for_custom = 6;
 
+	constexpr uint32_t block_face_count = 6;
+
 	constexpr ItemID block_type_air = 0;
 
 }

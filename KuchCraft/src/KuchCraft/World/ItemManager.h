@@ -30,15 +30,19 @@ namespace KuchCraft {
 
 		const auto& GetDataPackName() const { return m_DataPackConfig.Name; }
 		const auto& GetItemsData()    const { return m_ItemsData;  }
+		const auto& GetBlocksData()   const { return m_BlocksData; }
 		const auto& GetNameToID()     const { return m_NameToID;   }
 
-		const auto& GetItemTexture() const { return m_ItemTexture; }
+		const auto& GetItemTexture()  const { return m_ItemTexture; }
+		const auto& GetBlockTexture() const { return m_BlockTexture; }
+		const auto& GetBlockTextureLayers() const { return m_BlockTextureLayers; }
 
 	private:
 		void LoadConfig();
 		void LoadItems();
 		ItemData ParseItemJson(const nlohmann::json& itemJson);
 		void LoadItemTextures();
+		void LoadBlockTextures();
 
 	private:
 		Config m_Config;
@@ -52,10 +56,13 @@ namespace KuchCraft {
 		} m_DataPackConfig;
 
 		std::map<ItemID, ItemData> m_ItemsData;
+		std::map<ItemID, ItemData> m_BlocksData;
 
 		std::map<std::string, ItemID>  m_NameToID;
 
 		Ref<Texture2DArray> m_ItemTexture;
+		Ref<Texture2DArray> m_BlockTexture;
+		std::map<ItemID, int> m_BlockTextureLayers;
 	};
 
 }

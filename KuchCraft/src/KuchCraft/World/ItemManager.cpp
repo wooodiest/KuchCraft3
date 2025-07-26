@@ -40,6 +40,7 @@ namespace KuchCraft {
 		LoadConfig();
 		LoadItems();
 		LoadItemTextures();
+		LoadBlockTextures();
 
 		return true;
 	}
@@ -134,6 +135,9 @@ namespace KuchCraft {
 			}
 		};
 
+		m_BlocksData[block_type_air] = m_ItemsData[block_type_air];
+		m_NameToID["air"] = block_type_air;
+
 		ItemID currentID = block_type_air + 1;
 		for (const auto& entry : std::filesystem::directory_iterator(m_ItemsDirPath))
 		{
@@ -167,6 +171,8 @@ namespace KuchCraft {
 
 				m_ItemsData[currentID] = item;
 				m_NameToID[item.Name]  = currentID;
+				if (item.Block.has_value())
+					m_BlocksData[currentID] = item;
 
 				currentID++;
 			}
@@ -218,8 +224,27 @@ namespace KuchCraft {
 			if (blockJson.contains("IsReplaceable"))
 				blockData.IsReplaceable = blockJson["IsReplaceable"].get<bool>();
 
+			if (blockJson.contains("Textures"))
+			{
+				const auto& texturesJson = blockJson["Textures"];
+				for (auto it = texturesJson.begin(); it != texturesJson.end(); ++it)
+				{
+					std::string key = it.key();
+					std::string path = it.value().get<std::string>();
+
+					std::optional<BlockFace> face = FromString<BlockFace>(key);
+					if (face.has_value())
+						blockData.Textures[face.value()] = path;
+					else
+					{
+						KC_CORE_WARN("Unknown block texture face '{}'", key);
+					}
+				}
+			}
+
 			itemData.Block = blockData;
 		}
+
 		return itemData;
 	}
 
@@ -242,9 +267,11 @@ namespace KuchCraft {
 				{
 					KC_TODO("Generate default texture as block for item with block data");
 
-					/// Unsafe for different texture types
-					std::vector<uint32_t> pixels(m_DataPackConfig.TextureSize * m_DataPackConfig.TextureSize, 0xffffffff);
-					m_ItemTexture->SetLayerData(pixels.data(), pixels.size() * sizeof(uint32_t), id);
+					size_t textureSize = Utils::GetMemorySize(spec.Format, m_DataPackConfig.TextureSize, m_DataPackConfig.TextureSize);
+					uint8_t* data = new uint8_t[textureSize];
+					std::memset(data, 0xff, textureSize);
+					m_ItemTexture->SetLayerData(data, textureSize, id);
+					delete[] data;
 
 					continue;
 				}
@@ -258,23 +285,106 @@ namespace KuchCraft {
 
 			int width, height, channels;
 			stbi_set_flip_vertically_on_load(1);
-			uint8_t* data = stbi_load(texturePath.string().c_str(), &width, &height, &channels, Utils::GetTextureFormatChannelCount(spec.Format)); // RGBA forced
+			uint8_t* data = stbi_load(texturePath.string().c_str(), &width, &height, &channels, Utils::GetTextureFormatChannelCount(spec.Format));
 
 			if (!data || width != m_DataPackConfig.TextureSize || height != m_DataPackConfig.TextureSize)
 			{
 				KC_CORE_WARN("Failed to load or incorrect size for texture: {}", texturePath.string());
+				stbi_image_free(data);
 
-				/// Unsafe for different texture types
-				std::vector<uint32_t> pixels(m_DataPackConfig.TextureSize * m_DataPackConfig.TextureSize, 0xffffffff);
-				m_ItemTexture->SetLayerData(pixels.data(), pixels.size() * sizeof(uint32_t), id);
-
+				size_t textureSize = Utils::GetMemorySize(spec.Format, m_DataPackConfig.TextureSize, m_DataPackConfig.TextureSize);
+				data = new uint8_t[textureSize];
+				std::memset(data, 0xff, textureSize);
+				m_ItemTexture->SetLayerData(data, textureSize, id);
+				delete[] data;
 			}
 			else
 			{
-				m_ItemTexture->SetLayerData(data, Utils::GetMemorySize(spec.Format, width, height), id);	
-			}	
+				m_ItemTexture->SetLayerData(data, Utils::GetMemorySize(spec.Format, width, height), id);
+				stbi_image_free(data);
+			}		
+		}
+	}
 
-			stbi_image_free(data);
+	void ItemManager::LoadBlockTextures()
+	{
+		TextureSpecification spec;
+		spec.Format = TextureFormat::RGBA;
+		spec.Filter = TextureFilter::Nearest;
+		spec.Wrap   = TextureWrap::Clamp;
+		spec.Width  = m_DataPackConfig.TextureSize * block_face_count;
+		spec.Height = m_DataPackConfig.TextureSize;
+		m_BlockTexture = Texture2DArray::Create(spec, static_cast<int>(m_BlocksData.size()));
+		m_BlockTexture->SetDebugName("Blocks Texture Array");
+
+		int layer = 0;
+		for (const auto& [id, item] : m_BlocksData)
+		{
+			const BlockData& block = item.Block.value();
+
+			std::array<std::string, block_face_count> texturePaths;
+			auto getPath = [&](BlockFace face) -> std::filesystem::path {
+				auto it = block.Textures.find(face);
+				if (it != block.Textures.end())
+					return it->second;
+				return "";
+			};
+
+			std::string all  = getPath(BlockFace::All).string();
+			std::string side = getPath(BlockFace::Side).string();
+
+			texturePaths[0] = getPath(BlockFace::Front).string();   /// Front
+			texturePaths[1] = getPath(BlockFace::Left).string();    /// Left
+			texturePaths[2] = getPath(BlockFace::Back).string();    /// Back
+			texturePaths[3] = getPath(BlockFace::Right).string();   /// Right
+			texturePaths[4] = getPath(BlockFace::Top).string();     /// Top
+			texturePaths[5] = getPath(BlockFace::Bottom).string();  /// Bottom
+
+			for (int i = 0; i < block_face_count; i++)
+			{
+				if (texturePaths[i].empty())
+					texturePaths[i] = (i == 4 || i == 5) ? all : (!side.empty() ? side : all);
+			}
+
+			size_t textureSize = Utils::GetMemorySize(spec.Format, m_DataPackConfig.TextureSize * block_face_count, m_DataPackConfig.TextureSize);
+			uint8_t* mergedData = new uint8_t[textureSize];
+			std::memset(mergedData, 0xff, textureSize);
+
+			for (int i = 0; i < block_face_count; i++)
+			{
+				std::filesystem::path path = m_DataPackPath / texturePaths[i];
+				if (!std::filesystem::exists(path))
+				{
+					KC_CORE_WARN("Missing texture for block '{}': {}", item.Name, path.string());
+					continue;
+				}
+
+				int width, height, channels, desiredChannels = Utils::GetTextureFormatChannelCount(spec.Format);
+				stbi_set_flip_vertically_on_load(1);
+				uint8_t* data = stbi_load(path.string().c_str(), &width, &height, &channels, desiredChannels);
+
+				if (!data || width != m_DataPackConfig.TextureSize || height != m_DataPackConfig.TextureSize)
+				{
+					KC_CORE_WARN("Failed to load or incorrect size for texture: {}", path.string());
+					stbi_image_free(data);
+					continue;
+				}
+
+				for (int y = 0; y < m_DataPackConfig.TextureSize; y++)
+				{
+					std::memcpy(
+						mergedData + (y * spec.Width * desiredChannels) + (i * m_DataPackConfig.TextureSize * desiredChannels),
+						data + (y * m_DataPackConfig.TextureSize * desiredChannels),
+						m_DataPackConfig.TextureSize * desiredChannels);
+				}
+				
+				stbi_image_free(data);
+			}
+
+			m_BlockTextureLayers[id] = layer;
+			m_BlockTexture->SetLayerData(mergedData, textureSize, layer);
+			layer++;
+			delete[] mergedData;
 		}
 	}
 

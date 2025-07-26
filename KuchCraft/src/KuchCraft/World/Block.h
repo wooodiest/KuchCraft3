@@ -49,13 +49,24 @@ namespace KuchCraft {
 		Cube,
 		Slab,
 		Cross,
-		Plane,
-		Custom,
+		Plane
+	};
+
+	enum class BlockFace : uint8_t {
+		Front,
+		Left,
+		Back,
+		Right,
+		Top,
+		Bottom,
+		Side, 
+		All 
 	};
 
 	struct BlockData
 	{
 		BlockGeometryType GeometryType = BlockGeometryType::Cube;
+		std::unordered_map<BlockFace, std::filesystem::path> Textures;
 
 		float BreakingTime = 1.0f;
 		float Weight       = 1.0f;
