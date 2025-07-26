@@ -39,4 +39,48 @@ namespace KuchCraft {
 		int       TextureSlot  = 0;
 	};
 
+	enum class FaceWinding
+	{
+		CounterClockwise = 0,
+		Clockwise,
+		None
+	};
+
+	enum class DepthFunc
+	{
+		Never = 0,
+		Less ,
+		Equal,
+		LessEqual,
+		Greater,
+		NotEqual,
+		GreaterEqual,
+		Always,
+		None
+	};
+
+	enum class BlendFunc
+	{
+		Zero = 0,
+		One,
+		SrcAlpha,
+		OneMinusSrcAlpha,
+		None
+	};
+
+	enum class CullMode 
+	{
+		Back = 0,
+		Front,
+		FrontAndBack,
+		None
+	};
+
+	enum class PolygonMode
+	{
+		Fill = 0,
+		Line,
+		Point,
+		None
+	};
 }

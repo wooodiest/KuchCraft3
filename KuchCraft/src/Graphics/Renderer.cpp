@@ -13,6 +13,7 @@ namespace KuchCraft {
 		CheckExtensions();
 		SetupLogging();
 		SetGlobalSubstitutions();
+		InitializeRendererState();
 
 		m_ShaderLibrary.SetPath(m_Config.Renderer.ShadersPath);
 
@@ -285,6 +286,215 @@ namespace KuchCraft {
 		glViewport(0, 0, width, height);
 	}
 
+	void Renderer::InitializeRendererState()
+	{
+		m_RendererState.ForceSet = true; /// Force initial state to be set
+
+		SetPolygonMode(m_RendererState.PolygonMode);
+		SetFrontFaceWinding(m_RendererState.FrontFaceWinding);
+
+		SetDepthTest(m_RendererState.DepthTestEnabled);
+		SetDepthFunc(m_RendererState.DepthFunc);
+
+		SetBlend(m_RendererState.BlendEnabled);
+		SetBlendFunc(m_RendererState.SrcBlendFunc, m_RendererState.DstBlendFunc);
+
+		SetCullFace(m_RendererState.CullFaceEnabled);
+		SetCullMode(m_RendererState.CullFaceMode);
+
+		SetPolygonOffset(m_RendererState.PolygonOffsetEnabled, m_RendererState.PolygonOffsetFactor, m_RendererState.PolygonOffsetUnits);
+
+		m_RendererState.ForceSet = false;
+	}
+
+	void Renderer::SetPolygonMode(PolygonMode mode)
+	{
+		if (!m_RendererState.ForceSet && m_RendererState.PolygonMode == mode)
+			return;
+
+		m_RendererState.PolygonMode = mode;
+		switch (mode)
+		{
+			case PolygonMode::Fill:   glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);   break;
+			case PolygonMode::Line:   glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);   break;
+			case PolygonMode::Point:  glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);  break;
+			default:
+			{
+				KC_CORE_ERROR("Invalid PolygonMode: {}", (int)mode);
+				SetPolygonMode(PolygonMode::Fill);
+				break;
+			}
+		}
+	}
+
+	void Renderer::SetFrontFaceWinding(FaceWinding mode)
+	{
+		if (!m_RendererState.ForceSet && m_RendererState.FrontFaceWinding == mode)
+			return;
+
+		m_RendererState.FrontFaceWinding = mode;
+		switch (mode)
+		{
+			case FaceWinding::CounterClockwise: glFrontFace(GL_CCW); break;
+			case FaceWinding::Clockwise:        glFrontFace(GL_CW);  break;
+			default : 
+			{
+				KC_CORE_ERROR("Invalid FrontFace mode: {}", (int)mode);
+				SetFrontFaceWinding(FaceWinding::CounterClockwise);
+				break;
+			}
+		}
+	}
+
+	void Renderer::SetDepthTest(bool enabled)
+	{
+		if (!m_RendererState.ForceSet && m_RendererState.DepthTestEnabled == enabled)
+			return;
+
+		m_RendererState.DepthTestEnabled = enabled;
+		if (enabled)
+		{
+			glEnable(GL_DEPTH_TEST);
+			SetDepthFunc(m_RendererState.DepthFunc);
+		}
+		else
+		{
+			glDisable(GL_DEPTH_TEST);
+		}
+	}
+
+	void Renderer::SetDepthFunc(DepthFunc func)
+	{
+		if (!m_RendererState.ForceSet && m_RendererState.DepthFunc == func)
+			return;
+
+		m_RendererState.DepthFunc = func;
+		switch (func)
+		{
+			case DepthFunc::Never:        glDepthFunc(GL_NEVER);    break;
+			case DepthFunc::Less:         glDepthFunc(GL_LESS);     break;
+			case DepthFunc::Equal:        glDepthFunc(GL_EQUAL);    break;
+			case DepthFunc::LessEqual:    glDepthFunc(GL_LEQUAL);   break;
+			case DepthFunc::Greater:      glDepthFunc(GL_GREATER);  break;
+			case DepthFunc::NotEqual:     glDepthFunc(GL_NOTEQUAL); break;
+			case DepthFunc::GreaterEqual: glDepthFunc(GL_GEQUAL);   break;
+			case DepthFunc::Always:       glDepthFunc(GL_ALWAYS);   break;
+			default:
+			{
+				KC_CORE_ERROR("Invalid DepthFunc mode: {}", (int)func);
+				SetDepthFunc(DepthFunc::LessEqual);
+				break;
+			}
+		}
+	}
+
+	void Renderer::SetBlend(bool enabled)
+	{
+		if (!m_RendererState.ForceSet && m_RendererState.BlendEnabled == enabled)
+			return;
+
+		m_RendererState.BlendEnabled = enabled;
+		if (enabled)
+		{
+			glEnable(GL_BLEND);
+			SetBlendFunc(m_RendererState.SrcBlendFunc, m_RendererState.DstBlendFunc);
+		}
+		else
+		{
+			glDisable(GL_BLEND);
+		}
+	}
+
+	GLenum BlendFuncToGLenum(BlendFunc func)
+	{
+		switch (func)
+		{
+			case BlendFunc::Zero:             return GL_ZERO;
+			case BlendFunc::One:              return GL_ONE;
+			case BlendFunc::SrcAlpha:         return GL_SRC_ALPHA;
+			case BlendFunc::OneMinusSrcAlpha: return GL_ONE_MINUS_SRC_ALPHA;
+		}
+
+		return GL_ONE;
+	}
+
+	void Renderer::SetBlendFunc(BlendFunc src, BlendFunc dst)
+	{
+		if (!m_RendererState.ForceSet && m_RendererState.SrcBlendFunc == src && m_RendererState.DstBlendFunc == dst)
+			return;
+
+		m_RendererState.SrcBlendFunc = src;
+		m_RendererState.DstBlendFunc = dst;
+
+		if (src == BlendFunc::None || dst == BlendFunc::None)
+		{
+			KC_CORE_ERROR("Invalid BlendFunc combination: Src = {}, Dst = {}", (int)src, (int)dst);
+			SetBlendFunc(BlendFunc::SrcAlpha, BlendFunc::OneMinusSrcAlpha);
+			return;
+		}
+
+		glBlendFunc(BlendFuncToGLenum(src), BlendFuncToGLenum(dst));
+		glBlendEquation(GL_FUNC_ADD);
+	}
+
+	void Renderer::SetCullFace(bool enabled)
+	{
+		if (!m_RendererState.ForceSet && m_RendererState.CullFaceEnabled == enabled)
+			return;
+
+		m_RendererState.CullFaceEnabled = enabled;
+		if (enabled)
+		{
+			glEnable(GL_CULL_FACE);
+			SetCullMode(m_RendererState.CullFaceMode);
+		}
+		else
+		{
+			glDisable(GL_CULL_FACE);
+		}
+	}
+
+	void Renderer::SetCullMode(CullMode mode)
+	{
+		if (!m_RendererState.ForceSet && m_RendererState.CullFaceMode == mode)
+			return;
+
+		m_RendererState.CullFaceMode = mode;
+		switch (mode)
+		{
+			case CullMode::Front:        glCullFace(GL_FRONT);          break;
+			case CullMode::Back:         glCullFace(GL_BACK);           break;
+			case CullMode::FrontAndBack: glCullFace(GL_FRONT_AND_BACK); break;
+			default:
+			{
+				KC_CORE_ERROR("Invalid CullMode: {}", (int)mode);
+				SetCullMode(CullMode::Back);
+				break;
+			}
+		}
+	}
+
+	void Renderer::SetPolygonOffset(bool enabled, float factor, float units)
+	{
+		if (!m_RendererState.ForceSet && m_RendererState.PolygonOffsetEnabled == enabled && 
+			m_RendererState.PolygonOffsetFactor == factor && m_RendererState.PolygonOffsetUnits == units)
+			return;
+
+		m_RendererState.PolygonOffsetEnabled = enabled;
+		m_RendererState.PolygonOffsetFactor  = factor;
+		m_RendererState.PolygonOffsetUnits   = units;
+
+		if (enabled)
+		{
+			glEnable(GL_POLYGON_OFFSET_FILL);
+			glPolygonOffset(factor, units);
+		}
+		else
+		{
+			glDisable(GL_POLYGON_OFFSET_FILL);
+		}
+	}
+
 	void Renderer::ResetStats()
 	{
 		m_Stats.DrawCalls = 0;
@@ -354,11 +564,11 @@ namespace KuchCraft {
 		if (m_Quads2D.Vertices.empty())
 			return;
 
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		glDisable(GL_CULL_FACE);
-		glEnable(GL_DEPTH_TEST);
-		glDepthFunc(GL_LESS);
+		SetBlend(true);
+		SetBlendFunc(BlendFunc::SrcAlpha, BlendFunc::OneMinusSrcAlpha);
+		SetCullFace(false);
+		SetDepthTest(true);
+		SetDepthFunc(DepthFunc::LessEqual);
 
 		m_Quads2D.Shader     ->Bind();
 		m_WhiteTexture       ->Bind(0);

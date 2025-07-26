@@ -81,6 +81,40 @@ namespace KuchCraft {
 
 		Ref<UniformBuffer> m_EnvironmentUniformBuffer;
 
+		/// Renderer state
+		struct {
+			bool ForceSet = false;
+
+			PolygonMode PolygonMode = PolygonMode::Fill;
+			FaceWinding FrontFaceWinding = FaceWinding::CounterClockwise;
+
+			bool DepthTestEnabled = true;
+			DepthFunc DepthFunc = DepthFunc::LessEqual;
+
+			bool BlendEnabled = true;
+			BlendFunc SrcBlendFunc = BlendFunc::SrcAlpha;
+			BlendFunc DstBlendFunc = BlendFunc::OneMinusSrcAlpha;
+
+			bool CullFaceEnabled = false;
+			CullMode CullFaceMode = CullMode::Back;
+
+			bool  PolygonOffsetEnabled = false;
+			float PolygonOffsetFactor  = 0.0f;
+			float PolygonOffsetUnits   = 0.0f;
+
+		} m_RendererState;
+
+		void InitializeRendererState();
+		void SetPolygonMode(PolygonMode mode);
+		void SetDepthTest(bool enabled);
+		void SetDepthFunc(DepthFunc func);
+		void SetBlend(bool enabled);
+		void SetBlendFunc(BlendFunc src, BlendFunc dst);
+		void SetCullFace(bool enabled);
+		void SetFrontFaceWinding(FaceWinding mode);
+		void SetCullMode(CullMode mode);
+		void SetPolygonOffset(bool enabled, float factor = 0.0f, float units = 0.0f);
+
 		/// Stats
 		struct {
 			uint32_t DrawCalls = 0;
