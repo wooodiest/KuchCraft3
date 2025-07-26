@@ -13,9 +13,7 @@ namespace KuchCraft {
 
 	struct AssetHandle
 	{
-		UUID        ID = 0;
-		AssetType   Type = AssetType::None;
-		std::string Name = "Unnamed Asset";
+		UUID ID = 0;
 
 		bool IsValid() const { return ID != 0; }
 	};
@@ -25,6 +23,20 @@ namespace KuchCraft {
 	public:
 		AssetManager(Config config, const std::filesystem::path& dataPackPath);
 		~AssetManager();
+
+		AssetType GetType(const AssetHandle& handle) const {
+			auto it = m_AssetsTypes.find(handle.ID);
+			if (it != m_AssetsTypes.end())
+				return it->second;
+			return AssetType::None;
+		}
+
+		std::string GetName(const AssetHandle& handle) const {
+			auto it = m_AssetsNames.find(handle.ID);
+			if (it != m_AssetsNames.end())
+				return it->second;
+			return "Unnamed asset";
+		}
 
 		AssetHandle Load(const std::filesystem::path& filepath);
 		AssetHandle Load(const std::string& name);
@@ -46,7 +58,10 @@ namespace KuchCraft {
 		Config m_Config;
 		std::filesystem::path m_DataPackPath;
 
+		std::unordered_map<UUID, AssetType> m_AssetsTypes;
+		std::unordered_map<UUID, std::string> m_AssetsNames;
 		std::unordered_map<std::filesystem::path, AssetHandle> m_AssetsPaths;
+
 		std::unordered_map<UUID, Ref<Texture2D>> m_Textures2D;
 	};
 

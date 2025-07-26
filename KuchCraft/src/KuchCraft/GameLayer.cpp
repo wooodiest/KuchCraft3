@@ -197,9 +197,9 @@ namespace KuchCraft {
 					ImGui::DragFloat2("UV Start", glm::value_ptr(sprite.UVStart), 0.01f);
 					ImGui::DragFloat2("UV End", glm::value_ptr(sprite.UVEnd), 0.01f);
 
-					ImGui::Text("Asset:");
+					ImGui::Text("Asset:");	
 					ImGui::Text("ID: %llu", sprite.Asset.ID);
-					ImGui::Text("Name: %s", sprite.Asset.Name.c_str());
+					ImGui::Text("Name: %s", m_Scene->GetAssetManager()->GetName(sprite.Asset).c_str());
 					if (sprite.Asset.IsValid())
 					{
 						auto texture = m_Scene->GetAssetManager()->GetTexture2D(sprite.Asset);

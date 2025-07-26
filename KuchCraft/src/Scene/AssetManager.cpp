@@ -45,16 +45,18 @@ namespace KuchCraft {
 		}
 
 		AssetHandle assetHandle;
+		AssetType assetType = AssetType::None;
+		std::string assetName = "Unnamed asset";
 
 		if (assetJson.contains("Type"))
-			assetHandle.Type = FromString<AssetType>(assetJson["Type"].get<std::string>()).value_or(AssetType::None);
+			assetType = FromString<AssetType>(assetJson["Type"].get<std::string>()).value_or(AssetType::None);
 		else
 		{
 			KC_CORE_ERROR("Asset JSON does not contain 'Type' field: {}", filepath.string());
 			return AssetHandle();
 		}
 
-		if (assetHandle.Type == AssetType::None)
+		if (assetType == AssetType::None)
 		{
 			KC_CORE_ERROR("Unsupported asset type in JSON: {}", filepath.string());
 			return AssetHandle();
@@ -70,12 +72,12 @@ namespace KuchCraft {
 		}
 		
 		if (assetJson.contains("Name"))
-			assetHandle.Name = assetJson["Name"].get<std::string>();
+			assetName = assetJson["Name"].get<std::string>();
 		else
-			assetHandle.Name = filepath.filename().string();
+			assetName = filepath.filename().replace_extension("").string();
 
 		bool good = true;
-		switch (assetHandle.Type)
+		switch (assetType)
 		{
 			case AssetType::Texture2D: good = LoadTexture2D(assetHandle, assetJson); break;
 		}
@@ -85,6 +87,10 @@ namespace KuchCraft {
 			KC_CORE_ERROR("Failed to load asset: {}", filepath.string());
 			return AssetHandle();
 		}
+
+		m_AssetsTypes[assetHandle.ID] = assetType;
+		m_AssetsNames[assetHandle.ID] = assetName;
+		m_AssetsPaths[filepath] = assetHandle;
 
 		return assetHandle;
 	}
@@ -134,7 +140,7 @@ namespace KuchCraft {
 		}
 		else
 		{
-			KC_CORE_ERROR("Failed to load texture: {}", handle.Name);
+			KC_CORE_ERROR("Failed to load texture: {}", handle.ID);
 			return false;
 		}
 

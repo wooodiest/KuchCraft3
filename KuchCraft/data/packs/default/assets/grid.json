@@ -5,7 +5,7 @@
     "Specification": {
         "Format": "RGBA",
         "Filter": "Linear",
-        "Wrap": "Clamp",
+        "Wrap": "Repeat",
         "GenerateMips": false   
     }
 }
