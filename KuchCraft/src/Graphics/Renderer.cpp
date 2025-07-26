@@ -495,11 +495,126 @@ namespace KuchCraft {
 		}
 	}
 
+	inline GLenum ToOpenGLPrimitive(PrimitiveTopology topology)
+	{
+		switch (topology)
+		{
+			case PrimitiveTopology::Points:             return GL_POINTS;
+			case PrimitiveTopology::Lines:              return GL_LINES;
+			case PrimitiveTopology::LineStrip:          return GL_LINE_STRIP;
+			case PrimitiveTopology::Triangles:          return GL_TRIANGLES;
+			case PrimitiveTopology::TriangleStrip:      return GL_TRIANGLE_STRIP;
+			case PrimitiveTopology::TriangleFan:        return GL_TRIANGLE_FAN;
+			case PrimitiveTopology::LinesAdjacency:     return GL_LINES_ADJACENCY;
+			case PrimitiveTopology::TrianglesAdjacency: return GL_TRIANGLES_ADJACENCY;
+			case PrimitiveTopology::Patches:            return GL_PATCHES;
+			default:
+				KC_CORE_ERROR("Unknown PrimitiveTopology: {}", static_cast<int>(topology));
+				return GL_TRIANGLES;
+		}
+	}
+
+	void Renderer::DrawArrays(PrimitiveTopology topology, uint32_t firstVertex, uint32_t vertexCount)
+	{
+		glDrawArrays(ToOpenGLPrimitive(topology), firstVertex, vertexCount);
+
+		m_Stats.DrawCalls++;
+		m_Stats.Primitives += GetPrimitiveCount(topology, vertexCount);
+	}
+
+	void Renderer::DrawArraysInstanced(PrimitiveTopology topology, uint32_t firstVertex, uint32_t vertexCount, uint32_t instanceCount)
+	{
+		glDrawArraysInstanced(ToOpenGLPrimitive(topology), firstVertex, vertexCount, instanceCount);
+
+		m_Stats.DrawCalls++;
+		m_Stats.Primitives += GetPrimitiveCount(topology, vertexCount) * instanceCount;
+	}
+
+	void Renderer::DrawElements(PrimitiveTopology topology, uint32_t indexCount, uint32_t firstIndex)
+	{
+		glDrawElements(ToOpenGLPrimitive(topology), indexCount, GL_UNSIGNED_INT, (void*)(sizeof(uint32_t) * firstIndex));
+
+		m_Stats.DrawCalls++;
+		m_Stats.Primitives += GetPrimitiveCount(topology, indexCount);
+	}
+
+	void Renderer::DrawElementsInstanced(PrimitiveTopology topology, uint32_t indexCount, uint32_t firstIndex, uint32_t instanceCount)
+	{
+		glDrawElementsInstanced(ToOpenGLPrimitive(topology), indexCount, GL_UNSIGNED_INT, (void*)(sizeof(uint32_t) * firstIndex), instanceCount);
+
+		m_Stats.DrawCalls++;
+		m_Stats.Primitives += GetPrimitiveCount(topology, indexCount) * instanceCount;
+	}
+
+	void Renderer::DrawElementsBaseVertex(PrimitiveTopology topology, uint32_t indexCount, uint32_t firstIndex, int32_t baseVertex)
+	{
+		glDrawElementsBaseVertex(ToOpenGLPrimitive(topology), indexCount, GL_UNSIGNED_INT, (void*)(sizeof(uint32_t) * firstIndex), baseVertex);
+
+		m_Stats.DrawCalls++;
+		m_Stats.Primitives += GetPrimitiveCount(topology, indexCount);
+	}
+
+	void Renderer::DrawElementsInstancedBaseVertex(PrimitiveTopology topology, uint32_t indexCount, uint32_t firstIndex, uint32_t instanceCount, int32_t baseVertex)
+	{
+		glDrawElementsInstancedBaseVertex(ToOpenGLPrimitive(topology), indexCount, GL_UNSIGNED_INT, (void*)(sizeof(uint32_t) * firstIndex), instanceCount, baseVertex);
+
+		m_Stats.DrawCalls++;
+		m_Stats.Primitives += GetPrimitiveCount(topology, indexCount) * instanceCount;
+	}
+
+	void Renderer::DrawElementsInstancedBaseVertexBaseInstance(PrimitiveTopology topology, uint32_t indexCount, uint32_t firstIndex, uint32_t instanceCount, int32_t baseVertex, uint32_t baseInstance)
+	{
+		glDrawElementsInstancedBaseVertexBaseInstance(ToOpenGLPrimitive(topology), indexCount, GL_UNSIGNED_INT, (void*)(sizeof(uint32_t) * firstIndex), instanceCount, baseVertex, baseInstance);
+
+		m_Stats.DrawCalls++;
+		m_Stats.Primitives += GetPrimitiveCount(topology, indexCount) * instanceCount;
+	}
+
+	void Renderer::DrawRangeElements(PrimitiveTopology topology, uint32_t start, uint32_t end, uint32_t count)
+	{
+		glDrawRangeElements(ToOpenGLPrimitive(topology), start, end, count, GL_UNSIGNED_INT, nullptr);
+
+		m_Stats.DrawCalls++;
+		m_Stats.Primitives += GetPrimitiveCount(topology, count);
+	}
+
+	void Renderer::MultiDrawArrays(PrimitiveTopology topology, const std::vector<int>& firsts, const std::vector<int>& counts)
+	{
+		glMultiDrawArrays(ToOpenGLPrimitive(topology), firsts.data(), counts.data(), static_cast<GLsizei>(counts.size()));
+
+		m_Stats.DrawCalls++;
+		for (auto count : counts)
+			m_Stats.Primitives += GetPrimitiveCount(topology, count);
+	}
+
+	void Renderer::MultiDrawElements(PrimitiveTopology topology, const std::vector<GLsizei>& counts, const std::vector<void*>& offsets)
+	{
+		glMultiDrawElements(ToOpenGLPrimitive(topology), counts.data(), GL_UNSIGNED_INT, offsets.data(), static_cast<GLsizei>(counts.size()));
+
+		m_Stats.DrawCalls++;
+		for (auto count : counts)
+			m_Stats.Primitives += GetPrimitiveCount(topology, count);
+	}
+
+	void Renderer::DrawArraysIndirect(PrimitiveTopology topology, const void* indirect)
+	{
+		glDrawArraysIndirect(ToOpenGLPrimitive(topology), indirect);
+
+		m_Stats.DrawCalls++;
+	}
+
+	void Renderer::DrawElementsIndirect(PrimitiveTopology topology, const void* indirect)
+	{
+		glDrawElementsIndirect(ToOpenGLPrimitive(topology), GL_UNSIGNED_INT, indirect);
+
+		m_Stats.DrawCalls++;
+	}
+
+
 	void Renderer::ResetStats()
 	{
-		m_Stats.DrawCalls = 0;
-		m_Stats.Vertices  = 0;
-		m_Stats.Quads     = 0;
+		m_Stats.DrawCalls  = 0;
+		m_Stats.Primitives = 0;
 	}
 
 	void Renderer::InitQuads2D()
@@ -569,6 +684,8 @@ namespace KuchCraft {
 		SetCullFace(false);
 		SetDepthTest(true);
 		SetDepthFunc(DepthFunc::LessEqual);
+		SetPolygonMode(PolygonMode::Fill);
+		SetPolygonOffset(false);
 
 		m_Quads2D.Shader     ->Bind();
 		m_WhiteTexture       ->Bind(0);
@@ -650,11 +767,7 @@ namespace KuchCraft {
 		for (int slot = 1; slot < (int)m_Quads2D.CurrentTextureSlot; slot++)
 			Texture::Bind(slot, m_Quads2D.Textures[slot]);
 		
-		glDrawElements(GL_TRIANGLES, m_Quads2D.CurrentIndexCount, GL_UNSIGNED_INT, nullptr);
-
-		m_Stats.DrawCalls++;
-		m_Stats.Vertices += vertexCount;
-		m_Stats.Quads    += vertexCount / quad_vertex_count;
+		DrawElements(PrimitiveTopology::Triangles, m_Quads2D.CurrentIndexCount, 0);
 	}
 
 }

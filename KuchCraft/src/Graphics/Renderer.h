@@ -143,14 +143,33 @@ namespace KuchCraft {
 	
 #pragma endregion
 
-		/// Stats
+#pragma region RendererDrawCommands
+	private:
+		void DrawArrays(PrimitiveTopology topology, uint32_t firstVertex, uint32_t vertexCount);
+		void DrawArraysInstanced(PrimitiveTopology topology, uint32_t firstVertex, uint32_t vertexCount, uint32_t instanceCount);
+
+		void DrawElements(PrimitiveTopology topology, uint32_t indexCount, uint32_t firstIndex);
+		void DrawElementsInstanced(PrimitiveTopology topology, uint32_t indexCount, uint32_t firstIndex, uint32_t instanceCount);
+		void DrawElementsBaseVertex(PrimitiveTopology topology, uint32_t indexCount, uint32_t firstIndex, int32_t baseVertex);
+
+		void DrawElementsInstancedBaseVertex(PrimitiveTopology topology, uint32_t indexCount, uint32_t firstIndex, uint32_t instanceCount, int32_t baseVertex);
+		void DrawElementsInstancedBaseVertexBaseInstance( PrimitiveTopology topology, uint32_t indexCount, uint32_t firstIndex, uint32_t instanceCount, int32_t baseVertex, uint32_t baseInstance);
+		
+		void DrawRangeElements(PrimitiveTopology topology, uint32_t start, uint32_t end, uint32_t count);
+
+		void MultiDrawArrays(PrimitiveTopology topology, const std::vector<int>& firsts, const std::vector<int>& counts);
+		void MultiDrawElements(PrimitiveTopology topology, const std::vector<GLsizei>& counts, const std::vector<void*>& offsets);
+
+		void DrawArraysIndirect(PrimitiveTopology topology, const void* indirect);
+		void DrawElementsIndirect(PrimitiveTopology topology, const void* indirect);
+
+#pragma endregion
 
 #pragma region Stats
 	private:
 		struct {
-			uint32_t DrawCalls = 0;
-			uint32_t Vertices  = 0;
-			uint32_t Quads     = 0;
+			uint32_t DrawCalls  = 0;
+			uint32_t Primitives = 0;
 
 		} m_Stats;
 		

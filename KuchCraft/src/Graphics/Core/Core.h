@@ -7,9 +7,10 @@ namespace KuchCraft {
 
 	using RendererID  = uint32_t;
 
-	using GLenum = unsigned int;
-	using GLuint = unsigned int;
-	using GLint  = int;
+	using GLenum  = unsigned int;
+	using GLuint  = unsigned int;
+	using GLint   = int;
+	using GLsizei = int;
 
 	inline constexpr float ortho_near = -1.0f;
 	inline constexpr float ortho_far  =  1.0f;
@@ -83,4 +84,45 @@ namespace KuchCraft {
 		Point,
 		None
 	};
+
+	enum class PrimitiveTopology
+	{
+		Points = 0,
+		Lines,
+		LineStrip,
+		Triangles,
+		TriangleStrip,
+		TriangleFan,
+		LinesAdjacency,
+		TrianglesAdjacency,
+		Patches
+	};
+
+	constexpr uint32_t GetVerticesPerPrimitive(PrimitiveTopology topology)
+	{
+		switch (topology)
+		{
+			case PrimitiveTopology::Points:         return 1;
+			case PrimitiveTopology::Lines:          return 2;
+			case PrimitiveTopology::Triangles:      return 3;
+			case PrimitiveTopology::LinesAdjacency: return 4;
+			case PrimitiveTopology::TrianglesAdjacency: return 6;
+			default: return 1;
+		}
+	}
+
+	constexpr uint32_t GetPrimitiveCount(PrimitiveTopology topology, uint32_t vertexCount)
+	{
+		switch (topology)
+		{
+			case PrimitiveTopology::Points:         return vertexCount;
+			case PrimitiveTopology::Lines:          return vertexCount / 2;
+			case PrimitiveTopology::LineStrip:      return vertexCount >= 2 ? vertexCount - 1 : 0;
+			case PrimitiveTopology::Triangles:      return vertexCount / 3;
+			case PrimitiveTopology::TriangleStrip:  return vertexCount >= 3 ? vertexCount - 2 : 0;
+			case PrimitiveTopology::TriangleFan:    return vertexCount >= 3 ? vertexCount - 2 : 0;
+			default: return 0;
+		}
+	}
+
 }

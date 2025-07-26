@@ -54,8 +54,7 @@ namespace KuchCraft {
 			const auto& stats = m_Renderer->GetStats();
 
 			ImGui::Text("Draw calls: %d", stats.DrawCalls);
-			ImGui::Text("Vertices: %d", stats.Vertices);
-			ImGui::Text("Quads: %d", stats.Quads);
+			ImGui::Text("Primitives: %d", stats.Primitives);
 		}
 		
 		if (ImGui::CollapsingHeader("Shaders##RendererLayer"))
