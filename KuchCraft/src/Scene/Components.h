@@ -3,6 +3,8 @@
 #include "Graphics/Core/Camera.h"
 #include "Graphics/Core/Texture.h"
 
+#include "Scene/AssetManager.h"
+
 namespace KuchCraft {
 
 	struct IDComponent
@@ -104,9 +106,7 @@ namespace KuchCraft {
 	{
 		glm::vec4 Color = { 1.0f, 1.0f, 1.0f, 1.0f };
 
-		KC_TODO("Use texture by AssetHandle")
-		AssetHandle Texture = 0;
-		Ref<Texture2D> _Texture;
+		AssetHandle Asset;
 
 		float TilingFactor = 1.0f;
 		glm::vec2 UVStart  = { 0.0f, 0.0f };

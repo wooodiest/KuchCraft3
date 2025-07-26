@@ -5,6 +5,7 @@
         "GameLogLevel": "Info"
     },
     "Game": {
+        "DataPacksDir": "data/packs/",
         "WorldsDir": "data/worlds/"
     },
     "Renderer": {

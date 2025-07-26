@@ -109,7 +109,7 @@ namespace KuchCraft {
 					{ "TilingFactor", sprite.TilingFactor },
 					{ "UVStart",      sprite.UVStart },
 					{ "UVEnd",        sprite.UVEnd   },
-					{ "Texture",      sprite.Texture }
+					{ "Asset",        sprite.Asset.ID }
 				};
 			}
 
@@ -275,8 +275,8 @@ namespace KuchCraft {
 					spriteRendererComponent.UVStart = spriteRendererJson["UVStart"];
 				if (spriteRendererJson.contains("UVEnd"))
 					spriteRendererComponent.UVEnd = spriteRendererJson["UVEnd"];
-				if (spriteRendererJson.contains("Texture"))
-					spriteRendererComponent.Texture = spriteRendererJson["Texture"];
+				if (spriteRendererJson.contains("Asset"))
+					spriteRendererComponent.Asset.ID = spriteRendererJson["Asset"];
 			}
 		}
 

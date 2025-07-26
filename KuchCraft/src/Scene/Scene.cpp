@@ -89,8 +89,8 @@ namespace KuchCraft {
 			return;
 
 		m_Registry.view<TransformComponent, SpriteRendererComponent>().each([&](auto entity, auto& transformComponent, auto& spriteComponent) {	
-			if (spriteComponent._Texture)
-				m_Renderer->DrawQuad2D(transformComponent.GetTransform(), spriteComponent._Texture,
+			if (spriteComponent.Asset.IsValid())
+				m_Renderer->DrawQuad2D(transformComponent.GetTransform(), m_AssetManager->GetTexture2D(spriteComponent.Asset),
 					spriteComponent.TilingFactor, spriteComponent.Color, spriteComponent.UVStart, spriteComponent.UVEnd);
 			else
 				m_Renderer->DrawQuad2D(transformComponent.GetTransform(), spriteComponent.Color);
@@ -114,6 +114,9 @@ namespace KuchCraft {
 			KC_CORE_ERROR("Failed to set data pack: {}", m_DataPackName);
 			return;
 		}
+
+		m_AssetManager = CreateRef<AssetManager>(m_Config, m_ItemManager->GetDataPackPath());
+		m_AssetManager->LoadAll();
 	}
 
 	void Scene::Save()

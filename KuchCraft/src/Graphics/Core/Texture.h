@@ -26,6 +26,7 @@ namespace KuchCraft {
 		virtual RendererID GetRendererID() const = 0;
 		virtual bool IsValid() const = 0;
 
+		virtual const TextureSpecification& GetSpecification() const = 0;
 		virtual TextureFormat GetFormat() const = 0;
 		virtual TextureType   GetType()   const = 0;
 
@@ -52,6 +53,7 @@ namespace KuchCraft {
 
 		void SetData(const void* data, size_t size);
 
+		virtual const TextureSpecification& GetSpecification() const override { return m_Specification; };
 		virtual TextureFormat GetFormat() const override { return m_Specification.Format; }
 		virtual TextureType   GetType()   const override { return TextureType::Texture2D; }
 
@@ -90,6 +92,7 @@ namespace KuchCraft {
 
 		void CopyTo(const Ref<Texture2D>& target, int layer = 0) const;
 
+		virtual const TextureSpecification& GetSpecification() const override { return m_Specification; };
 		virtual TextureFormat GetFormat() const override { return m_Specification.Format; }
 		virtual TextureType   GetType()   const override { return TextureType::Texture2DArray; }
 		int GetLayerCount() const { return m_LayerCount; }
@@ -128,6 +131,7 @@ namespace KuchCraft {
 
 		void SetFaceData(const void* data, size_t size, CubeTextureFaces face);
 
+		virtual const TextureSpecification& GetSpecification() const override { return m_Specification; };
 		virtual TextureFormat GetFormat() const override { return m_Specification.Format; }
 		virtual TextureType   GetType()   const override { return TextureType::TextureCube; }
 

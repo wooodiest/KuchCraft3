@@ -5,6 +5,8 @@
 #include "Scene/Entity.h"
 #include "KuchCraft/CameraController.h"
 
+#include "Graphics/Core/GraphicsUtils.h"
+
 #include <imgui.h>
 #include <misc/cpp/imgui_stdlib.h>
 
@@ -189,26 +191,44 @@ namespace KuchCraft {
 					ImGui::Text("Forward: %f, %f, %f", forwardDirection.x, forwardDirection.y, forwardDirection.z);
 				});
 
-				ImGui_DrawComponent<SpriteRendererComponent>("Sprite Renderer", selectedEntity, [](auto& sprite) {
+				ImGui_DrawComponent<SpriteRendererComponent>("Sprite Renderer", selectedEntity, [&](auto& sprite) {
 					ImGui::ColorEdit4("Color", glm::value_ptr(sprite.Color));
 					ImGui::DragFloat("Tiling Factor", &sprite.TilingFactor, 0.1f, 0.1f, 10.0f);
 					ImGui::DragFloat2("UV Start", glm::value_ptr(sprite.UVStart), 0.01f);
 					ImGui::DragFloat2("UV End", glm::value_ptr(sprite.UVEnd), 0.01f);
 
-					if (sprite._Texture && sprite._Texture->IsValid())
+					ImGui::Text("Asset:");
+					ImGui::Text("ID: %llu", sprite.Asset.ID);
+					ImGui::Text("Name: %s", sprite.Asset.Name.c_str());
+					if (sprite.Asset.IsValid())
 					{
-						ImVec2 size = { ImGui::GetContentRegionAvail().x , (float)sprite._Texture->GetHeight() * ImGui::GetContentRegionAvail().x / (float)sprite._Texture->GetWidth() };
+						auto texture = m_Scene->GetAssetManager()->GetTexture2D(sprite.Asset);
+						if (texture && texture->IsValid())
+						{
+							const auto& spec = texture->GetSpecification();
+							ImGui::Text("Format: %s", std::string(ToString(spec.Format)).c_str());
+							ImGui::Text("Size: %dx%d", spec.Width, spec.Height);
+							ImGui::Text("Filter: %s", std::string(ToString(spec.Filter)).c_str());
+							ImGui::Text("Wrap: %s", std::string(ToString(spec.Wrap)).c_str());
+							ImGui::Text("Memory Size: %zu bytes", Utils::GetMemorySize(spec.Format, spec.Width, spec.Height));
+							ImGui::Text("Renderer ID: %llu", texture->GetRendererID());
 
-						ImGui::Image(
-							(ImTextureID)(sprite._Texture->GetRendererID()),
-							size,
-							ImVec2{ 0, 1 },
-							ImVec2{ 1, 0 }
-						);
+							ImVec2 size = { ImGui::GetContentRegionAvail().x , (float)texture->GetHeight() * ImGui::GetContentRegionAvail().x / (float)texture->GetWidth() };
+							ImGui::Image(
+								(ImTextureID)(uintptr_t)(texture->GetRendererID()),
+								size,
+								ImVec2{ 0, 1 },
+								ImVec2{ 1, 0 }
+							);
+						}
+						else
+						{
+							ImGui::Text("No texture loaded.");
+						}
 					}
 					else
 					{
-						ImGui::Text("No texture loaded.");
+						ImGui::Text("No asset assigned.");
 					}
 				});
 			}

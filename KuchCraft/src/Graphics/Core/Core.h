@@ -6,7 +6,6 @@
 namespace KuchCraft {
 
 	using RendererID  = uint32_t;
-	using AssetHandle = UUID;
 
 	using GLenum = unsigned int;
 	using GLuint = unsigned int;

@@ -29,6 +29,7 @@ namespace KuchCraft {
 		const BlockData& GetBlockDataUnsafe(const std::string& name) const { return GetItemDataUnsafe(name).Block.value();};
 
 		const auto& GetDataPackName() const { return m_DataPackConfig.Name; }
+		const auto& GetDataPackPath() const { return m_DataPackPath; }
 		const auto& GetItemsData()    const { return m_ItemsData;  }
 		const auto& GetBlocksData()   const { return m_BlocksData; }
 		const auto& GetNameToID()     const { return m_NameToID;   }

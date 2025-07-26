@@ -1,0 +1,11 @@
+{
+    "Type": "Texture2D",
+    "UUID": 2731472247423211151,
+    "FilePath": "textures/grid.png",
+    "Specification": {
+        "Format": "RGBA",
+        "Filter": "Linear",
+        "Wrap": "Clamp",
+        "GenerateMips": false   
+    }
+}

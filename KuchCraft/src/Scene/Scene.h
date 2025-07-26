@@ -2,6 +2,8 @@
 
 #include <entt/entt.hpp>
 
+#include "Scene/AssetManager.h"
+
 #include "KuchCraft/World/ItemManager.h"
 #include "Graphics/Renderer.h"
 
@@ -39,6 +41,7 @@ namespace KuchCraft {
 
 		const std::string& GetDataPackName() const { return m_DataPackName; }
 		Ref<ItemManager> GetItemManager() const { return m_ItemManager; }
+		Ref<AssetManager> GetAssetManager() const { return m_AssetManager; }
 
 		/// Entities
 		Entity CreateEntity(const std::string& name = "Unnamed");
@@ -91,8 +94,9 @@ namespace KuchCraft {
 		entt::registry m_Registry;
 		bool m_IsPaused = false;
 
-		Ref<Renderer>    m_Renderer;
-		Ref<ItemManager> m_ItemManager;
+		Ref<Renderer>     m_Renderer;
+		Ref<ItemManager>  m_ItemManager;
+		Ref<AssetManager> m_AssetManager;
 		Config m_Config;
 
 		std::filesystem::path m_Path;

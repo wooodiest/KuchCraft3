@@ -1,0 +1,135 @@
+{
+    "DataPack": "default",
+    "Entities": [
+        {
+            "Camera": {
+                "AspectRatio": 1.8879055976867676,
+                "FarClip": 1000.0,
+                "FixedAspectRatio": false,
+                "Fov": 0.7853981852531433,
+                "NearClip": 0.009999999776482582,
+                "UseTransformComponent": true
+            },
+            "NativeScript": {
+                "ScriptName": "CameraController",
+                "State": {
+                    "MouseSensitivity": 0.5,
+                    "MovementSpeed": 1.0
+                }
+            },
+            "Relationship": {
+                "Children": [],
+                "Parent": 0
+            },
+            "Tag": "Camera",
+            "Transform": {
+                "Rotation": [
+                    3.2221603393554688,
+                    0.934097945690155,
+                    0.0
+                ],
+                "Scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Translation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ]
+            },
+            "UUID": 2731472247423211154
+        },
+        {
+            "Relationship": {
+                "Children": [
+                    17888550455190649067
+                ],
+                "Parent": 0
+            },
+            "SpriteRenderer": {
+                "Asset": 0,
+                "Color": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ],
+                "TilingFactor": 1.0,
+                "UVEnd": [
+                    1.0,
+                    1.0
+                ],
+                "UVStart": [
+                    0.0,
+                    0.0
+                ]
+            },
+            "Tag": "Quad",
+            "Transform": {
+                "Rotation": [
+                    0.0,
+                    0.0,
+                    0.6457718014717102
+                ],
+                "Scale": [
+                    536.0,
+                    360.0,
+                    1.0
+                ],
+                "Translation": [
+                    1164.0,
+                    676.0,
+                    0.0
+                ]
+            },
+            "UUID": 11765414511042818973
+        },
+        {
+            "Relationship": {
+                "Children": [],
+                "Parent": 11765414511042818973
+            },
+            "SpriteRenderer": {
+                "Asset": 2731472247423211151,
+                "Color": [
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "TilingFactor": 1.0,
+                "UVEnd": [
+                    1.0,
+                    1.0
+                ],
+                "UVStart": [
+                    0.0,
+                    0.0
+                ]
+            },
+            "Tag": "Textured Entity",
+            "Transform": {
+                "Rotation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "Scale": [
+                    300.0,
+                    300.0,
+                    1.0
+                ],
+                "Translation": [
+                    619.0,
+                    259.0,
+                    0.0
+                ]
+            },
+            "UUID": 17888550455190649067
+        }
+    ],
+    "PrimaryCameraEntityUUID": 2731472247423211154,
+    "SceneUUID": 11853978348966633752
+}

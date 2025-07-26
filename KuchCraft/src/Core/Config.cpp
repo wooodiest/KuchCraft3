@@ -40,7 +40,8 @@ namespace KuchCraft {
 		};
 
 		configJson["Game"] = {
-			{ "WorldsDir", Game.WorldsDir }
+			{ "WorldsDir",    Game.WorldsDir },
+			{ "DataPacksDir", Game.DataPacksDir }
 		};
 
 		std::ofstream file(path);
@@ -163,6 +164,8 @@ namespace KuchCraft {
 
 			if (gameJson.contains("WorldsDir"))
 				Game.WorldsDir = gameJson["WorldsDir"];
+			if (gameJson.contains("DataPacksDir"))
+				Game.DataPacksDir = gameJson["DataPacksDir"];
 		}
 
 	}
