@@ -83,7 +83,7 @@ namespace KuchCraft {
 		void ClearDefaultFrameBuffer();
 		void SetRenderTargetToDefault();
 
-		Ref<FrameBuffer> m_OffscreenRenderTarget;
+		Ref<FrameBuffer> m_SceneRenderTarget;
 
 #pragma endregion
 

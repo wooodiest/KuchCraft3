@@ -32,15 +32,16 @@ namespace KuchCraft {
 		m_ShaderLibrary.SetGlobalSubstitution("ENVIRONMENT_UNIFORM_BUFFER_BINDING", std::to_string(m_EnvironmentUniformBuffer->GetBinding()));
 
 		FrameBufferSpecification fbSpec;
-		fbSpec.Name   = "Offscreen Frame Buffer";
+		fbSpec.Name   = "Scene Frame Buffer";
 		fbSpec.Width  = Application::Get().GetWindow()->GetWidth();
 		fbSpec.Height = Application::Get().GetWindow()->GetHeight();
 		fbSpec.Attachments.Attachments = {
-			{ "ColorAttachment", TextureFormat::RGBA     },
-			{ "DepthAttachment", TextureFormat::DEPTH32F }
+			{ "ColorAttachment",  TextureFormat::RGBA     },
+			{ "NormalAttachment", TextureFormat::RGBA16F  },
+			{ "DepthAttachment",  TextureFormat::DEPTH32F }
 		};
 
-		m_OffscreenRenderTarget = FrameBuffer::Create(fbSpec);
+		m_SceneRenderTarget = FrameBuffer::Create(fbSpec);
 
 		InitSprites();
 		InitPlanes();
@@ -68,15 +69,16 @@ namespace KuchCraft {
 
 	void Renderer::EndFrame()
 	{
-		m_OffscreenRenderTarget->Bind();
-		m_OffscreenRenderTarget->ClearAttachments();
+		m_SceneRenderTarget->Bind();
+		m_SceneRenderTarget->ClearAttachments();
 
-		RenderSprites();
 		RenderPlanes();
 
-		m_OffscreenRenderTarget->Unbind();
+		m_SceneRenderTarget->Unbind();
 		SetRenderTargetToDefault();
-		m_OffscreenRenderTarget->BlitToDefault(FrameBufferBlitMask::Color, TextureFilter::Linear);
+		m_SceneRenderTarget->BlitToDefault(FrameBufferBlitMask::Color, TextureFilter::Linear);
+
+		RenderSprites();
 	}
 
 	void Renderer::OnWindowResize(int width, int height)
@@ -84,7 +86,7 @@ namespace KuchCraft {
 		if (width <= 0 || height <= 0)
 			return;
 
-		m_OffscreenRenderTarget->Resize(width, height);
+		m_SceneRenderTarget->Resize(width, height);
 	}
 
 	void Renderer::DrawLine2D(const glm::vec2& start, const glm::vec2& end, const glm::vec4& color, float thickness)

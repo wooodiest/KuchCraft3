@@ -28,6 +28,7 @@ void main()
 #pragma value(SHADER_VERSION_LONG)
 
 layout (location = 0) out vec4 o_Color;
+layout (location = 1) out vec4 o_Normal;
 
 uniform sampler2D u_Textures[#pragma value(MAX_COMBINED_TEXTURE_SLOTS)];
 
@@ -42,6 +43,6 @@ void main()
    if (color.a == 0.0)
 		discard;
 
-	o_Color = color;
-
+	o_Color  = color;
+	o_Normal = vec4(v_Normal, 1.0);
 }
