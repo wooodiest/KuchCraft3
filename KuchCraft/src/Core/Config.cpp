@@ -36,7 +36,8 @@ namespace KuchCraft {
 			{ "OpenGlLogging",            Renderer.OpenGlLogging },
 			{ "MaxCombinedTextureSlots",  Renderer.MaxCombinedTextureSlots },
 			{ "MaxTextureSlots",          Renderer.MaxTextureSlots },
-			{ "MaxQuadsInBatch",          Renderer.MaxQuadsInBatch }
+			{ "MaxQuadsInBatch",          Renderer.MaxQuadsInBatch },
+			{ "MaxPlanesInBatch",         Renderer.MaxPlanesInBatch }
 		};
 
 		configJson["Game"] = {
@@ -156,6 +157,8 @@ namespace KuchCraft {
 				Renderer.MaxTextureSlots = rendererJson["MaxTextureSlots"];
 			if (rendererJson.contains("MaxQuadsInBatch"))
 				Renderer.MaxQuadsInBatch = rendererJson["MaxQuadsInBatch"];
+			if (rendererJson.contains("MaxPlanesInBatch"))
+				Renderer.MaxPlanesInBatch = rendererJson["MaxPlanesInBatch"];
 		}
 
 		if (configJson.contains("Game"))

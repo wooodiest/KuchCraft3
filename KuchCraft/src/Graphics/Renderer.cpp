@@ -6,7 +6,7 @@
 #include <glad/glad.h>
 
 namespace KuchCraft {
-
+	
 	Renderer::Renderer(Config config)
 		: m_Config(config)
 	{
@@ -43,6 +43,7 @@ namespace KuchCraft {
 		m_OffscreenRenderTarget = FrameBuffer::Create(fbSpec);
 
 		InitQuads2D();
+		InitPlanes();
 	}
 
 	Renderer::~Renderer()
@@ -60,7 +61,7 @@ namespace KuchCraft {
 		ClearDefaultFrameBuffer();
 		ResetStats();
 
-		m_EnvironmentUniformBufferData.ViewProjection  = glm::mat4(1.0f);
+		m_EnvironmentUniformBufferData.ViewProjection  = m_Camera ? m_Camera->GetViewProjection() : glm::mat4(1.0f);
 		m_EnvironmentUniformBufferData.OrthoProjection = glm::ortho(0.0f, (float)width, 0.0f, (float)height);
 		m_EnvironmentUniformBuffer->SetData(&m_EnvironmentUniformBufferData, sizeof(m_EnvironmentUniformBufferData));
 	}
@@ -71,6 +72,7 @@ namespace KuchCraft {
 		m_OffscreenRenderTarget->ClearAttachments();
 
 		RenderQuads2D();
+		RenderPlanes();
 
 		m_OffscreenRenderTarget->Unbind();
 		SetRenderTargetToDefault();
@@ -205,6 +207,92 @@ namespace KuchCraft {
 
 			m_Quads2D.Vertices.emplace_back(
 				glm::vec3(transform * quad_vertex_positions[i]),
+				tintColor,
+				uv,
+				textureID
+			);
+		}
+	}
+
+	void Renderer::DrawPlane(const glm::vec3& position, const glm::vec3& rotation, const glm::vec2& size, const glm::vec4& color)
+	{
+		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
+			* glm::toMat4(glm::quat(rotation))
+			* glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
+
+		glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(transform)));
+		glm::vec3 normal = glm::normalize(normalMatrix * plane_normal);
+
+		int textureID = 0; /// White texture
+		for (uint32_t i = 0; i < plane_vertex_count; i++)
+		{
+			m_Planes.Vertices.emplace_back(
+				glm::vec3(transform * plane_vertex_positions[i]),
+				normal,
+				color,
+				plane_vertex_texture_coords[i],
+				textureID
+			);
+		}
+	}
+
+	void Renderer::DrawPlane(const glm::vec3& position, const glm::vec3& rotation, const glm::vec2& size, const Ref<Texture2D>& texture, float tilingFactor, const glm::vec4& tintColor, glm::vec2 uv0, glm::vec2 uv1)
+	{
+		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
+			* glm::toMat4(glm::quat(rotation))
+			* glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
+
+		glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(transform)));
+		glm::vec3 normal = glm::normalize(normalMatrix * plane_normal);
+
+		int textureID = texture->GetRendererID();
+		for (uint32_t i = 0; i < plane_vertex_count; i++)
+		{
+			glm::vec2 baseUV = plane_vertex_texture_coords[i];
+			glm::vec2 uv = glm::mix(uv0, uv1, baseUV) * tilingFactor;
+
+			m_Planes.Vertices.emplace_back(
+				glm::vec3(transform * plane_vertex_positions[i]),
+				normal,
+				tintColor,
+				uv,
+				textureID
+			);
+		}
+	}
+
+	void Renderer::DrawPlane(const glm::mat4& transform, const glm::vec4& color)
+	{
+		glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(transform)));
+		glm::vec3 normal = glm::normalize(normalMatrix * plane_normal);
+
+		int textureID = 0; /// White texture
+		for (uint32_t i = 0; i < plane_vertex_count; i++)
+		{
+			m_Planes.Vertices.emplace_back(
+				glm::vec3(transform * plane_vertex_positions[i]),
+				normal,
+				color,
+				plane_vertex_texture_coords[i],
+				textureID
+			);
+		}
+	}
+
+	void Renderer::DrawPlane(const glm::mat4& transform, const Ref<Texture2D>& texture, float tilingFactor, const glm::vec4& tintColor, glm::vec2 uv0, glm::vec2 uv1)
+	{
+		glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(transform)));
+		glm::vec3 normal = glm::normalize(normalMatrix * plane_normal);
+
+		int textureID = texture->GetRendererID();
+		for (uint32_t i = 0; i < plane_vertex_count; i++)
+		{
+			glm::vec2 baseUV = plane_vertex_texture_coords[i];
+			glm::vec2 uv = glm::mix(uv0, uv1, baseUV) * tilingFactor;
+
+			m_Planes.Vertices.emplace_back(
+				glm::vec3(transform * plane_vertex_positions[i]),
+				normal,
 				tintColor,
 				uv,
 				textureID
@@ -768,6 +856,159 @@ namespace KuchCraft {
 			Texture::Bind(slot, m_Quads2D.Textures[slot]);
 		
 		DrawElements(PrimitiveTopology::Triangles, m_Quads2D.CurrentIndexCount, 0);
+	}
+
+	void Renderer::InitPlanes()
+	{
+		/// Graphics
+		m_Planes.MaxPlanesInBatch = m_Config.Renderer.MaxPlanesInBatch;
+		m_Planes.MaxIndices  = m_Planes.MaxPlanesInBatch * plane_index_count;
+		m_Planes.MaxVertices = m_Planes.MaxPlanesInBatch * plane_vertex_count;
+
+		m_Planes.Shader = m_ShaderLibrary.Load(std::filesystem::path("Plane.glsl"));
+		m_Planes.Shader->Bind();
+
+		m_Planes.VertexArray = VertexArray::Create();
+		m_Planes.VertexArray->Bind();
+		m_Planes.VertexArray->SetDebugName("Planes_VAO");
+
+		m_Planes.VertexBuffer = VertexBuffer::Create(VertexBufferDataUsage::Dynamic, m_Planes.MaxVertices * sizeof(VertexPlane));
+		m_Planes.VertexBuffer->SetDebugName("Planes_VBO");
+		m_Planes.VertexBuffer->SetLayout(m_Planes.Shader->GetVertexInputLayout());
+		m_Planes.VertexArray->AddVertexBuffer(m_Planes.VertexBuffer);
+
+		std::vector<uint32_t> indices;
+		indices.reserve(m_Planes.MaxIndices);
+		uint32_t offset = 0;
+		for (uint32_t i = 0; i < m_Planes.MaxIndices; i += plane_index_count)
+		{
+			indices.push_back(offset + 0);
+			indices.push_back(offset + 1);
+			indices.push_back(offset + 2);
+			indices.push_back(offset + 2);
+			indices.push_back(offset + 3);
+			indices.push_back(offset + 0);
+
+			offset += quad_vertex_count;
+		}
+
+		m_Planes.IndexBuffer = IndexBuffer::Create(indices.data(), m_Planes.MaxIndices);
+		m_Planes.IndexBuffer->SetDebugName("Planes_IBO");
+		m_Planes.VertexArray->SetIndexBuffer(m_Planes.IndexBuffer);
+
+		auto setupTexturesSamplers = [this](Shader* shader) {
+			std::vector<int> samplers;
+			samplers.reserve(m_Config.Renderer.MaxCombinedTextureSlots);
+			for (int i = 0; i < m_Config.Renderer.MaxCombinedTextureSlots; i++)
+				samplers.push_back(i);
+
+			shader->SetIntArray("u_Textures", samplers.data(), m_Config.Renderer.MaxCombinedTextureSlots);
+		};
+
+		setupTexturesSamplers(m_Planes.Shader.get());
+		m_Planes.Shader->AddReloadCallback(setupTexturesSamplers);
+
+		/// Internal
+		m_Planes.Textures.resize(m_Config.Renderer.MaxCombinedTextureSlots, 0);
+		m_Planes.Textures[0] = m_WhiteTexture->GetRendererID();
+
+		m_Planes.Vertices.reserve(m_Planes.MaxVertices);
+	}
+
+	void Renderer::RenderPlanes()
+	{
+		if (m_Planes.Vertices.empty())
+			return;
+
+		SetBlend(true);
+		SetBlendFunc(BlendFunc::SrcAlpha, BlendFunc::OneMinusSrcAlpha);
+		SetCullFace(false);
+		SetDepthTest(true);
+		SetDepthFunc(DepthFunc::LessEqual);
+		SetPolygonMode(PolygonMode::Fill);
+		SetPolygonOffset(false);
+
+		m_Planes.Shader     ->Bind();
+		m_WhiteTexture      ->Bind(0);
+		m_Planes.VertexArray->Bind();
+
+		m_Planes.VertexOffset = 0;
+
+		StartBatchPlanes();
+		for (size_t i = 0; i < m_Planes.Vertices.size(); i += plane_vertex_count)
+		{
+			if (m_Planes.CurrentIndexCount == m_Planes.MaxIndices)
+				NextBatchPlanes();
+
+			/// TextureSlot temporarily holds the texture rendererID
+			if (m_Planes.Vertices[i].TextureSlot == 0)
+			{
+				/// Just color, white texture is bound to slot 0
+				m_Planes.CurrentIndexCount += plane_index_count;
+			}
+			else
+			{
+				/// Do we already have assigned slot to that texture?
+				int textureSlot = 0;
+				for (size_t j = 1; j < m_Planes.CurrentTextureSlot; j++)
+				{
+					if (m_Planes.Textures[j] == (RendererID)m_Planes.Vertices[i].TextureSlot) /// TextureSlot temporarily holds the texture rendererID
+					{
+						textureSlot = (int)j;
+						break;
+					}
+				}
+
+				/// If not, do it
+				if (textureSlot == 0)
+				{
+					if (m_Planes.CurrentTextureSlot >= m_Config.Renderer.MaxCombinedTextureSlots)
+						NextBatchPlanes();
+
+					textureSlot = (int)m_Planes.CurrentTextureSlot;
+					m_Planes.Textures[m_Planes.CurrentTextureSlot] = (RendererID)m_Planes.Vertices[i].TextureSlot;
+					m_Planes.CurrentTextureSlot++;
+				}
+
+				m_Planes.Vertices[i + 0].TextureSlot = textureSlot;
+				m_Planes.Vertices[i + 1].TextureSlot = textureSlot;
+				m_Planes.Vertices[i + 2].TextureSlot = textureSlot;
+				m_Planes.Vertices[i + 3].TextureSlot = textureSlot;
+
+				m_Planes.CurrentIndexCount += plane_index_count;
+			}
+		}
+
+		FlushPlanes();
+
+		m_Planes.Vertices.clear();
+	}
+
+	void Renderer::StartBatchPlanes()
+	{
+		m_Planes.CurrentIndexCount = 0;
+		m_Planes.CurrentTextureSlot = 1; /// 0 is reserved for a default white texture
+	}
+
+	void Renderer::NextBatchPlanes()
+	{
+		FlushPlanes();
+		StartBatchPlanes();
+	}
+
+	void Renderer::FlushPlanes()
+	{
+		if (m_Planes.CurrentIndexCount == 0)
+			return;
+
+		uint32_t vertexCount = m_Planes.CurrentIndexCount / plane_index_count * plane_vertex_count;
+		m_Planes.VertexBuffer->SetData(&m_Planes.Vertices[m_Planes.VertexOffset], vertexCount * sizeof(VertexPlane));
+
+		m_Planes.VertexOffset += vertexCount;
+		for (int slot = 1; slot < (int)m_Planes.CurrentTextureSlot; slot++)
+			Texture::Bind(slot, m_Planes.Textures[slot]);
+
+		DrawElements(PrimitiveTopology::Triangles, m_Planes.CurrentIndexCount, 0);
 	}
 
 }

@@ -88,12 +88,22 @@ namespace KuchCraft {
 		if (!mainCamera)
 			return;
 
+		m_Renderer->SetCamera(mainCamera);
+
 		m_Registry.view<TransformComponent, SpriteRendererComponent>().each([&](auto entity, auto& transformComponent, auto& spriteComponent) {	
 			if (spriteComponent.Asset.IsValid())
 				m_Renderer->DrawQuad2D(transformComponent.GetTransform(), m_AssetManager->GetTexture2D(spriteComponent.Asset),
 					spriteComponent.TilingFactor, spriteComponent.Color, spriteComponent.UVStart, spriteComponent.UVEnd);
 			else
 				m_Renderer->DrawQuad2D(transformComponent.GetTransform(), spriteComponent.Color);
+		});
+
+		m_Registry.view<TransformComponent, PlaneRendererComponent>().each([&](auto entity, auto& transformComponent, auto& planeComponent) {
+			if (planeComponent.Asset.IsValid())
+				m_Renderer->DrawPlane(transformComponent.GetTransform(), m_AssetManager->GetTexture2D(planeComponent.Asset),
+					planeComponent.TilingFactor, planeComponent.Color, planeComponent.UVStart, planeComponent.UVEnd);
+			else
+				m_Renderer->DrawPlane(transformComponent.GetTransform(), planeComponent.Color);
 		});
 	}
 

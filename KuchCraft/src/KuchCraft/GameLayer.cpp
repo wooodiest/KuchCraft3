@@ -222,6 +222,38 @@ namespace KuchCraft {
 						ImGui::Text("No asset assigned.");
 					}
 				});
+
+				ImGui_DrawComponent<PlaneRendererComponent>("Plane Renderer", selectedEntity, [&](auto& plane) {
+					ImGui::ColorEdit4("Color", glm::value_ptr(plane.Color));
+					ImGui::DragFloat("Tiling Factor", &plane.TilingFactor, 0.1f, 0.1f, 10.0f);
+					ImGui::DragFloat2("UV Start", glm::value_ptr(plane.UVStart), 0.01f);
+					ImGui::DragFloat2("UV End", glm::value_ptr(plane.UVEnd), 0.01f);
+
+					ImGui::Text("Asset: %s", m_Scene->GetAssetManager()->GetName(plane.Asset).c_str());
+					ImGui::Text("UUID: %llu", plane.Asset.ID);
+					if (plane.Asset.IsValid())
+					{
+						auto texture = m_Scene->GetAssetManager()->GetTexture2D(plane.Asset);
+						if (texture && texture->IsValid())
+						{
+							ImVec2 size = { ImGui::GetContentRegionAvail().x , (float)texture->GetHeight() * ImGui::GetContentRegionAvail().x / (float)texture->GetWidth() };
+							ImGui::Image(
+								(ImTextureID)(uintptr_t)(texture->GetRendererID()),
+								size,
+								ImVec2{ 0, 1 },
+								ImVec2{ 1, 0 }
+							);
+						}
+						else
+						{
+							ImGui::Text("No texture loaded.");
+						}
+					}
+					else
+					{
+						ImGui::Text("No asset assigned.");
+					}
+				});
 			}
 		}
 

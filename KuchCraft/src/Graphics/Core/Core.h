@@ -18,6 +18,9 @@ namespace KuchCraft {
 	constexpr inline uint32_t quad_vertex_count = 4;
 	constexpr inline uint32_t quad_index_count = 6;
 
+	constexpr inline uint32_t plane_vertex_count = 4;
+	constexpr inline uint32_t plane_index_count = 6;
+
 	constexpr inline glm::vec4 quad_vertex_positions[quad_vertex_count] = {
 		{ -0.5f, -0.5f, 0.0f, 1.0f }, ///< Bottom-left corner.
 		{  0.5f, -0.5f, 0.0f, 1.0f }, ///< Bottom-right corner.
@@ -32,12 +35,37 @@ namespace KuchCraft {
 		{ 0.0f, 1.0f }  ///< Top-left corner.
 	};
 
+	constexpr inline glm::vec4 plane_vertex_positions[plane_vertex_count] = {
+		{ -0.5f, -0.5f, 0.0f, 1.0f }, ///< Bottom-left corner.
+		{  0.5f, -0.5f, 0.0f, 1.0f }, ///< Bottom-right corner.
+		{  0.5f,  0.5f, 0.0f, 1.0f }, ///< Top-right corner.
+		{ -0.5f,  0.5f, 0.0f, 1.0f }  ///< Top-left corner.
+	};
+
+	constexpr inline glm::vec2 plane_vertex_texture_coords[plane_vertex_count] = {
+		{ 0.0f, 0.0f }, ///< Bottom-left corner.
+		{ 1.0f, 0.0f }, ///< Bottom-right corner
+		{ 1.0f, 1.0f }, ///< Top-right corner.
+		{ 0.0f, 1.0f }  ///< Top-left corner.
+	};
+
+	constexpr inline glm::vec3 plane_normal = { 0.0f, 0.0f, 1.0f };
+
 	struct VertexQuad2D
 	{
 		glm::vec3 Position     = { 0.0f, 0.0f, 0.0f };
 		glm::vec4 Color        = { 1.0f, 1.0f, 1.0f, 1.0f };
 		glm::vec2 TextureCoord = { 0.0f, 0.0f };
 		int       TextureSlot  = 0;
+	};
+
+	struct VertexPlane
+	{
+		glm::vec3 Position = { 0.0f, 0.0f, 0.0f };
+		glm::vec3 Normal   = { 0.0f, 0.0f, 0.0f };
+		glm::vec4 Color    = { 1.0f, 1.0f, 1.0f, 1.0f };
+		glm::vec2 TextureCoord = { 0.0f, 0.0f };
+		int       TextureSlot = 0;
 	};
 
 	enum class FaceWinding

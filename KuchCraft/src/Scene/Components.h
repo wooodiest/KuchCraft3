@@ -116,4 +116,18 @@ namespace KuchCraft {
 		SpriteRendererComponent(const SpriteRendererComponent& other) = default;
 	};
 
+	struct PlaneRendererComponent
+	{
+		glm::vec4 Color = { 1.0f, 1.0f, 1.0f, 1.0f };
+
+		AssetHandle Asset;
+
+		float TilingFactor = 1.0f;
+		glm::vec2 UVStart = { 0.0f, 0.0f };
+		glm::vec2 UVEnd = { 1.0f, 1.0f };
+
+		PlaneRendererComponent() = default;
+		PlaneRendererComponent(const PlaneRendererComponent& other) = default;
+	};
+
 }

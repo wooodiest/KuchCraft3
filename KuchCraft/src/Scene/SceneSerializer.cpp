@@ -113,6 +113,18 @@ namespace KuchCraft {
 				};
 			}
 
+			if (entity.HasComponent<PlaneRendererComponent>())
+			{
+				auto& plane = entity.GetComponent<PlaneRendererComponent>();
+				entityJson["PlaneRenderer"] = {
+					{ "Color",        plane.Color },
+					{ "TilingFactor", plane.TilingFactor },
+					{ "UVStart",      plane.UVStart },
+					{ "UVEnd",        plane.UVEnd   },
+					{ "Asset",        plane.Asset.ID }
+				};
+			}
+
 			sceneJson["Entities"].push_back(entityJson);
 		}
 
@@ -277,6 +289,23 @@ namespace KuchCraft {
 					spriteRendererComponent.UVEnd = spriteRendererJson["UVEnd"];
 				if (spriteRendererJson.contains("Asset"))
 					spriteRendererComponent.Asset.ID = spriteRendererJson["Asset"];
+			}
+
+			if (entityJson.contains("PlaneRenderer"))
+			{
+				auto& planeRendererComponent = entity.AddComponent<PlaneRendererComponent>();
+
+				nlohmann::json planeRendererJson = entityJson["PlaneRenderer"];
+				if (planeRendererJson.contains("Color"))
+					planeRendererComponent.Color = planeRendererJson["Color"];
+				if (planeRendererJson.contains("TilingFactor"))
+					planeRendererComponent.TilingFactor = planeRendererJson["TilingFactor"];
+				if (planeRendererJson.contains("UVStart"))
+					planeRendererComponent.UVStart = planeRendererJson["UVStart"];
+				if (planeRendererJson.contains("UVEnd"))
+					planeRendererComponent.UVEnd = planeRendererJson["UVEnd"];
+				if (planeRendererJson.contains("Asset"))
+					planeRendererComponent.Asset.ID = planeRendererJson["Asset"];
 			}
 		}
 
