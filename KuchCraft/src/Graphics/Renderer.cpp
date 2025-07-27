@@ -42,7 +42,7 @@ namespace KuchCraft {
 
 		m_OffscreenRenderTarget = FrameBuffer::Create(fbSpec);
 
-		InitQuads2D();
+		InitSprites();
 		InitPlanes();
 	}
 
@@ -71,7 +71,7 @@ namespace KuchCraft {
 		m_OffscreenRenderTarget->Bind();
 		m_OffscreenRenderTarget->ClearAttachments();
 
-		RenderQuads2D();
+		RenderSprites();
 		RenderPlanes();
 
 		m_OffscreenRenderTarget->Unbind();
@@ -87,12 +87,12 @@ namespace KuchCraft {
 		m_OffscreenRenderTarget->Resize(width, height);
 	}
 
-	void Renderer::DrawQuad2D(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color)
+	void Renderer::DrawSprite(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color)
 	{
-		DrawQuad2D({ position.x, position.y, m_DepthFromZIndex }, size, color);
+		DrawSprite({ position.x, position.y, m_DepthFromZIndex }, size, color);
 	}
 
-	void Renderer::DrawQuad2D(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color)
+	void Renderer::DrawSprite(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color)
 	{
 		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
 			* glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
@@ -100,7 +100,7 @@ namespace KuchCraft {
 		int textureID = 0; /// White texture
 		for (uint32_t i = 0; i < quad_vertex_count; i++)
 		{
-			m_Quads2D.Vertices.emplace_back(
+			m_Sprites.Vertices.emplace_back(
 				glm::vec3(transform * quad_vertex_positions[i]),
 				color,
 				quad_vertex_texture_coords[i],
@@ -109,12 +109,12 @@ namespace KuchCraft {
 		}
 	}
 
-	void Renderer::DrawQuad2D(const glm::vec2& position, const glm::vec2& size, const Ref<Texture2D>& texture, float tilingFactor, const glm::vec4& tintColor, glm::vec2 uv0, glm::vec2 uv1)
+	void Renderer::DrawSprite(const glm::vec2& position, const glm::vec2& size, const Ref<Texture2D>& texture, float tilingFactor, const glm::vec4& tintColor, glm::vec2 uv0, glm::vec2 uv1)
 	{
-		DrawQuad2D({ position.x, position.y, m_DepthFromZIndex }, size, texture, tilingFactor, tintColor, uv0, uv1);
+		DrawSprite({ position.x, position.y, m_DepthFromZIndex }, size, texture, tilingFactor, tintColor, uv0, uv1);
 	}
 
-	void Renderer::DrawQuad2D(const glm::vec3& position, const glm::vec2& size, const Ref<Texture2D>& texture, float tilingFactor, const glm::vec4& tintColor, glm::vec2 uv0, glm::vec2 uv1)
+	void Renderer::DrawSprite(const glm::vec3& position, const glm::vec2& size, const Ref<Texture2D>& texture, float tilingFactor, const glm::vec4& tintColor, glm::vec2 uv0, glm::vec2 uv1)
 	{
 		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
 			* glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
@@ -125,7 +125,7 @@ namespace KuchCraft {
 			glm::vec2 baseUV = quad_vertex_texture_coords[i];
 			glm::vec2 uv     = glm::mix(uv0, uv1, baseUV) * tilingFactor;
 
-			m_Quads2D.Vertices.emplace_back(
+			m_Sprites.Vertices.emplace_back(
 				glm::vec3(transform * quad_vertex_positions[i]),
 				tintColor,                                      
 				uv,                                            
@@ -134,12 +134,12 @@ namespace KuchCraft {
 		}
 	}
 
-	void Renderer::DrawRotatedQuad2D(const glm::vec2& position, const glm::vec2& size, float rotation, const glm::vec4& color)
+	void Renderer::DrawRotatedSprite(const glm::vec2& position, const glm::vec2& size, float rotation, const glm::vec4& color)
 	{
-		DrawRotatedQuad2D({ position.x, position.y, m_DepthFromZIndex }, size, rotation, color);
+		DrawRotatedSprite({ position.x, position.y, m_DepthFromZIndex }, size, rotation, color);
 	}
 
-	void Renderer::DrawRotatedQuad2D(const glm::vec3& position, const glm::vec2& size, float rotation, const glm::vec4& color)
+	void Renderer::DrawRotatedSprite(const glm::vec3& position, const glm::vec2& size, float rotation, const glm::vec4& color)
 	{
 		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) 
 			* glm::rotate(glm::mat4(1.0f), rotation, { 0.0f, 0.0f, 1.0f })
@@ -148,7 +148,7 @@ namespace KuchCraft {
 		int textureID = 0; /// White texture
 		for (uint32_t i = 0; i < quad_vertex_count; i++)
 		{
-			m_Quads2D.Vertices.emplace_back(
+			m_Sprites.Vertices.emplace_back(
 				glm::vec3(transform * quad_vertex_positions[i]),
 				color,
 				quad_vertex_texture_coords[i],
@@ -157,12 +157,12 @@ namespace KuchCraft {
 		}
 	}
 
-	void Renderer::DrawRotatedQuad2D(const glm::vec2& position, const glm::vec2& size, float rotation, const Ref<Texture2D>& texture, float tilingFactor, const glm::vec4& tintColor, glm::vec2 uv0, glm::vec2 uv1)
+	void Renderer::DrawRotatedSprite(const glm::vec2& position, const glm::vec2& size, float rotation, const Ref<Texture2D>& texture, float tilingFactor, const glm::vec4& tintColor, glm::vec2 uv0, glm::vec2 uv1)
 	{
-		DrawRotatedQuad2D({ position.x, position.y, m_DepthFromZIndex }, size, rotation, texture, tilingFactor, tintColor, uv0, uv1);
+		DrawRotatedSprite({ position.x, position.y, m_DepthFromZIndex }, size, rotation, texture, tilingFactor, tintColor, uv0, uv1);
 	}
 
-	void Renderer::DrawRotatedQuad2D(const glm::vec3& position, const glm::vec2& size, float rotation, const Ref<Texture2D>& texture, float tilingFactor, const glm::vec4& tintColor, glm::vec2 uv0, glm::vec2 uv1)
+	void Renderer::DrawRotatedSprite(const glm::vec3& position, const glm::vec2& size, float rotation, const Ref<Texture2D>& texture, float tilingFactor, const glm::vec4& tintColor, glm::vec2 uv0, glm::vec2 uv1)
 	{
 		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
 			* glm::rotate(glm::mat4(1.0f), rotation, { 0.0f, 0.0f, 1.0f })
@@ -174,7 +174,7 @@ namespace KuchCraft {
 			glm::vec2 baseUV = quad_vertex_texture_coords[i];
 			glm::vec2 uv = glm::mix(uv0, uv1, baseUV) * tilingFactor;
 
-			m_Quads2D.Vertices.emplace_back(
+			m_Sprites.Vertices.emplace_back(
 				glm::vec3(transform * quad_vertex_positions[i]),
 				tintColor,
 				uv,
@@ -183,12 +183,12 @@ namespace KuchCraft {
 		}
 	}
 
-	void Renderer::DrawQuad2D(const glm::mat4& transform, const glm::vec4& color)
+	void Renderer::DrawSprite(const glm::mat4& transform, const glm::vec4& color)
 	{
 		int textureID = 0; /// White texture
 		for (uint32_t i = 0; i < quad_vertex_count; i++)
 		{
-			m_Quads2D.Vertices.emplace_back(
+			m_Sprites.Vertices.emplace_back(
 				glm::vec3(transform * quad_vertex_positions[i]),
 				color,
 				quad_vertex_texture_coords[i],
@@ -197,7 +197,7 @@ namespace KuchCraft {
 		}
 	}
 
-	void Renderer::DrawQuad2D(const glm::mat4& transform, const Ref<Texture2D>& texture, float tilingFactor, const glm::vec4& tintColor, glm::vec2 uv0, glm::vec2 uv1)
+	void Renderer::DrawSprite(const glm::mat4& transform, const Ref<Texture2D>& texture, float tilingFactor, const glm::vec4& tintColor, glm::vec2 uv0, glm::vec2 uv1)
 	{
 		int textureID = texture->GetRendererID();
 		for (uint32_t i = 0; i < quad_vertex_count; i++)
@@ -205,7 +205,7 @@ namespace KuchCraft {
 			glm::vec2 baseUV = quad_vertex_texture_coords[i];
 			glm::vec2 uv = glm::mix(uv0, uv1, baseUV) * tilingFactor;
 
-			m_Quads2D.Vertices.emplace_back(
+			m_Sprites.Vertices.emplace_back(
 				glm::vec3(transform * quad_vertex_positions[i]),
 				tintColor,
 				uv,
@@ -705,29 +705,29 @@ namespace KuchCraft {
 		m_Stats.Primitives = 0;
 	}
 
-	void Renderer::InitQuads2D()
+	void Renderer::InitSprites()
 	{
 		/// Graphics
-		m_Quads2D.MaxQuadsInBatch = m_Config.Renderer.MaxQuadsInBatch;
-		m_Quads2D.MaxIndices  = m_Quads2D.MaxQuadsInBatch * quad_index_count;
-		m_Quads2D.MaxVertices = m_Quads2D.MaxQuadsInBatch * quad_vertex_count;
+		m_Sprites.MaxQuadsInBatch = m_Config.Renderer.MaxQuadsInBatch;
+		m_Sprites.MaxIndices  = m_Sprites.MaxQuadsInBatch * quad_index_count;
+		m_Sprites.MaxVertices = m_Sprites.MaxQuadsInBatch * quad_vertex_count;
 
-		m_Quads2D.Shader = m_ShaderLibrary.Load(std::filesystem::path("Quads2D.glsl"));
-		m_Quads2D.Shader->Bind();
+		m_Sprites.Shader = m_ShaderLibrary.Load(std::filesystem::path("Sprite.glsl"));
+		m_Sprites.Shader->Bind();
 
-		m_Quads2D.VertexArray = VertexArray::Create();
-		m_Quads2D.VertexArray->Bind();
-		m_Quads2D.VertexArray->SetDebugName("Quads2D_VAO");
+		m_Sprites.VertexArray = VertexArray::Create();
+		m_Sprites.VertexArray->Bind();
+		m_Sprites.VertexArray->SetDebugName("Sprites_VAO");
 
-		m_Quads2D.VertexBuffer = VertexBuffer::Create(VertexBufferDataUsage::Dynamic, m_Quads2D.MaxVertices * sizeof(VertexQuad2D));
-		m_Quads2D.VertexBuffer->SetDebugName("Quads2D_VBO");
-		m_Quads2D.VertexBuffer->SetLayout(m_Quads2D.Shader->GetVertexInputLayout());
-		m_Quads2D.VertexArray ->AddVertexBuffer(m_Quads2D.VertexBuffer);
+		m_Sprites.VertexBuffer = VertexBuffer::Create(VertexBufferDataUsage::Dynamic, m_Sprites.MaxVertices * sizeof(VertexQuad2D));
+		m_Sprites.VertexBuffer->SetDebugName("Sprites_VBO");
+		m_Sprites.VertexBuffer->SetLayout(m_Sprites.Shader->GetVertexInputLayout());
+		m_Sprites.VertexArray ->AddVertexBuffer(m_Sprites.VertexBuffer);
 
 		std::vector<uint32_t> indices;
-		indices.reserve(m_Quads2D.MaxIndices);
+		indices.reserve(m_Sprites.MaxIndices);
 		uint32_t offset = 0;
-		for (uint32_t i = 0; i < m_Quads2D.MaxIndices; i += quad_index_count)
+		for (uint32_t i = 0; i < m_Sprites.MaxIndices; i += quad_index_count)
 		{
 			indices.push_back(offset + 0);
 			indices.push_back(offset + 1);
@@ -739,9 +739,9 @@ namespace KuchCraft {
 			offset += quad_vertex_count;
 		}
 
-		m_Quads2D.IndexBuffer = IndexBuffer::Create(indices.data(), m_Quads2D.MaxIndices);
-		m_Quads2D.IndexBuffer->SetDebugName("Quads2D_IBO");
-		m_Quads2D.VertexArray->SetIndexBuffer(m_Quads2D.IndexBuffer);
+		m_Sprites.IndexBuffer = IndexBuffer::Create(indices.data(), m_Sprites.MaxIndices);
+		m_Sprites.IndexBuffer->SetDebugName("Sprites_IBO");
+		m_Sprites.VertexArray->SetIndexBuffer(m_Sprites.IndexBuffer);
 
 		auto setupTexturesSamplers = [this](Shader* shader) {
 			std::vector<int> samplers;
@@ -752,19 +752,19 @@ namespace KuchCraft {
 			shader->SetIntArray("u_Textures", samplers.data(), m_Config.Renderer.MaxCombinedTextureSlots);
 		};	
 
-		setupTexturesSamplers(m_Quads2D.Shader.get());
-		m_Quads2D.Shader->AddReloadCallback(setupTexturesSamplers);
+		setupTexturesSamplers(m_Sprites.Shader.get());
+		m_Sprites.Shader->AddReloadCallback(setupTexturesSamplers);
 
 		/// Internal
-		m_Quads2D.Textures.resize(m_Config.Renderer.MaxCombinedTextureSlots, 0);
-		m_Quads2D.Textures[0] = m_WhiteTexture->GetRendererID();
+		m_Sprites.Textures.resize(m_Config.Renderer.MaxCombinedTextureSlots, 0);
+		m_Sprites.Textures[0] = m_WhiteTexture->GetRendererID();
 
-		m_Quads2D.Vertices.reserve(m_Quads2D.MaxVertices);
+		m_Sprites.Vertices.reserve(m_Sprites.MaxVertices);
 	}
 
-	void Renderer::RenderQuads2D()
+	void Renderer::RenderSprites()
 	{
-		if (m_Quads2D.Vertices.empty())
+		if (m_Sprites.Vertices.empty())
 			return;
 
 		SetBlend(true);
@@ -775,31 +775,31 @@ namespace KuchCraft {
 		SetPolygonMode(PolygonMode::Fill);
 		SetPolygonOffset(false);
 
-		m_Quads2D.Shader     ->Bind();
+		m_Sprites.Shader     ->Bind();
 		m_WhiteTexture       ->Bind(0);
-		m_Quads2D.VertexArray->Bind();
+		m_Sprites.VertexArray->Bind();
 
-		m_Quads2D.VertexOffset = 0;
+		m_Sprites.VertexOffset = 0;
 
-		StartBatchQuads2D();
-		for (size_t i = 0; i < m_Quads2D.Vertices.size(); i += quad_vertex_count)
+		StartBatchSprites();
+		for (size_t i = 0; i < m_Sprites.Vertices.size(); i += quad_vertex_count)
 		{
-			if (m_Quads2D.CurrentIndexCount == m_Quads2D.MaxIndices)
-				NextBatchQuads2D();
+			if (m_Sprites.CurrentIndexCount == m_Sprites.MaxIndices)
+				NextBatchSprites();
 
 			/// TextureSlot temporarily holds the texture rendererID
-			if (m_Quads2D.Vertices[i].TextureSlot == 0)
+			if (m_Sprites.Vertices[i].TextureSlot == 0)
 			{
 				/// Just color, white texture is bound to slot 0
-				m_Quads2D.CurrentIndexCount += quad_index_count;
+				m_Sprites.CurrentIndexCount += quad_index_count;
 			}
 			else
 			{
 				/// Do we already have assigned slot to that texture?
 				int textureSlot = 0;
-				for (size_t j = 1; j < m_Quads2D.CurrentTextureSlot; j++)
+				for (size_t j = 1; j < m_Sprites.CurrentTextureSlot; j++)
 				{
-					if (m_Quads2D.Textures[j] == (RendererID)m_Quads2D.Vertices[i].TextureSlot) /// TextureSlot temporarily holds the texture rendererID
+					if (m_Sprites.Textures[j] == (RendererID)m_Sprites.Vertices[i].TextureSlot) /// TextureSlot temporarily holds the texture rendererID
 					{
 						textureSlot = (int)j;
 						break;
@@ -809,53 +809,53 @@ namespace KuchCraft {
 				/// If not, do it
 				if (textureSlot == 0)
 				{
-					if (m_Quads2D.CurrentTextureSlot >= m_Config.Renderer.MaxCombinedTextureSlots)
-						NextBatchQuads2D();
+					if (m_Sprites.CurrentTextureSlot >= m_Config.Renderer.MaxCombinedTextureSlots)
+						NextBatchSprites();
 
-					textureSlot = (int)m_Quads2D.CurrentTextureSlot;
-					m_Quads2D.Textures[m_Quads2D.CurrentTextureSlot] = (RendererID)m_Quads2D.Vertices[i].TextureSlot;
-					m_Quads2D.CurrentTextureSlot++;
+					textureSlot = (int)m_Sprites.CurrentTextureSlot;
+					m_Sprites.Textures[m_Sprites.CurrentTextureSlot] = (RendererID)m_Sprites.Vertices[i].TextureSlot;
+					m_Sprites.CurrentTextureSlot++;
 				}
 
-				m_Quads2D.Vertices[i + 0].TextureSlot = textureSlot;
-				m_Quads2D.Vertices[i + 1].TextureSlot = textureSlot;
-				m_Quads2D.Vertices[i + 2].TextureSlot = textureSlot;
-				m_Quads2D.Vertices[i + 3].TextureSlot = textureSlot;
+				m_Sprites.Vertices[i + 0].TextureSlot = textureSlot;
+				m_Sprites.Vertices[i + 1].TextureSlot = textureSlot;
+				m_Sprites.Vertices[i + 2].TextureSlot = textureSlot;
+				m_Sprites.Vertices[i + 3].TextureSlot = textureSlot;
 
-				m_Quads2D.CurrentIndexCount += quad_index_count;
+				m_Sprites.CurrentIndexCount += quad_index_count;
 			}
 		}
 
-		FlushQuads2D();
+		FlushSprites();
 
-		m_Quads2D.Vertices.clear();
+		m_Sprites.Vertices.clear();
 	}
 
-	void Renderer::StartBatchQuads2D()
+	void Renderer::StartBatchSprites()
 	{
-		m_Quads2D.CurrentIndexCount  = 0;
-		m_Quads2D.CurrentTextureSlot = 1; /// 0 is reserved for a default white texture
+		m_Sprites.CurrentIndexCount  = 0;
+		m_Sprites.CurrentTextureSlot = 1; /// 0 is reserved for a default white texture
 	}
 
-	void Renderer::NextBatchQuads2D()
+	void Renderer::NextBatchSprites()
 	{
-		FlushQuads2D();
-		StartBatchQuads2D();
+		FlushSprites();
+		StartBatchSprites();
 	}
 
-	void Renderer::FlushQuads2D()
+	void Renderer::FlushSprites()
 	{
-		if (m_Quads2D.CurrentIndexCount == 0)
+		if (m_Sprites.CurrentIndexCount == 0)
 			return;
 
-		uint32_t vertexCount = m_Quads2D.CurrentIndexCount / quad_index_count * quad_vertex_count;
-		m_Quads2D.VertexBuffer->SetData(&m_Quads2D.Vertices[m_Quads2D.VertexOffset], vertexCount * sizeof(VertexQuad2D));
+		uint32_t vertexCount = m_Sprites.CurrentIndexCount / quad_index_count * quad_vertex_count;
+		m_Sprites.VertexBuffer->SetData(&m_Sprites.Vertices[m_Sprites.VertexOffset], vertexCount * sizeof(VertexQuad2D));
 
-		m_Quads2D.VertexOffset += vertexCount;
-		for (int slot = 1; slot < (int)m_Quads2D.CurrentTextureSlot; slot++)
-			Texture::Bind(slot, m_Quads2D.Textures[slot]);
+		m_Sprites.VertexOffset += vertexCount;
+		for (int slot = 1; slot < (int)m_Sprites.CurrentTextureSlot; slot++)
+			Texture::Bind(slot, m_Sprites.Textures[slot]);
 		
-		DrawElements(PrimitiveTopology::Triangles, m_Quads2D.CurrentIndexCount, 0);
+		DrawElements(PrimitiveTopology::Triangles, m_Sprites.CurrentIndexCount, 0);
 	}
 
 	void Renderer::InitPlanes()

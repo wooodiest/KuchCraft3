@@ -92,10 +92,10 @@ namespace KuchCraft {
 
 		m_Registry.view<TransformComponent, SpriteRendererComponent>().each([&](auto entity, auto& transformComponent, auto& spriteComponent) {	
 			if (spriteComponent.Asset.IsValid())
-				m_Renderer->DrawQuad2D(transformComponent.GetTransform(), m_AssetManager->GetTexture2D(spriteComponent.Asset),
+				m_Renderer->DrawSprite(transformComponent.GetTransform(), m_AssetManager->GetTexture2D(spriteComponent.Asset),
 					spriteComponent.TilingFactor, spriteComponent.Color, spriteComponent.UVStart, spriteComponent.UVEnd);
 			else
-				m_Renderer->DrawQuad2D(transformComponent.GetTransform(), spriteComponent.Color);
+				m_Renderer->DrawSprite(transformComponent.GetTransform(), spriteComponent.Color);
 		});
 
 		m_Registry.view<TransformComponent, PlaneRendererComponent>().each([&](auto entity, auto& transformComponent, auto& planeComponent) {

@@ -28,22 +28,23 @@ namespace KuchCraft {
 		void OnWindowResize(int width, int height);
 
 		void SetCamera(Camera* camera) { m_Camera = camera; }
+
 #pragma region DrawCommands
 	public:
-		void DrawQuad2D(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color);
-		void DrawQuad2D(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color);
+		void DrawSprite(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color);
+		void DrawSprite(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color);
 
-		void DrawQuad2D(const glm::vec2& position, const glm::vec2& size, const Ref<Texture2D>& texture, float tilingFactor = 1.0f, const glm::vec4& tintColor = glm::vec4(1.0f), glm::vec2 uv0 = glm::vec2(0.0f), glm::vec2 uv1 = glm::vec2(1.0f));
-		void DrawQuad2D(const glm::vec3& position, const glm::vec2& size, const Ref<Texture2D>& texture, float tilingFactor = 1.0f, const glm::vec4& tintColor = glm::vec4(1.0f), glm::vec2 uv0 = glm::vec2(0.0f), glm::vec2 uv1 = glm::vec2(1.0f));
+		void DrawSprite(const glm::vec2& position, const glm::vec2& size, const Ref<Texture2D>& texture, float tilingFactor = 1.0f, const glm::vec4& tintColor = glm::vec4(1.0f), glm::vec2 uv0 = glm::vec2(0.0f), glm::vec2 uv1 = glm::vec2(1.0f));
+		void DrawSprite(const glm::vec3& position, const glm::vec2& size, const Ref<Texture2D>& texture, float tilingFactor = 1.0f, const glm::vec4& tintColor = glm::vec4(1.0f), glm::vec2 uv0 = glm::vec2(0.0f), glm::vec2 uv1 = glm::vec2(1.0f));
 
-		void DrawRotatedQuad2D(const glm::vec2& position, const glm::vec2& size, float rotation, const glm::vec4& color);
-		void DrawRotatedQuad2D(const glm::vec3& position, const glm::vec2& size, float rotation, const glm::vec4& color);
+		void DrawRotatedSprite(const glm::vec2& position, const glm::vec2& size, float rotation, const glm::vec4& color);
+		void DrawRotatedSprite(const glm::vec3& position, const glm::vec2& size, float rotation, const glm::vec4& color);
 		
-		void DrawRotatedQuad2D(const glm::vec2& position, const glm::vec2& size, float rotation, const Ref<Texture2D>& texture, float tilingFactor = 1.0f, const glm::vec4& tintColor = glm::vec4(1.0f), glm::vec2 uv0 = glm::vec2(0.0f), glm::vec2 uv1 = glm::vec2(1.0f));
-		void DrawRotatedQuad2D(const glm::vec3& position, const glm::vec2& size, float rotation, const Ref<Texture2D>& texture, float tilingFactor = 1.0f, const glm::vec4& tintColor = glm::vec4(1.0f), glm::vec2 uv0 = glm::vec2(0.0f), glm::vec2 uv1 = glm::vec2(1.0f));
+		void DrawRotatedSprite(const glm::vec2& position, const glm::vec2& size, float rotation, const Ref<Texture2D>& texture, float tilingFactor = 1.0f, const glm::vec4& tintColor = glm::vec4(1.0f), glm::vec2 uv0 = glm::vec2(0.0f), glm::vec2 uv1 = glm::vec2(1.0f));
+		void DrawRotatedSprite(const glm::vec3& position, const glm::vec2& size, float rotation, const Ref<Texture2D>& texture, float tilingFactor = 1.0f, const glm::vec4& tintColor = glm::vec4(1.0f), glm::vec2 uv0 = glm::vec2(0.0f), glm::vec2 uv1 = glm::vec2(1.0f));
 
-		void DrawQuad2D(const glm::mat4& transform, const glm::vec4& color);
-		void DrawQuad2D(const glm::mat4& transform, const Ref<Texture2D>& texture, float tilingFactor = 1.0f, const glm::vec4& tintColor = glm::vec4(1.0f), glm::vec2 uv0 = glm::vec2(0.0f), glm::vec2 uv1 = glm::vec2(1.0f));
+		void DrawSprite(const glm::mat4& transform, const glm::vec4& color);
+		void DrawSprite(const glm::mat4& transform, const Ref<Texture2D>& texture, float tilingFactor = 1.0f, const glm::vec4& tintColor = glm::vec4(1.0f), glm::vec2 uv0 = glm::vec2(0.0f), glm::vec2 uv1 = glm::vec2(1.0f));
 
 		void DrawPlane(const glm::vec3& position, const glm::vec3& rotation, const glm::vec2& size, const glm::vec4& color);
 		void DrawPlane(const glm::vec3& position, const glm::vec3& rotation, const glm::vec2& size, const Ref<Texture2D>& texture, float tilingFactor = 1.0f, const glm::vec4& tintColor = glm::vec4(1.0f), glm::vec2 uv0 = glm::vec2(0.0f), glm::vec2 uv1 = glm::vec2(1.0f));
@@ -99,6 +100,8 @@ namespace KuchCraft {
 		} m_EnvironmentUniformBufferData;
 
 		Ref<UniformBuffer> m_EnvironmentUniformBuffer;
+
+		Camera* m_Camera = nullptr;
 
 #pragma endregion
 
@@ -187,7 +190,7 @@ namespace KuchCraft {
 
 #pragma endregion
 
-#pragma region Quads2D
+#pragma region Sprites
 	private:
 		struct {
 			uint32_t MaxQuadsInBatch = 10'000;
@@ -207,11 +210,11 @@ namespace KuchCraft {
 			Ref<Shader>       Shader;
 		} m_Quads2D;
 
-		void InitQuads2D();
-		void RenderQuads2D();
-		void StartBatchQuads2D();
-		void NextBatchQuads2D();
-		void FlushQuads2D();
+		void InitSprites();
+		void RenderSprites();
+		void StartBatchSprites();
+		void NextBatchSprites();
+		void FlushSprites();
 
 #pragma endregion
 
