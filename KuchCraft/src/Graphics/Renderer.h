@@ -31,6 +31,9 @@ namespace KuchCraft {
 
 #pragma region DrawCommands
 	public:
+		void DrawLine2D(const glm::vec2& start, const glm::vec2& end, const glm::vec4& color, float thickness);
+		void DrawLine2D(const glm::vec3& start, const glm::vec3& end, const glm::vec4& color, float thickness);
+
 		void DrawSprite(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color);
 		void DrawSprite(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color);
 
@@ -208,7 +211,7 @@ namespace KuchCraft {
 			Ref<VertexBuffer> VertexBuffer;
 			Ref<IndexBuffer>  IndexBuffer;
 			Ref<Shader>       Shader;
-		} m_Quads2D;
+		} m_Sprites;
 
 		void InitSprites();
 		void RenderSprites();

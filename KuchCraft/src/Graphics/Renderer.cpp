@@ -87,6 +87,40 @@ namespace KuchCraft {
 		m_OffscreenRenderTarget->Resize(width, height);
 	}
 
+	void Renderer::DrawLine2D(const glm::vec2& start, const glm::vec2& end, const glm::vec4& color, float thickness)
+	{
+		glm::vec2 direction = end - start;
+		float length = glm::length(direction);
+		if (length == 0.0f)
+			return;
+
+		glm::vec2 center = (start + end) * 0.5f;
+		float angle = std::atan2(direction.y, direction.x);
+
+		glm::mat4 transform = glm::translate(glm::mat4(1.0f), glm::vec3(center, m_DepthFromZIndex))
+			* glm::rotate(glm::mat4(1.0f), angle, { 0.0f, 0.0f, 1.0f })
+			* glm::scale(glm::mat4(1.0f), { length, thickness, 1.0f });
+
+		DrawSprite(transform, color);
+	}
+
+	void Renderer::DrawLine2D(const glm::vec3& start, const glm::vec3& end, const glm::vec4& color, float thickness)
+	{
+		glm::vec3 direction = end - start;
+		float length = glm::length(glm::vec2(direction));
+		if (length == 0.0f)
+			return;
+
+		glm::vec3 center = (start + end) * 0.5f;
+		float angle = std::atan2(direction.y, direction.x);
+
+		glm::mat4 transform = glm::translate(glm::mat4(1.0f), center)
+			* glm::rotate(glm::mat4(1.0f), angle, { 0.0f, 0.0f, 1.0f })
+			* glm::scale(glm::mat4(1.0f), { length, thickness, 1.0f });
+
+		DrawSprite(transform, color);
+	}
+
 	void Renderer::DrawSprite(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color)
 	{
 		DrawSprite({ position.x, position.y, m_DepthFromZIndex }, size, color);
