@@ -5,6 +5,7 @@
 #include "Scene/AssetManager.h"
 
 #include "KuchCraft/World/ItemManager.h"
+#include "KuchCraft/World/World.h"
 #include "Graphics/Renderer.h"
 
 namespace KuchCraft {
@@ -40,7 +41,8 @@ namespace KuchCraft {
 		const std::filesystem::path& GetScenePath() const { return m_ScenePath; }
 
 		const std::string& GetDataPackName() const { return m_DataPackName; }
-		Ref<ItemManager> GetItemManager() const { return m_ItemManager; }
+		Ref<Renderer>     GetRenderer()     const { return m_Renderer;     }
+		Ref<ItemManager>  GetItemManager()  const { return m_ItemManager;  }
 		Ref<AssetManager> GetAssetManager() const { return m_AssetManager; }
 
 		/// Entities
@@ -98,6 +100,8 @@ namespace KuchCraft {
 		Ref<ItemManager>  m_ItemManager;
 		Ref<AssetManager> m_AssetManager;
 		Config m_Config;
+
+		Ref<World> m_World;
 
 		std::filesystem::path m_Path;
 		std::filesystem::path m_ScenePath;

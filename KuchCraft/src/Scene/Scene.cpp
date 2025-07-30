@@ -45,6 +45,9 @@ namespace KuchCraft {
 			script.Instance->OnPreUpdate(ts);
 		});
 
+		if (m_World)
+			m_World->OnUpdate(ts);
+
 		m_Registry.view<NativeScriptComponent>().each([&](auto entity, auto& script){
 			script.Instance->OnUpdate(ts);
 		});
@@ -62,6 +65,13 @@ namespace KuchCraft {
 	{
 		if (m_IsPaused)
 			return;
+
+		if (m_World)
+			m_World->OnTick(ts);
+
+		m_Registry.view<NativeScriptComponent>().each([&](auto entity, auto& script) {
+			script.Instance->OnTick(ts);
+		});
 	}
 
 	void Scene::OnRender()
@@ -89,6 +99,9 @@ namespace KuchCraft {
 			return;
 
 		m_Renderer->SetCamera(mainCamera);
+
+		if (m_World)
+			m_World->OnRender();
 
 		m_Registry.view<TransformComponent, SpriteRendererComponent>().each([&](auto entity, auto& transformComponent, auto& spriteComponent) {	
 			if (spriteComponent.Asset.IsValid())
@@ -127,6 +140,8 @@ namespace KuchCraft {
 
 		m_AssetManager = CreateRef<AssetManager>(m_Config, m_ItemManager->GetDataPackPath());
 		m_AssetManager->LoadAll();
+
+		m_World = CreateRef<World>(this);
 	}
 
 	void Scene::Save()
