@@ -253,7 +253,7 @@ namespace KuchCraft {
 	std::string ShaderPreprocessor::SubstituteValues(const std::string& source, const std::unordered_map<std::string, std::string>& valueMap, std::unordered_set<std::string>& visitedKeys)
 	{
 		std::string result = source;
-		const std::string markerStart = "#pragma value(";
+		const std::string markerStart = "#value(";
 		const std::string markerEnd = ")";
 
 		size_t pos = 0;
@@ -268,7 +268,7 @@ namespace KuchCraft {
 
 			if (visitedKeys.contains(key))
 			{
-				KC_CORE_ERROR("Cyclic #pragma value reference: '{}'", key);
+				KC_CORE_ERROR("Cyclic #value reference: '{}'", key);
 				result.replace(pos, end - pos + markerEnd.length(), "");
 				continue;
 			}
@@ -276,7 +276,7 @@ namespace KuchCraft {
 			auto it = valueMap.find(key);
 			if (it == valueMap.end())
 			{
-				KC_CORE_WARN("Unknown #pragma value key: '{}'", key);
+				KC_CORE_WARN("Unknown #value key: '{}'", key);
 				result.replace(pos, end - pos + markerEnd.length(), "");
 				continue;
 			}

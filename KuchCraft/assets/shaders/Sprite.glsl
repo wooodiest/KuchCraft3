@@ -1,5 +1,5 @@
 ### Vertex
-#pragma value(SHADER_VERSION_LONG)
+#value(SHADER_VERSION_LONG)
 
 layout (location = 0) in vec3 a_Position;
 layout (location = 1) in vec4 a_Color;
@@ -22,11 +22,11 @@ void main()
 }
 
 ### Fragment
-#pragma value(SHADER_VERSION_LONG)
+#value(SHADER_VERSION_LONG)
 
 layout (location = 0) out vec4 o_Color;
 
-uniform sampler2D u_Textures[#pragma value(MAX_COMBINED_TEXTURE_SLOTS)];
+uniform sampler2D u_Textures[#value(MAX_COMBINED_TEXTURE_SLOTS)];
 
 in vec4 v_Color;
 in vec2 v_TextureCoord;
