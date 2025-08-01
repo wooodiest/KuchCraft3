@@ -11,6 +11,8 @@
 #include "Graphics/Core/FrameBuffer.h"
 #include "Graphics/Core/Texture.h"
 #include "Graphics/Core/UniformBuffer.h"
+#include "Graphics/KuchCraft/ChunkMesh.h"
+
 #include "KuchCraft/World/World.h"
 
 namespace KuchCraft {
@@ -53,6 +55,8 @@ namespace KuchCraft {
 		
 		void DrawPlane(const glm::mat4& transform, const glm::vec4& color);
 		void DrawPlane(const glm::mat4& transform, const Ref<Texture2D>& texture, float tilingFactor = 1.0f, const glm::vec4& tintColor = glm::vec4(1.0f), glm::vec2 uv0 = glm::vec2(0.0f), glm::vec2 uv1 = glm::vec2(1.0f));
+
+		void DrawChunkMesh(const Ref<ChunkMesh>& chunkMesh) { m_Chunks.Meshes.push_back(chunkMesh); }
 
 #pragma endregion
 
@@ -257,8 +261,27 @@ namespace KuchCraft {
 
 #pragma endregion
 
+#pragma region Chunk
+		private:
+			struct {
+				uint32_t MaxVertices = block_count_per_chunk * block_face_count * block_vertices_per_face * sizeof(BlockMesh);
+				uint32_t MaxIndices  = block_count_per_chunk * block_face_count * block_indicies_per_face;
+
+				std::vector<Ref<ChunkMesh>> Meshes;
+				Ref<VertexArray>  VertexArray;
+				Ref<VertexBuffer> VertexBuffer;
+				Ref<IndexBuffer>  IndexBuffer;
+				Ref<Shader>       Shader;
+			} m_Chunks;
+
+			void InitChunks();
+			void RenderChunks();
+
+#pragma endregion
+
 	private:
 		Config m_Config;
+
 		Renderer(Config config);
 
 		friend class RendererLayer;

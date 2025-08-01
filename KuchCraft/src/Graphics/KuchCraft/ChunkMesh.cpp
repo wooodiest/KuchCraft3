@@ -38,6 +38,7 @@ namespace KuchCraft {
 
 		Ref<ItemManager> itemManager = m_Chunk->m_World->GetItemManager();
 
+		KC_TODO("Create map od offsets to have abbility to render only visible sections");
 		size_t sectionOffset = 0;
 		for (size_t sectionIndex = 0; sectionIndex < m_Chunk->GetSections().size(); sectionIndex++)
 		{
@@ -54,6 +55,8 @@ namespace KuchCraft {
 						Block     block     = section.GetBlock(inSectionPosition);
 						BlockData blockData = itemManager->GetBlockDataUnsafe(block.GetId());
 
+						KC_TODO("Check BlockGeometryType and handle it accordingly");
+						KC_TODO("Check if block is solid or has some flags to not render it");
 						if (block.IsAir() /* check for other flags or states from block data*/)
 							continue;
 						
@@ -71,9 +74,10 @@ namespace KuchCraft {
 								continue;
 
 							uint16_t layer = itemManager->GetBlockTextureLayer(block.GetId());
+							KC_TODO("Extract rotation from block data by stata or flags depending on block");
 							for (uint8_t vert = 0; vert < block_vertices_per_face; vert++)
 							{
-								BlockMesh mesh( inChunkPosition.x, inChunkPosition.y, inChunkPosition.z, layer, i, 0, vert );
+								BlockMesh mesh(inChunkPosition.x, inChunkPosition.y, inChunkPosition.z, layer, i, 0, vert);
 								m_MeshData.push_back(mesh);
 							}
 						}

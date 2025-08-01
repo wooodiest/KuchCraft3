@@ -472,9 +472,8 @@ namespace KuchCraft {
 			{
 				m_GameState = GameState::InGame;
 
-				m_Scene = CreateRef<Scene>(name);
-				m_Scene->SetRenderer(m_Renderer);
-				m_Scene->SetConfig(m_Config);
+				m_Scene = CreateRef<Scene>(m_Config, m_Renderer, name);
+				m_Scene->Load();
 			}
 			else
 			{

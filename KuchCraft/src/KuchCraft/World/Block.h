@@ -46,14 +46,14 @@ namespace KuchCraft {
 
 	enum class BlockGeometryType : uint8_t
 	{
-		Cube,
+		Cube = 0,
 		Slab,
 		Cross,
 		Plane
 	};
 
 	enum class BlockFace : uint8_t {
-		Front,
+		Front = 0,
 		Left,
 		Back,
 		Right,

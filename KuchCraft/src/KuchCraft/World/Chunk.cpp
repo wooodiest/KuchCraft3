@@ -26,6 +26,29 @@ namespace KuchCraft {
 
 	void Chunk::Build()
 	{
+
+		for (uint32_t y = 0; y < chunk_size_y; y++)
+		{
+			for (uint32_t z = 0; z < chunk_size_z; z++)
+			{
+				for (uint32_t x = 0; x < chunk_size_x; x++)
+				{
+					if (y < 50)
+					{
+						Block block;
+
+						if (x % 3 == 0)
+							block.SetId(1);
+						else if (x % 3 == 1)
+							block.SetId(2);
+						else if(x % 3 == 2)
+							block.SetId(3);
+
+						SetBlock({ x, y, z }, block);
+					}
+				}
+			}
+		}
 	}
 
 	void Chunk::BuildMesh()

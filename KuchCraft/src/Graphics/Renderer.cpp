@@ -6,7 +6,7 @@
 #include <glad/glad.h>
 
 namespace KuchCraft {
-	
+
 	Renderer::Renderer(Config config)
 		: m_Config(config)
 	{
@@ -45,6 +45,7 @@ namespace KuchCraft {
 
 		InitSprites();
 		InitPlanes();
+		InitChunks();
 	}
 
 	Renderer::~Renderer()
@@ -73,6 +74,7 @@ namespace KuchCraft {
 		m_SceneRenderTarget->ClearAttachments();
 
 		RenderPlanes();
+		RenderChunks();
 
 		m_SceneRenderTarget->Unbind();
 		SetRenderTargetToDefault();
@@ -392,6 +394,29 @@ namespace KuchCraft {
 		m_ShaderLibrary.SetGlobalSubstitution("SHADER_VERSION_LONG", "#version " + m_Config.Renderer.GetOpenGlVersion());
 		m_ShaderLibrary.SetGlobalSubstitution("MAX_TEXTURE_SLOTS",          std::to_string(m_Config.Renderer.MaxTextureSlots));
 		m_ShaderLibrary.SetGlobalSubstitution("MAX_COMBINED_TEXTURE_SLOTS", std::to_string(m_Config.Renderer.MaxCombinedTextureSlots));
+
+		m_ShaderLibrary.SetGlobalSubstitution("BLOCK_FACE_COUNT",                 std::to_string(block_face_count));
+		m_ShaderLibrary.SetGlobalSubstitution("BLOCK_VERTICES_PER_FACE",          std::to_string(block_vertices_per_face));
+		m_ShaderLibrary.SetGlobalSubstitution("BLOCK_MESH_SHIFT_POSITION_X",      std::to_string(block_mesh_shift_position_x));
+		m_ShaderLibrary.SetGlobalSubstitution("BLOCK_MESH_SHIFT_POSITION_Y",      std::to_string(block_mesh_shift_position_y));
+		m_ShaderLibrary.SetGlobalSubstitution("BLOCK_MESH_SHIFT_POSITION_Z",      std::to_string(block_mesh_shift_position_z));
+		m_ShaderLibrary.SetGlobalSubstitution("BLOCK_MESH_SHIFT_ROTATION",        std::to_string(block_mesh_shift_rotation));
+		m_ShaderLibrary.SetGlobalSubstitution("BLOCK_MESH_SHIFT_FACE",            std::to_string(block_mesh_shift_face));
+		m_ShaderLibrary.SetGlobalSubstitution("BLOCK_MESH_SHIFT_VERTEX_INDEX",    std::to_string(block_mesh_shift_vertex_index));
+		m_ShaderLibrary.SetGlobalSubstitution("BLOCK_MESH_SHIFT_LAYER",           std::to_string(block_mesh_shift_layer));
+		m_ShaderLibrary.SetGlobalSubstitution("BLOCK_MESH_BITS_FOR_POSITION_X",   std::to_string(block_mesh_bits_for_position_x));
+		m_ShaderLibrary.SetGlobalSubstitution("BLOCK_MESH_BITS_FOR_POSITION_Y",   std::to_string(block_mesh_bits_for_position_y));
+		m_ShaderLibrary.SetGlobalSubstitution("BLOCK_MESH_BITS_FOR_POSITION_Z",   std::to_string(block_mesh_bits_for_position_z));
+		m_ShaderLibrary.SetGlobalSubstitution("BLOCK_MESH_BITS_FOR_ROTATION",     std::to_string(block_mesh_bits_for_rotation));
+		m_ShaderLibrary.SetGlobalSubstitution("BLOCK_MESH_BITS_FOR_FACE",         std::to_string(block_mesh_bits_for_face));
+		m_ShaderLibrary.SetGlobalSubstitution("BLOCK_MESH_BITS_FOR_VERTEX_INDEX", std::to_string(block_mesh_bits_for_vertex_index));
+		m_ShaderLibrary.SetGlobalSubstitution("BLOCK_MESH_BITS_FOR_LAYER",        std::to_string(block_mesh_bits_for_layer));
+		m_ShaderLibrary.SetGlobalSubstitution("BLOCK_MESH_FACE_FRONT",            std::to_string(static_cast<int>(BlockFace::Front)));
+		m_ShaderLibrary.SetGlobalSubstitution("BLOCK_MESH_FACE_LEFT",             std::to_string(static_cast<int>(BlockFace::Left)));
+		m_ShaderLibrary.SetGlobalSubstitution("BLOCK_MESH_FACE_BACK",             std::to_string(static_cast<int>(BlockFace::Back)));
+		m_ShaderLibrary.SetGlobalSubstitution("BLOCK_MESH_FACE_RIGHT",            std::to_string(static_cast<int>(BlockFace::Right)));
+		m_ShaderLibrary.SetGlobalSubstitution("BLOCK_MESH_FACE_TOP",              std::to_string(static_cast<int>(BlockFace::Top)));
+		m_ShaderLibrary.SetGlobalSubstitution("BLOCK_MESH_FACE_BOTTOM",           std::to_string(static_cast<int>(BlockFace::Bottom)));
 		/// Maybe reload shaders??
 	}
 
@@ -1045,6 +1070,72 @@ namespace KuchCraft {
 			Texture::Bind(slot, m_Planes.Textures[slot]);
 
 		DrawElements(PrimitiveTopology::Triangles, m_Planes.CurrentIndexCount, 0);
+	}
+
+	void Renderer::InitChunks()
+	{
+		m_Chunks.Shader = m_ShaderLibrary.Load(std::filesystem::path("ChunkMesh.glsl"));
+		m_Chunks.Shader->Bind();
+
+		m_Chunks.VertexArray = VertexArray::Create();
+		m_Chunks.VertexArray->Bind();
+		m_Chunks.VertexArray->SetDebugName("ChunkMesh_VAO");
+
+		m_Chunks.VertexBuffer = VertexBuffer::Create(VertexBufferDataUsage::Dynamic, m_Chunks.MaxVertices * sizeof(BlockMesh));
+		m_Chunks.VertexBuffer->SetDebugName("ChunkMesh_VBO");
+		m_Chunks.VertexBuffer->SetLayout(m_Chunks.Shader->GetVertexInputLayout());
+		m_Chunks.VertexArray->AddVertexBuffer(m_Chunks.VertexBuffer);
+
+		std::vector<uint32_t> indices;
+		indices.reserve(m_Chunks.MaxIndices);
+		uint32_t offset = 0;
+		for (uint32_t i = 0; i < m_Chunks.MaxIndices; i += block_indicies_per_face)
+		{
+			indices.push_back(offset + 0);
+			indices.push_back(offset + 1);
+			indices.push_back(offset + 2);
+			indices.push_back(offset + 2);
+			indices.push_back(offset + 3);
+			indices.push_back(offset + 0);
+
+			offset += block_vertices_per_face;
+		}
+
+		m_Chunks.IndexBuffer = IndexBuffer::Create(indices.data(), m_Chunks.MaxIndices);
+		m_Chunks.IndexBuffer->SetDebugName("ChunkMesh_IBO");
+		m_Chunks.VertexArray->SetIndexBuffer(m_Chunks.IndexBuffer);
+	}
+
+	void Renderer::RenderChunks()
+	{
+		if (m_Chunks.Meshes.empty())
+			return;
+
+		SetBlend(true);
+		SetBlendFunc(BlendFunc::SrcAlpha, BlendFunc::OneMinusSrcAlpha);
+		SetCullFace(true);
+		SetCullMode(CullMode::Back);
+		SetDepthTest(true);
+		SetDepthFunc(DepthFunc::LessEqual);
+		SetPolygonMode(PolygonMode::Fill);
+		SetPolygonOffset(false);
+
+		m_Chunks.Shader     ->Bind();
+		m_Chunks.VertexArray->Bind();
+
+		if (!m_World)
+			return;
+		
+		m_World->GetItemManager()->GetBlockTexture()->Bind();
+		for (const auto& mesh : m_Chunks.Meshes)
+		{
+			m_Chunks.Shader->SetFloat3("u_GlobalPosition", mesh->GetGlobalPosition() + glm::vec3(0.5f, 0.5f, 0.5f));
+			m_Chunks.VertexBuffer->SetData(mesh->GetMeshData().data(), mesh->GetMeshData().size() * sizeof(BlockMesh));
+
+			DrawElements(PrimitiveTopology::Triangles, mesh->GetMeshData().size() / block_vertices_per_face * block_indicies_per_face, 0);
+		}
+
+		m_Chunks.Meshes.clear();
 	}
 
 }

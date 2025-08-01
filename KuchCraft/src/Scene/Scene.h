@@ -16,7 +16,7 @@ namespace KuchCraft {
 	{
 	public:
 		/// Scene
-		Scene(const std::string& name = "UntitledScene");
+		Scene(const Config& config, const Ref<Renderer>& renderer, const std::string& name);
 		~Scene();
 
 		void OnUpdate(Timestep ts);
@@ -30,9 +30,6 @@ namespace KuchCraft {
 		void SetName(const std::string& name) { m_Name = name; }
 
 		void Pause(bool value) { m_IsPaused = value; }
-
-		void SetRenderer(const Ref<Renderer>& renderer) { m_Renderer = renderer; }
-		void SetConfig(const Config& config) { m_Config = config; }
 
 		void Load();
 		void Save();

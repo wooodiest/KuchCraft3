@@ -28,6 +28,14 @@ namespace KuchCraft {
 		const BlockData& GetBlockDataUnsafe(ItemID id) const { return GetItemDataUnsafe(id).Block.value(); };
 		const BlockData& GetBlockDataUnsafe(const std::string& name) const { return GetItemDataUnsafe(name).Block.value();};
 
+		int GetBlockTextureLayer(ItemID id) const
+		{
+			auto it = m_BlockTextureLayers.find(id);
+			if (it != m_BlockTextureLayers.end())
+				return it->second;
+			return -1;
+		}
+
 		const auto& GetDataPackName() const { return m_DataPackConfig.Name; }
 		const auto& GetDataPackPath() const { return m_DataPackPath; }
 		const auto& GetItemsData()    const { return m_ItemsData;  }

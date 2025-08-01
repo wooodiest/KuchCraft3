@@ -109,6 +109,8 @@ namespace KuchCraft {
 
 		void Build();
 
+		bool IsEmpty() const { return m_MeshData.empty(); }
+
 		const std::vector<BlockMesh>& GetMeshData() const { return m_MeshData; }
 
 		const glm::vec3& GetGlobalPosition() const { return m_GlobalPosition; }

@@ -4,11 +4,11 @@
 
 #include "KuchCraft/World/ItemManager.h"
 #include "Scene/AssetManager.h"
-#include "Graphics/Renderer.h"
 
 namespace KuchCraft {
 
 	class Scene;
+	class Renderer;
 
 	class World
 	{
@@ -23,6 +23,10 @@ namespace KuchCraft {
 		Block GetBlock(const glm::ivec3& pos) const;
 		void  SetBlock(const glm::ivec3& pos, Block block);
 
+		Ref<ItemManager>  GetItemManager()  const { return m_ItemManager; }
+		Ref<AssetManager> GetAssetManager() const { return m_AssetManager; }
+		Ref<Renderer>     GetRenderer()     const { return m_Renderer; }
+
 	private:
 		Scene* m_Scene = nullptr;
 		Ref<Renderer>     m_Renderer;
@@ -30,6 +34,8 @@ namespace KuchCraft {
 		Ref<AssetManager> m_AssetManager;
 
 		std::unordered_map<glm::ivec2, Chunk> m_Chunks;
+
+		Ref<Chunk> m_ExampleChunk;
 	};
 
 }

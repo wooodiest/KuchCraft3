@@ -6,7 +6,7 @@
     "Texture" : "textures/blocks/dirt.png",
     "Block": {
       "Textures": {
-        "All": "textures/blocks/stone.png"
+        "All": "textures/blocks/dirt.png"
       },
       
       "GeometryType": "Cube",

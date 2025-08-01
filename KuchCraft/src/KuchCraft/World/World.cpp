@@ -11,6 +11,10 @@ namespace KuchCraft {
 		m_AssetManager = m_Scene->GetAssetManager();
 		m_ItemManager  = m_Scene->GetItemManager();
 		m_Renderer     = m_Scene->GetRenderer();
+
+		m_ExampleChunk = CreateRef<Chunk>(glm::ivec3(0, 0, 0), this);
+		m_ExampleChunk->Build();
+		m_ExampleChunk->BuildMesh();
 	}
 
 	World::~World()
@@ -27,6 +31,7 @@ namespace KuchCraft {
 
 	void World::OnRender()
 	{
+		m_Renderer->DrawChunkMesh(m_ExampleChunk->GetMesh());
 	}
 
 	Block World::GetBlock(const glm::ivec3& pos) const

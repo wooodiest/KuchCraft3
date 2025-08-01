@@ -9,8 +9,8 @@
 
 namespace KuchCraft {
 
-	Scene::Scene(const std::string& name)
-		: m_Name(name)
+	Scene::Scene(const Config& config, const Ref<Renderer>& renderer, const std::string& name)
+		: m_Name(name), m_Config(config), m_Renderer(renderer)
 	{
 		m_Path      = m_Config.Game.WorldsDir + m_Name + "/";
 		m_ScenePath = m_Path.string() + m_Name + SceneSerializer::DefaultExtension;
@@ -18,8 +18,6 @@ namespace KuchCraft {
 		m_Registry.on_construct<NativeScriptComponent>().connect<&Scene::OnNativeScriptComponentAdded>(this);
 		m_Registry.on_destroy<NativeScriptComponent>().connect<&Scene::OnNativeScriptComponentRemoved>(this);	
 		m_Registry.on_construct<CameraComponent>().connect<&Scene::OnCameraComponentAdded>(this);
-
-		Load();
 	}
 
 	Scene::~Scene()
@@ -142,6 +140,7 @@ namespace KuchCraft {
 		m_AssetManager->LoadAll();
 
 		m_World = CreateRef<World>(this);
+		m_Renderer->SetWorld(m_World);
 	}
 
 	void Scene::Save()
