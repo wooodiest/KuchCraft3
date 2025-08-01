@@ -30,10 +30,13 @@ namespace KuchCraft {
 
 	void Chunk::BuildMesh()
 	{
+		if (!m_Mesh)
+			m_Mesh = CreateRef<ChunkMesh>(this);
 
+		m_Mesh->Build();
 	}
 
-	Block Chunk::GetBlock(const glm::ivec3& position) const
+	Block Chunk::GetBlockSafe(const glm::ivec3& position) const
 	{
 		int section = ToSectionIndex(position.y);
 		if (section < 0 || section >= sections_per_chunk)
@@ -42,7 +45,7 @@ namespace KuchCraft {
 			return Block();
 		}
 
-		return m_Sections[section].GetBlock(ToLocalCoords(position));
+		return m_Sections[section].GetBlock(ToSectionCoords(position));
 	}
 
 	void Chunk::SetBlock(const glm::ivec3& position, Block block)
@@ -54,7 +57,17 @@ namespace KuchCraft {
 			return ;
 		}
 
-		return m_Sections[section].SetBlock(ToLocalCoords(position), block);
+		return m_Sections[section].SetBlock(ToSectionCoords(position), block);
+	}
+
+	const auto& Chunk::GetSectionSafe(size_t index) const
+	{
+		if (index < 0 || index >= sections_per_chunk)
+		{
+			KC_ERROR("Chunk::GetSection: Invalid section index: {}", index);
+			return m_Sections[0];
+		}
+		return m_Sections[index];
 	}
 
 }
