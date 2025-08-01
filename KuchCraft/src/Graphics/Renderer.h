@@ -11,6 +11,7 @@
 #include "Graphics/Core/FrameBuffer.h"
 #include "Graphics/Core/Texture.h"
 #include "Graphics/Core/UniformBuffer.h"
+#include "KuchCraft/World/World.h"
 
 namespace KuchCraft {
 
@@ -26,8 +27,6 @@ namespace KuchCraft {
 
 		/// Should be called by application when window is resized
 		void OnWindowResize(int width, int height);
-
-		void SetCamera(Camera* camera) { m_Camera = camera; }
 
 #pragma region DrawCommands
 	public:
@@ -71,6 +70,17 @@ namespace KuchCraft {
 
 #pragma endregion
 
+#pragma region Environment
+	private:
+		Camera* m_Camera = nullptr;
+		Ref<World> m_World;
+
+	public:
+		void SetCamera(Camera* camera) { m_Camera = camera; }
+		void SetWorld(const Ref<World>& world) { m_World = world; }
+
+#pragma endregion
+
 #pragma region RendererInitialization
 	private:
 		void CheckExtensions();
@@ -103,8 +113,6 @@ namespace KuchCraft {
 		} m_EnvironmentUniformBufferData;
 
 		Ref<UniformBuffer> m_EnvironmentUniformBuffer;
-
-		Camera* m_Camera = nullptr;
 
 #pragma endregion
 
