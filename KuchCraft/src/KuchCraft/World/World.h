@@ -3,6 +3,7 @@
 #include "KuchCraft/World/Chunk.h"
 
 #include "KuchCraft/World/ItemManager.h"
+#include "KuchCraft/World/WorldGenerator.h"
 #include "Scene/AssetManager.h"
 
 namespace KuchCraft {
@@ -43,18 +44,22 @@ namespace KuchCraft {
 			return chunk;
 		}
 
-		Ref<ItemManager>  GetItemManager()  const { return m_ItemManager; }
-		Ref<AssetManager> GetAssetManager() const { return m_AssetManager; }
-		Ref<Renderer>     GetRenderer()     const { return m_Renderer; }
+		Ref<ItemManager>    GetItemManager()  const { return m_ItemManager; }
+		Ref<AssetManager>   GetAssetManager() const { return m_AssetManager; }
+		Ref<Renderer>       GetRenderer()     const { return m_Renderer; }
+		Ref<WorldGenerator> GetWorldGenerator() const { return m_WorldGenerator; }
 
 		static glm::ivec3 GetChunkPosition(const glm::vec3& pos) { return glm::ivec3(std::floor(pos.x / chunk_size_x) * chunk_size_x, 0.0f, std::floor(pos.z / chunk_size_z) * chunk_size_z); };
 
 	private:
 		Scene* m_Scene = nullptr;
 		Config m_Config;
-		Ref<Renderer>     m_Renderer;
-		Ref<ItemManager>  m_ItemManager;
-		Ref<AssetManager> m_AssetManager;
+		Ref<Renderer>       m_Renderer;
+		Ref<ItemManager>    m_ItemManager;
+		Ref<AssetManager>   m_AssetManager;
+		Ref<WorldGenerator> m_WorldGenerator;
+
+		glm::vec3 m_PlayerPosition = { 0.0f, 0.0f, 0.0f };
 
 		std::unordered_map<glm::ivec3, Ref<Chunk>> m_Chunks;
 	};

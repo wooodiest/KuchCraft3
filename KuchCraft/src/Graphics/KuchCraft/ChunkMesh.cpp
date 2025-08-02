@@ -97,7 +97,7 @@ namespace KuchCraft {
 			{
 				if (neighborPos.x >= chunk_size_x) [[unlikely]]
 				{
-					Chunk* rightChunk = m_Chunk->GetRightNeighbor();
+					Ref<Chunk> rightChunk = m_Chunk->GetRightNeighbor();
 					if (!rightChunk || !rightChunk->IsBuilt())
 						return std::nullopt;
 
@@ -110,7 +110,7 @@ namespace KuchCraft {
 			{
 				if (neighborPos.x < 0) [[unlikely]]
 				{
-					Chunk* leftChunk = m_Chunk->GetLeftNeighbor();
+					Ref<Chunk> leftChunk = m_Chunk->GetLeftNeighbor();
 					if (!leftChunk || !leftChunk->IsBuilt())
 						return std::nullopt;
 
@@ -123,7 +123,7 @@ namespace KuchCraft {
 			{
 				if (neighborPos.z >= chunk_size_z) [[unlikely]]
 				{
-					Chunk* frontChunk = m_Chunk->GetFrontNeighbor();
+					Ref<Chunk> frontChunk = m_Chunk->GetFrontNeighbor();
 					if (!frontChunk || !frontChunk->IsBuilt())
 						return std::nullopt;
 
@@ -136,7 +136,7 @@ namespace KuchCraft {
 			{
 				if (neighborPos.z < 0) [[unlikely]]
 				{
-					Chunk* backChunk = m_Chunk->GetBackNeighbor();
+					Ref<Chunk> backChunk = m_Chunk->GetBackNeighbor();
 					if (!backChunk || !backChunk->IsBuilt())
 						return std::nullopt;
 

@@ -70,10 +70,10 @@ namespace KuchCraft {
 			return { position.x & (section_size_x - 1), position.y & (section_size_y - 1), position.z & (section_size_z - 1) };
 		}
 
-		Chunk* GetLeftNeighbor()  const { return nullptr; } // tmp
-		Chunk* GetRightNeighbor() const { return nullptr; } // tmp
-		Chunk* GetFrontNeighbor() const { return nullptr; } // tmp
-		Chunk* GetBackNeighbor()  const { return nullptr; } // tmp
+		Ref<Chunk> GetLeftNeighbor()  const;
+		Ref<Chunk> GetRightNeighbor() const;
+		Ref<Chunk> GetFrontNeighbor() const;
+		Ref<Chunk> GetBackNeighbor()  const;
 
 		const auto& GetSections() const { return m_Sections; }
 		const auto& GetSection(size_t index) const { return m_Sections[index]; }

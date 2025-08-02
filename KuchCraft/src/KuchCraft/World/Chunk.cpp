@@ -1,6 +1,10 @@
 #include "kcpch.h"
 #include "KuchCraft/World/Chunk.h"
 
+#include "KuchCraft/World/WorldGenerator.h"
+
+#include "KuchCraft/World/World.h"
+
 namespace KuchCraft {
 
 	Chunk::Chunk(const glm::ivec3& position, World* world)
@@ -26,38 +30,14 @@ namespace KuchCraft {
 
 	void Chunk::Build()
 	{
-
-		for (uint32_t y = 0; y < chunk_size_y; y++)
-		{
-			for (uint32_t z = 0; z < chunk_size_z; z++)
-			{
-				for (uint32_t x = 0; x < chunk_size_x; x++)
-				{
-					if (y < 50)
-					{
-						Block block;
-
-						if (x % 3 == 0)
-							block.SetId(1);
-						else if (x % 3 == 1)
-							block.SetId(2);
-						else if(x % 3 == 2)
-							block.SetId(3);
-
-						SetBlock({ x, y, z }, block);
-					}
-				}
-			}
-		}
-		Block block;
-		block.SetId(2);
-		SetBlock({ 8, 51, 8 }, block);
-
 		m_IsBuilt = true;
 	}
 
 	void Chunk::BuildMesh()
 	{
+		if (!m_IsBuilt)
+			return;
+
 		if (!m_Mesh)
 			m_Mesh = CreateRef<ChunkMesh>(this);
 
@@ -86,6 +66,27 @@ namespace KuchCraft {
 		}
 
 		return m_Sections[section].SetBlock(ToSectionCoords(position), block);
+	}
+
+	Ref<Chunk> Chunk::GetLeftNeighbor() const
+	{
+		return m_World->GetChunk({ m_Position.x - chunk_size_x, m_Position.y, m_Position.z });	
+	}
+
+	Ref<Chunk> Chunk::GetRightNeighbor() const
+	{
+		return m_World->GetChunk({ m_Position.x + chunk_size_x, m_Position.y, m_Position.z });
+		
+	}
+
+	Ref<Chunk> Chunk::GetFrontNeighbor() const
+	{
+		return m_World->GetChunk({ m_Position.x, m_Position.y, m_Position.z + chunk_size_z });
+	}
+
+	Ref<Chunk> Chunk::GetBackNeighbor() const
+	{
+		return m_World->GetChunk({ m_Position.x, m_Position.y, m_Position.z - chunk_size_z });
 	}
 
 	const auto& Chunk::GetSectionSafe(size_t index) const

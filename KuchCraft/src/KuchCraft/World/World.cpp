@@ -12,6 +12,8 @@ namespace KuchCraft {
 		m_AssetManager = m_Scene->GetAssetManager();
 		m_ItemManager  = m_Scene->GetItemManager();
 		m_Renderer     = m_Scene->GetRenderer();
+
+		m_WorldGenerator = CreateRef<WorldGenerator>(m_Config);
 	}
 
 	World::~World()
@@ -20,8 +22,6 @@ namespace KuchCraft {
 
 	void World::OnUpdate(Timestep ts)
 	{
-		glm::vec3 playerPos = { 0.0f, 0.0f, 0.0f };
-
 		if (m_Scene)
 		{
 			Entity playerEntity = m_Scene->GetPlayerEntity();
@@ -30,7 +30,7 @@ namespace KuchCraft {
 				if (playerEntity.HasComponent<TransformComponent>())
 				{
 					auto& transform = playerEntity.GetComponent<TransformComponent>();
-					playerPos = transform.Translation;
+					m_PlayerPosition = transform.Translation;
 				}
 			}
 		}
@@ -46,7 +46,7 @@ namespace KuchCraft {
 		{
 			for (float dz = -createDistance; dz <= createDistance; dz += createDistanceStepZ)
 			{
-				glm::vec3 chunkPos = playerPos + glm::vec3(dx, 0.0f, dz);
+				glm::vec3 chunkPos = m_PlayerPosition + glm::vec3(dx, 0.0f, dz);
 				if (!GetChunk(chunkPos))
 					CreateChunk(chunkPos);
 			}
@@ -57,7 +57,7 @@ namespace KuchCraft {
 		const float deleteDistance2 = deleteDistance * deleteDistance;
 		for (auto it = m_Chunks.begin(); it != m_Chunks.end();)
 		{
-			float distance2 = glm::length2(glm::vec2(playerPos.x, playerPos.z) - glm::vec2(it->first));
+			float distance2 = glm::length2(glm::vec2(m_PlayerPosition.x, m_PlayerPosition.z) - glm::vec2(it->first));
 			if (distance2 > deleteDistance2)
 				it = m_Chunks.erase(it); 
 			else
@@ -70,6 +70,7 @@ namespace KuchCraft {
 		{
 			if (!chunk->IsBuilt())
 			{
+				m_WorldGenerator->GenerateChunk(chunk);
 				chunk->Build();
 				chunk->BuildMesh();
 
