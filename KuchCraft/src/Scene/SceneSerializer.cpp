@@ -37,6 +37,10 @@ namespace KuchCraft {
 		if (primaryCameraEntity)
 			sceneJson["PrimaryCameraEntityUUID"] = primaryCameraEntity.GetUUID();
 
+		Entity playerEntity = m_Scene->GetPlayerEntity();
+		if (playerEntity)
+			sceneJson["PlayerEntityUUID"] = playerEntity.GetUUID();
+
 		sceneJson["DataPack"] = m_Scene->GetDataPackName();
 
 		const auto entityMap = m_Scene->GetEntityMap();
@@ -314,6 +318,13 @@ namespace KuchCraft {
 			Entity primaryCameraEntity = m_Scene->TryGetEntityWithUUID(sceneJson["PrimaryCameraEntityUUID"].get<UUID>());
 			if (primaryCameraEntity)
 				m_Scene->SetPrimaryCamera(primaryCameraEntity);
+		}
+
+		if (sceneJson.contains("PlayerEntityUUID"))
+		{
+			Entity playerEntity = m_Scene->TryGetEntityWithUUID(sceneJson["PlayerEntityUUID"].get<UUID>());
+			if (playerEntity)
+				m_Scene->SetPlayerEntity(playerEntity);
 		}
 
 		return true;

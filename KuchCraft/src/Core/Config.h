@@ -60,6 +60,8 @@ namespace KuchCraft {
 		uint32_t MaxQuadsInBatch  = 10'000;
 		uint32_t MaxPlanesInBatch = 10'000;
 
+		uint32_t RenderDistance = 5;
+
 		std::string GetOpenGlVersion() const { return std::to_string(OpenGlMajorVersion * 100 + OpenGlMinorVersion * 10) + " core"; }
 	};
 

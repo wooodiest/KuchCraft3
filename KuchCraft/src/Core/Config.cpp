@@ -37,7 +37,8 @@ namespace KuchCraft {
 			{ "MaxCombinedTextureSlots",  Renderer.MaxCombinedTextureSlots },
 			{ "MaxTextureSlots",          Renderer.MaxTextureSlots },
 			{ "MaxQuadsInBatch",          Renderer.MaxQuadsInBatch },
-			{ "MaxPlanesInBatch",         Renderer.MaxPlanesInBatch }
+			{ "MaxPlanesInBatch",         Renderer.MaxPlanesInBatch },
+			{ "RenderDistance",           Renderer.RenderDistance },
 		};
 
 		configJson["Game"] = {
@@ -159,6 +160,8 @@ namespace KuchCraft {
 				Renderer.MaxQuadsInBatch = rendererJson["MaxQuadsInBatch"];
 			if (rendererJson.contains("MaxPlanesInBatch"))
 				Renderer.MaxPlanesInBatch = rendererJson["MaxPlanesInBatch"];
+			if (rendererJson.contains("RenderDistance"))
+				Renderer.RenderDistance = rendererJson["RenderDistance"];
 		}
 
 		if (configJson.contains("Game"))

@@ -81,6 +81,9 @@ namespace KuchCraft {
 		Entity GetPrimaryCameraEntity();
 		Camera* GetPrimaryCamera();
 
+		void SetPlayerEntity(Entity entity);
+		Entity GetPlayerEntity();
+
 	private:
 		bool OnWindowResize(WindowResizeEvent& e);
 		void OnNativeScriptComponentAdded(entt::registry& registry, entt::entity entity);
@@ -110,6 +113,7 @@ namespace KuchCraft {
 		std::vector<std::function<void()>> m_PreUpdateQueue;
 
 		entt::entity m_PrimaryCameraEntity = entt::null;
+		entt::entity m_PlayerEntity        = entt::null;
 
 		friend class Entity;
 		friend class SceneSerializer;

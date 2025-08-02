@@ -139,7 +139,7 @@ namespace KuchCraft {
 		m_AssetManager = CreateRef<AssetManager>(m_Config, m_ItemManager->GetDataPackPath());
 		m_AssetManager->LoadAll();
 
-		m_World = CreateRef<World>(this);
+		m_World = CreateRef<World>(this, m_Config);
 		m_Renderer->SetWorld(m_World);
 	}
 
@@ -292,6 +292,25 @@ namespace KuchCraft {
 			return &cameraEntity.GetComponent<CameraComponent>().Camera;
 
 		return nullptr;
+	}
+
+	void Scene::SetPlayerEntity(Entity entity)
+	{
+		if (!entity.HasComponent<TransformComponent>())
+		{
+			KC_CORE_ERROR("Trying to set player entity as entity without TransformComponent");
+			return;
+		}
+
+		m_PlayerEntity = entity;
+	}
+
+	Entity Scene::GetPlayerEntity()
+	{
+		if (m_PlayerEntity == entt::null)
+			return Entity();
+
+		return Entity(m_PlayerEntity, this);
 	}
 
 	bool Scene::OnWindowResize(WindowResizeEvent& e)

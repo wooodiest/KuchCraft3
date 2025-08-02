@@ -49,6 +49,11 @@ namespace KuchCraft {
 				}
 			}
 		}
+		Block block;
+		block.SetId(2);
+		SetBlock({ 8, 51, 8 }, block);
+
+		m_IsBuilt = true;
 	}
 
 	void Chunk::BuildMesh()
